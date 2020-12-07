@@ -36,7 +36,7 @@ public class RezervacijaController {
 		return new ResponseEntity<RezervacijaDTO>(rezervacijaDTO, HttpStatus.OK);
 	}
 
-	@GetMapping(value = "/pacijent/{idPacijent}")
+	@GetMapping(value = "/pacijentRezervacija/{idPacijent}")
 	ResponseEntity <List<RezervacijaDTO>> findOne1(@PathVariable Long idPacijent) {
 		
 		List<Rezervacija> rezervacije = rezervacijaService.findByPacijentId(idPacijent);
