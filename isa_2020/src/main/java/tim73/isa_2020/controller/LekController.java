@@ -1,7 +1,9 @@
 package tim73.isa_2020.controller;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,6 +19,7 @@ import tim73.isa_2020.model.Apoteka;
 import tim73.isa_2020.model.Dermatolog;
 import tim73.isa_2020.model.Lek;
 import tim73.isa_2020.service.LekService;
+import tim73.isa_2020.service.PacijentService;
 
 @RestController
 @RequestMapping(value = "/lekovi")
@@ -24,6 +27,9 @@ public class LekController {
 
 	@Autowired
 	private LekService lekService;
+	
+	@Autowired
+	private PacijentService pacijentService;
 	
 	@GetMapping(value = "/sviLekovi")
 	ResponseEntity<List<LekDTO>> findAll() {
@@ -49,6 +55,22 @@ public class LekController {
 		for(Lek l: lekovi) {
 			lekoviDTO.add(new LekDTO(l));
 		}	
+		
+		return new ResponseEntity<List<LekDTO>>(lekoviDTO, HttpStatus.OK);
+	}
+	
+	@GetMapping(value = "/pacijent/{id}")
+	ResponseEntity<List<LekDTO>> findAlergije(@PathVariable Long id) {
+		
+		Set<Lek> lekovi= pacijentService.findById(id).getAlergija().getLekovi();
+		
+		
+        List<LekDTO> lekoviDTO= new ArrayList<>();
+		
+		for(Lek l: lekovi) {
+			
+			lekoviDTO.add(new LekDTO(l));
+		}
 		
 		return new ResponseEntity<List<LekDTO>>(lekoviDTO, HttpStatus.OK);
 	}

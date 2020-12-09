@@ -10,6 +10,7 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
@@ -33,6 +34,10 @@ public class Lek {
 	
 	@OneToMany(mappedBy = "lek", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	private Set<Rezervacija> rezervacije = new HashSet<Rezervacija>();
+	
+	@ManyToMany(mappedBy = "lekovi")
+	private Set<Alergije> alergije= new HashSet<Alergije>();
+	
 
 	public Lek() {
 		super();
@@ -90,7 +95,13 @@ public class Lek {
 	public void setRezervacije(Set<Rezervacija> rezervacije) {
 		this.rezervacije = rezervacije;
 	}
-	
-	
+
+	public Set<Alergije> getAlergije() {
+		return alergije;
+	}
+
+	public void setAlergije(Set<Alergije> alergije) {
+		this.alergije = alergije;
+	}
 	
 }

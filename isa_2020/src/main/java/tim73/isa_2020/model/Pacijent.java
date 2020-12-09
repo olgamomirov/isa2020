@@ -6,7 +6,9 @@ import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 
 @Entity
 public class Pacijent extends Korisnik{
@@ -16,6 +18,10 @@ public class Pacijent extends Korisnik{
 	
 	@OneToMany(mappedBy = "pacijent", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	private Set<Pregled> pregledi = new HashSet<Pregled>();
+	
+	@OneToOne(cascade = CascadeType.ALL)
+	@JoinColumn(name = "alergija_id", referencedColumnName = "id")
+	private Alergije alergija;
 
 	public Pacijent() {
 		super();
@@ -43,7 +49,13 @@ public class Pacijent extends Korisnik{
 	public void setPregledi(Set<Pregled> pregledi) {
 		this.pregledi = pregledi;
 	}
-	
-	
+
+	public Alergije getAlergija() {
+		return alergija;
+	}
+
+	public void setAlergija(Alergije alergija) {
+		this.alergija = alergija;
+	}
 
 }
