@@ -13,6 +13,9 @@ public class Pacijent extends Korisnik{
 	
 	@OneToMany(mappedBy = "pacijent", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	private Set<Rezervacija> rezervacije = new HashSet<Rezervacija>();
+	
+	@OneToMany(mappedBy = "pacijent", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	private Set<Pregled> pregledi = new HashSet<Pregled>();
 
 	public Pacijent() {
 		super();
@@ -31,6 +34,14 @@ public class Pacijent extends Korisnik{
 
 	public void setRezervacije(Set<Rezervacija> rezervacije) {
 		this.rezervacije = rezervacije;
+	}
+
+	public Set<Pregled> getPregledi() {
+		return pregledi;
+	}
+
+	public void setPregledi(Set<Pregled> pregledi) {
+		this.pregledi = pregledi;
 	}
 	
 	

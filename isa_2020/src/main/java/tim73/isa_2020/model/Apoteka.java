@@ -57,6 +57,9 @@ public class Apoteka {
 	
 	@OneToMany(mappedBy = "apoteka", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	private Set<RadnoVreme> radnoVreme = new HashSet<RadnoVreme>();
+	
+	@OneToMany(mappedBy = "apoteka", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	private Set<Pregled> pregledi = new HashSet<Pregled>();
 
 	public Apoteka() {
 		super();
@@ -156,6 +159,14 @@ public class Apoteka {
 
 	public void setRadnoVreme(Set<RadnoVreme> radnoVreme) {
 		this.radnoVreme = radnoVreme;
+	}
+
+	public Set<Pregled> getPregledi() {
+		return pregledi;
+	}
+
+	public void setPregledi(Set<Pregled> pregledi) {
+		this.pregledi = pregledi;
 	}
 	
 	
