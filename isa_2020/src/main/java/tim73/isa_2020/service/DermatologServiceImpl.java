@@ -21,4 +21,12 @@ public class DermatologServiceImpl implements DermatologService {
 		
 	}
 
+
+
+	@Override
+	public void save(Dermatolog dermatolog) {
+		dermatologRepository.save(dermatolog);
+		
+	}
+
 }

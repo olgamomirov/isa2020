@@ -1,14 +1,39 @@
 package tim73.isa_2020.model;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 
 @Entity
 public class Farmaceut extends Korisnik{
 	
 	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	private Apoteka apoteka ;
+	
+	@OneToMany(mappedBy = "farmaceut", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	private Set<RadnoVreme> radnoVreme= new HashSet<>();
+
+	public Apoteka getApoteka() {
+		return apoteka;
+	}
+
+	public void setApoteka(Apoteka apoteka) {
+		this.apoteka = apoteka;
+	}
+
+	public Set<RadnoVreme> getRadnoVreme() {
+		return radnoVreme;
+	}
+
+	public void setRadnoVreme(Set<RadnoVreme> radnoVreme) {
+		this.radnoVreme = radnoVreme;
+	}
+	
+	
 
 }

@@ -44,6 +44,15 @@
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+		
+		<!-- Za radno vreme -->
+		<dependency>
+  			<groupId>joda-time</groupId>
+ 			 <artifactId>joda-time</artifactId>
+  			<version>2.10.8</version>
+		</dependency>
+		
+		
 	</dependencies>
 
 	<build>
