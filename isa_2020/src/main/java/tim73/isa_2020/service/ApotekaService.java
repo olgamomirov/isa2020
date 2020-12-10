@@ -9,4 +9,8 @@ public interface ApotekaService {
 	Apoteka findById(long id);
 	
 	List<Apoteka> findAll();
+	
+	void delete(long id);
+	
+	void save(Apoteka apoteka);
 }

@@ -29,4 +29,20 @@ public class ApotekaServiceImpl implements ApotekaService {
 		return apotekaRepository.findAll();
 	}
 
+
+	@Override
+	public void delete(long id) {
+		
+		apotekaRepository.deleteById(id);
+		
+	}
+
+
+	@Override
+	public void save(Apoteka apoteka) {
+		
+		apotekaRepository.save(apoteka);
+		
+	}
+
 }

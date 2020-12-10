@@ -32,7 +32,7 @@ public class Lek {
 	@ManyToOne
 	private Apoteka apoteka;
 	
-	@OneToMany(mappedBy = "lek", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "lek", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	private Set<Rezervacija> rezervacije = new HashSet<Rezervacija>();
 	
 	@ManyToMany(mappedBy = "lekovi")

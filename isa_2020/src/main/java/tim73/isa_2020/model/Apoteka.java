@@ -52,7 +52,7 @@ public class Apoteka {
 	@OneToMany(mappedBy = "apoteka", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	private Set<AdministratorApoteke> administratorApoteke = new HashSet<AdministratorApoteke>();
 	
-	@OneToMany(mappedBy = "apoteka", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "apoteka", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	private Set<Lek> lekovi = new HashSet<Lek>();
 	
 	@OneToMany(mappedBy = "apoteka", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
