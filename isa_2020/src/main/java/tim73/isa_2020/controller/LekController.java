@@ -32,7 +32,7 @@ public class LekController {
 	private PacijentService pacijentService;
 	
 	@GetMapping(value = "/sviLekovi")
-	ResponseEntity<List<LekDTO>> findAll() {
+	public ResponseEntity<List<LekDTO>> findAll() {
 		
 		List<Lek> lekovi= lekService.findAll();
 		
@@ -46,7 +46,7 @@ public class LekController {
 	}
 	
 	@GetMapping(value = "/{id}")
-	ResponseEntity<List<LekDTO>> findOne(@PathVariable Long id) {
+	public ResponseEntity<List<LekDTO>> findOne(@PathVariable Long id) {
 		
 		List<Lek> lekovi= lekService.findByApotekaId(id);
 		
@@ -60,7 +60,7 @@ public class LekController {
 	}
 	
 	@GetMapping(value = "/pacijent/{id}")
-	ResponseEntity<List<LekDTO>> findAlergije(@PathVariable Long id) {
+	public ResponseEntity<List<LekDTO>> findAlergije(@PathVariable Long id) {
 		
 		Set<Lek> lekovi= pacijentService.findById(id).getAlergija().getLekovi();
 		
