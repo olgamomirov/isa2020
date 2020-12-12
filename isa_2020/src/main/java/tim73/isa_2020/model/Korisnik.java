@@ -2,16 +2,32 @@ package tim73.isa_2020.model;
 
 import static javax.persistence.InheritanceType.JOINED;
 
+import java.util.Collection;
+import java.util.List;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Inheritance;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+
 
 @Entity
 @Inheritance(strategy=JOINED)
-public class Korisnik {
+public class Korisnik implements UserDetails {
+
+	private static final long serialVersionUID = 1L;
 
 	
 	@Id
@@ -34,6 +50,16 @@ public class Korisnik {
 	private String drzava;
 	
 	private String telefon;
+	
+	@Column(name = "enabled")
+    private boolean enabled=true;
+	
+	@ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(name = "korisnik_authority",
+            joinColumns = @JoinColumn(name = "korisnik_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "authority_id", referencedColumnName = "id"))
+    private List<Authority> authorities;
+
 
 	public Korisnik() {
 		super();
@@ -121,6 +147,55 @@ public class Korisnik {
 		return id;
 	}
 	
+	//za spring security
+
+	@Override
+	public Collection<? extends GrantedAuthority> getAuthorities() {
+		
+        return this.authorities;
+	}
+
+	public void setAuthorities(List<Authority> authorities) {
+		this.authorities = authorities;
+	}
 	
+	@Override
+	public String getPassword() {
+		return lozinka;
+	}
+
+	@Override
+	public String getUsername() {
+		
+		return email;
+	}
+
+	@JsonIgnore
+	@Override
+	public boolean isAccountNonExpired() {
+		return true;
+	}
+
+	@JsonIgnore
+	@Override
+	public boolean isAccountNonLocked() {
+		return true;
+	}
+
+	@JsonIgnore
+	@Override
+	public boolean isCredentialsNonExpired() {
+		return true;
+	}
+
+
+	@Override
+	public boolean isEnabled() {
+		return enabled;
+	}
+	
+	public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
 	
 }

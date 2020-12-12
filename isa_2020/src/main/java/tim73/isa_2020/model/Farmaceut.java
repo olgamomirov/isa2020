@@ -12,6 +12,9 @@ import javax.persistence.OneToMany;
 @Entity
 public class Farmaceut extends Korisnik{
 	
+	
+	private static final long serialVersionUID = 1L;
+
 	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	private Apoteka apoteka ;
 	

@@ -13,6 +13,9 @@ import javax.persistence.OneToOne;
 @Entity
 public class Pacijent extends Korisnik{
 	
+	
+	private static final long serialVersionUID = 1L;
+
 	@OneToMany(mappedBy = "pacijent", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	private Set<Rezervacija> rezervacije = new HashSet<Rezervacija>();
 	

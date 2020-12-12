@@ -12,6 +12,10 @@ import javax.persistence.OneToMany;
 @Entity
 public class Dermatolog extends Korisnik{
 	
+	
+	private static final long serialVersionUID = 1L;
+
+
 	@ManyToMany(mappedBy = "dermatolozi")
 	private Set<Apoteka> apoteke= new HashSet<Apoteka>();
 	

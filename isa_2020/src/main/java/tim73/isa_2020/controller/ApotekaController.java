@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,7 +23,7 @@ import tim73.isa_2020.model.Apoteka;
 import tim73.isa_2020.service.ApotekaService;
 import tim73.isa_2020.service.DermatologService;
 
-@CrossOrigin(origins = "http://localhost:3000")
+//@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping(value = "/a")
 public class ApotekaController {
@@ -35,7 +36,9 @@ public class ApotekaController {
 		return new ResponseEntity<>(new ApotekaDTO(apotekaService.findById(id)), HttpStatus.OK);
 	}
 
+	
 	@GetMapping(value = "/all")
+	@PreAuthorize("hasRole('PACIJENT')")
 	public ResponseEntity<List<ApotekaDTO>> findAll() {
 		
 		List<Apoteka> apoteke= apotekaService.findAll();

@@ -52,6 +52,20 @@
   			<version>2.10.8</version>
 		</dependency>
 		
+		<!--  Za spring security -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-security</artifactId>
+		</dependency>
+		
+		
+		<!-- Za rad sa JWT -->
+		<dependency>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt</artifactId>
+			<version>0.6.0</version>
+		</dependency>
+		
 		
 	</dependencies>
 

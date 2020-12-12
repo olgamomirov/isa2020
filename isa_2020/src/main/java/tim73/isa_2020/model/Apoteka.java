@@ -17,7 +17,6 @@ import javax.persistence.OneToMany;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import tim73.isa_2020.model.Dermatolog;
 
 
 @Entity

@@ -9,5 +9,7 @@ import tim73.isa_2020.model.Korisnik;
 public interface KorisnikRepository extends JpaRepository<Korisnik, Long>{
 	
 	Korisnik findByEmailAndLozinka(String email, String lozinka);
+	
+	Korisnik findByEmail (String email);
 
 }

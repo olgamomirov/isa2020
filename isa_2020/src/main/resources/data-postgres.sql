@@ -1,4 +1,4 @@
-insert into "public"."korisnik" ("id", "drzava", "email", "grad", "ime", "lozinka", "prezime", "telefon", "ulica") values(2, null, 'marica@gmail.com', null, 'Marica', 'marabubamara', null, null, null)
+insert into "public"."korisnik" ("id", "drzava", "email", "grad", "ime", "lozinka", "prezime", "telefon", "ulica", "enabled") values(2, null, 'marica@gmail.com', null, 'Marica', '$2a$04$Vbug2lwwJGrvUXTj6z7ff.97IzVBkrJ1XfApfGNl.Z695zqcnPYra', null, null, null, true)
 insert into "public"."dermatolog" ("id") values(2)
 insert into "public"."apoteka" ("drzava", "grad", "naziv", "ocena", "ulica") values(null, null, 'Higija', 5, null)
 insert into "public"."zaposleni_dermatolozi" ("apoteka_id", "dermatolog_id") values(1, 2)
@@ -13,7 +13,7 @@ insert into "public"."lek" ("id", "kolicina", "naziv", "sifra", "apoteka_id") va
 insert into "public"."lek" ("id", "kolicina", "naziv", "sifra", "apoteka_id") values(2, 1, 'bromazepam', '123', 2)
 insert into "public"."lek" ("id", "kolicina", "naziv", "sifra", "apoteka_id") values(3, 1, 'fervex', '12345', 2)
 
-insert into "public"."korisnik" ("id", "drzava", "email", "grad", "ime", "lozinka", "prezime", "telefon", "ulica") values(3, null, 'ivica@gmail.com', null, 'Ivica', 'ivacar', null, null, null)
+insert into "public"."korisnik" ("id", "drzava", "email", "grad", "ime", "lozinka", "prezime", "telefon", "ulica", "enabled") values(3, null, 'ivica@gmail.com', null, 'Ivica', '$2a$04$Vbug2lwwJGrvUXTj6z7ff.97IzVBkrJ1XfApfGNl.Z695zqcnPYra', null, null, null, true)
 
 insert into "public"."pacijent" ("id") values(3)
 
@@ -23,4 +23,9 @@ insert into "public"."rezervacija" ("id", "datum_preuzimanja", "lek_id", "pacije
 
 insert into "public"."rezervacija" ("id", "datum_preuzimanja", "lek_id", "pacijent_id") values(2, '2020-10-09', 3, 3)
 
-<--insert into "public"."radno_vreme" () values() -->
+
+insert into "public"."authority" ("name") values ('ROLE_PACIJENT')
+insert into "public"."authority" ("name") values ('ROLE_LEKAR')
+
+insert into "public"."korisnik_authority"  ("korisnik_id", "authority_id") values (3, 1)
+insert into "public"."korisnik_authority"  ("korisnik_id", "authority_id") values (2, 2)
