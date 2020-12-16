@@ -23,7 +23,7 @@ import tim73.isa_2020.service.LekService;
 @RestController
 @RequestMapping(value = "/svi")
 public class NeautentifikovaniController {
-	
+//proba
 	
 	@Autowired
 	private LekService lekService;
