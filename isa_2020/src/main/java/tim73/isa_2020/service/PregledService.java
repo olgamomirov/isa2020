@@ -9,5 +9,9 @@ public interface PregledService {
 	
 	void save(Pregled pregled);
 
-	List<Pregled> findByApotekaId(Long id);
+	List<Pregled> findByApotekaId(Long i);
+
+	List<Pregled> findAll();
+	
+	Pregled findOne(Long id);
 }

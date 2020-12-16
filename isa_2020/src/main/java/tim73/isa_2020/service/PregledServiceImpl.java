@@ -27,4 +27,16 @@ public class PregledServiceImpl implements PregledService{
 		return pregledRepository.findByApotekaId(id);
 	}
 
+	@Override
+	public List<Pregled> findAll() {
+		// TODO Auto-generated method stub
+		return pregledRepository.findAll();
+	}
+
+	@Override
+	public Pregled findOne(Long id) {
+		// TODO Auto-generated method stub
+		return pregledRepository.findById(id).orElse(null);
+	}
+
 }
