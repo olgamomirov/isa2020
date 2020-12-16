@@ -22,7 +22,6 @@ public class Authority implements GrantedAuthority {
 
     
     
-    
     public Authority() {
 		super();
 	}

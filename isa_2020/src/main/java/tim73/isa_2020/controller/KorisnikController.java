@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 
 import tim73.isa_2020.dto.PregledDTO;
+import tim73.isa_2020.model.Authority;
 import tim73.isa_2020.model.Korisnik;
 import tim73.isa_2020.model.Pregled;
 import tim73.isa_2020.model.UserTokenState;
@@ -83,11 +84,13 @@ public class KorisnikController {
 
 		// Kreiraj token za tog korisnika
 		Korisnik user = (Korisnik) authentication.getPrincipal();
+		List<Authority> authority = (List<Authority>) user.getAuthorities();
+		String role = authority.get(0).getName();
 		String jwt = tokenUtils.generateToken(user.getUsername());
 		int expiresIn = tokenUtils.getExpiredIn();
 
 		// Vrati token kao odgovor na uspesnu autentifikaciju
-		return ResponseEntity.ok(new UserTokenState(jwt, expiresIn));
+		return ResponseEntity.ok(new UserTokenState(jwt, expiresIn, role));
 	}
 
 }
