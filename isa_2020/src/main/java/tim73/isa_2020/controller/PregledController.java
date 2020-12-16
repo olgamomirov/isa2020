@@ -85,7 +85,6 @@ public class PregledController {
 		return new ResponseEntity<List<PregledDTO>>(preglediDTO, HttpStatus.OK);
 	}
 	@GetMapping(value = "/svi")
-	//@PreAuthorize("hasRole('PACIJENT')")
 	public ResponseEntity<List<PregledDTO>> findAll() {
 		
 		List<Pregled> pregledi= pregledService.findAll();
