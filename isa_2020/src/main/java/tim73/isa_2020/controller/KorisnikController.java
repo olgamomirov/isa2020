@@ -86,6 +86,7 @@ public class KorisnikController {
 		Korisnik user = (Korisnik) authentication.getPrincipal();
 		List<Authority> authority = (List<Authority>) user.getAuthorities();
 		String role = authority.get(0).getName();
+		
 		String jwt = tokenUtils.generateToken(user.getUsername());
 		int expiresIn = tokenUtils.getExpiredIn();
 
