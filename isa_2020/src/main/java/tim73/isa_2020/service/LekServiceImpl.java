@@ -1,6 +1,7 @@
 package tim73.isa_2020.service;
 
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,12 @@ public class LekServiceImpl implements LekService {
 	public List<Lek> findByApotekaId(Long id) {
 		// TODO Auto-generated method stub
 		return lekRepository.findByApotekaId(id);
+	}
+
+	@Override
+	public Set<Lek> findByNaziv(String naziv) {
+		
+		return lekRepository.findByNaziv(naziv);
 	}
 
 }

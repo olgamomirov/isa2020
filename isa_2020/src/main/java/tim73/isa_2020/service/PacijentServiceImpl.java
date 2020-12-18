@@ -18,4 +18,9 @@ public class PacijentServiceImpl implements PacijentService{
 		return pacijentRepository.findById(id).orElse(null);
 	}
 
+	@Override
+	public void save(Pacijent pacijent) {
+		pacijentRepository.save(pacijent);
+	}
+
 }

@@ -5,4 +5,6 @@ import tim73.isa_2020.model.Pacijent;
 public interface PacijentService {
 
 	Pacijent findById(Long id);
+	
+	void save(Pacijent pacijent);
 }

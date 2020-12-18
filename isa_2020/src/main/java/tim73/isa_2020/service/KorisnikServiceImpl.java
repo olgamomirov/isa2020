@@ -55,5 +55,10 @@ public class KorisnikServiceImpl implements  UserDetailsService , KorisnikServic
 		Korisnik u = korisnikRepository.findByEmail(email);
 		return u;
 	}
+
+	@Override
+	public void save(Korisnik k) {
+		korisnikRepository.save(k);
+	}
 	
 }

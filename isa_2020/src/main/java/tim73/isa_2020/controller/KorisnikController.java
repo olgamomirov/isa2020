@@ -3,12 +3,14 @@ package tim73.isa_2020.controller;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -17,14 +19,16 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-
+import tim73.isa_2020.dto.PacijentPodaciDTO;
 import tim73.isa_2020.dto.PregledDTO;
 import tim73.isa_2020.model.Authority;
 import tim73.isa_2020.model.Korisnik;
+import tim73.isa_2020.model.Pacijent;
 import tim73.isa_2020.model.Pregled;
 import tim73.isa_2020.model.UserTokenState;
 import tim73.isa_2020.securityService.TokenUtils;
@@ -92,6 +96,44 @@ public class KorisnikController {
 
 		// Vrati token kao odgovor na uspesnu autentifikaciju
 		return ResponseEntity.ok(new UserTokenState(jwt, expiresIn, role));
+	}
+	
+	@GetMapping("/getPodaci")
+	@PreAuthorize("hasRole('PACIJENT')") //mozda se moze iskoristiti i za ostale korisnike 
+	public ResponseEntity<PacijentPodaciDTO> getPodaci(HttpServletRequest request) {
+
+		System.out.println("podaci");
+		
+		String token = tokenUtils.getToken(request);
+		String username = this.tokenUtils.getUsernameFromToken(token);
+		Korisnik korisnik = (Korisnik) this.userDetailsService.loadUserByUsername(username);
+
+		PacijentPodaciDTO pacijentdto= new PacijentPodaciDTO(korisnik);
+
+		
+		return ResponseEntity.ok(pacijentdto);
+	}
+	
+	@PostMapping(value="/promeniPodatke", consumes=MediaType.APPLICATION_JSON_VALUE)
+	@PreAuthorize("hasRole('PACIJENT')")
+	public ResponseEntity<PacijentPodaciDTO> setPodaci(@RequestBody PacijentPodaciDTO pacijent, HttpServletRequest request){
+		
+	
+		
+		String token = tokenUtils.getToken(request);
+		String username = this.tokenUtils.getUsernameFromToken(token);
+		Korisnik korisnik = (Korisnik) this.userDetailsService.loadUserByUsername(username);
+		
+		korisnik.setIme(pacijent.getIme());
+		korisnik.setPrezime(pacijent.getPrezime());
+		korisnik.setUlica(pacijent.getUlica());
+		korisnik.setGrad(pacijent.getGrad());
+		korisnik.setDrzava(pacijent.getDrzava());
+		korisnik.setTelefon(pacijent.getTelefon());
+		
+		userDetailsService.save(korisnik);
+		System.out.println("sacuvao korisnika");
+		return new ResponseEntity<PacijentPodaciDTO>(pacijent,HttpStatus.OK);
 	}
 
 }
