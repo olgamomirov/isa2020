@@ -1,11 +1,11 @@
 insert into "public"."korisnik" ("id", "drzava", "email", "grad", "ime", "lozinka", "prezime", "telefon", "ulica", "enabled") values(2, null, 'marica@gmail.com', null, 'Marica', '$2a$04$Vbug2lwwJGrvUXTj6z7ff.97IzVBkrJ1XfApfGNl.Z695zqcnPYra', null, null, null, true)
 insert into "public"."dermatolog" ("id") values(2)
-insert into "public"."apoteka" ("drzava", "grad", "naziv", "ocena", "ulica") values(null, null, 'Higija', 5, null)
+insert into "public"."apoteka" ("drzava", "grad", "naziv", "ocena", "ulica") values(null, 'Novi Becej', 'Higija', 2, null)
 insert into "public"."korisnik" ("id", "drzava", "email", "grad", "ime", "lozinka", "prezime", "telefon", "ulica", "enabled") values(4, null, 'mara@gmail.com', null, 'Miroslava', '$2a$04$Vbug2lwwJGrvUXTj6z7ff.97IzVBkrJ1XfApfGNl.Z695zqcnPYra', null, null, null, true)
 insert into "public"."farmaceut" ("id", "apoteka_id") values(4, 1)
 
-insert into "public"."apoteka" ("drzava", "grad", "naziv", "ocena", "ulica") values(null, null, 'Neka', 5, null)
-insert into "public"."apoteka" ("drzava", "grad", "naziv", "ocena", "ulica") values(null, null, 'Nova', 5, null)
+insert into "public"."apoteka" ("drzava", "grad", "naziv", "ocena", "ulica") values(null, 'Ruma', 'Neka', 5, null)
+insert into "public"."apoteka" ("drzava", "grad", "naziv", "ocena", "ulica") values(null, 'Beograd', 'Nova', 4, null)
 
 insert into "public"."zaposleni_dermatolozi" ("apoteka_id", "dermatolog_id") values(2, 2)
 
