@@ -2,6 +2,7 @@ package tim73.isa_2020.controller;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -24,9 +25,15 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import tim73.isa_2020.dto.ApotekaDTO;
+import tim73.isa_2020.dto.DermatologDTO;
+import tim73.isa_2020.dto.FarmaceutDTO;
 import tim73.isa_2020.dto.PacijentPodaciDTO;
 import tim73.isa_2020.dto.PregledDTO;
+import tim73.isa_2020.model.Apoteka;
 import tim73.isa_2020.model.Authority;
+import tim73.isa_2020.model.Dermatolog;
+import tim73.isa_2020.model.Farmaceut;
 import tim73.isa_2020.model.Korisnik;
 import tim73.isa_2020.model.Pacijent;
 import tim73.isa_2020.model.Pregled;
@@ -134,6 +141,66 @@ public class KorisnikController {
 		userDetailsService.save(korisnik);
 		System.out.println("sacuvao korisnika");
 		return new ResponseEntity<PacijentPodaciDTO>(pacijent,HttpStatus.OK);
+	}
+	
+	@GetMapping(value = "/sviPacijenti")
+	@PreAuthorize("hasRole('DERMATOLOG')")
+	public ResponseEntity<List<PacijentPodaciDTO>> findAll(HttpServletRequest request) {
+		
+        List<Pacijent> pacijenti = new ArrayList<Pacijent>();
+		
+		String token = tokenUtils.getToken(request);
+		String username = this.tokenUtils.getUsernameFromToken(token);
+		Korisnik k = (Korisnik) this.userDetailsService.loadUserByUsername(username);
+		
+		List<PacijentPodaciDTO> pacijentiDTO= new ArrayList<>();
+		
+		Dermatolog d = (Dermatolog) k;
+		
+		for(Pregled p: d.getPregledi()) {
+			if(p.getStatus().equals("odradjen")) {
+				pacijenti.add(p.getPacijent());
+			}
+		}
+		
+		for(Pacijent p: pacijenti) {
+			pacijentiDTO.add(new PacijentPodaciDTO(p));
+		}
+		
+		return new ResponseEntity<List<PacijentPodaciDTO>>(pacijentiDTO, HttpStatus.OK);
+	}
+	
+	@GetMapping(value = "/dermatolog")
+	@PreAuthorize("hasRole('DERMATOLOG')")
+	public ResponseEntity<DermatologDTO> findOne(HttpServletRequest request) {
+		
+       
+		String token = tokenUtils.getToken(request);
+		String username = this.tokenUtils.getUsernameFromToken(token);
+		Korisnik k = (Korisnik) this.userDetailsService.loadUserByUsername(username);
+		
+		Dermatolog d = (Dermatolog) k;
+		
+		DermatologDTO dermatologDTO = new DermatologDTO(d);
+		
+		
+		return new ResponseEntity<DermatologDTO>(dermatologDTO, HttpStatus.OK);
+	}
+	@GetMapping(value = "/farmaceut")
+	@PreAuthorize("hasRole('FARMACEUT')")
+	public ResponseEntity<FarmaceutDTO> findFarmaceut(HttpServletRequest request) {
+		
+       
+		String token = tokenUtils.getToken(request);
+		String username = this.tokenUtils.getUsernameFromToken(token);
+		Korisnik k = (Korisnik) this.userDetailsService.loadUserByUsername(username);
+		
+		Farmaceut f = (Farmaceut) k;
+		
+		FarmaceutDTO farmaceutDTO = new FarmaceutDTO(f);
+		
+		
+		return new ResponseEntity<FarmaceutDTO>(farmaceutDTO, HttpStatus.OK);
 	}
 
 }

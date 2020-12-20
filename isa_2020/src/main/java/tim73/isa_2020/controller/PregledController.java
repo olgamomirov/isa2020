@@ -28,6 +28,7 @@ import tim73.isa_2020.model.Dermatolog;
 import tim73.isa_2020.model.Farmaceut;
 import tim73.isa_2020.model.Korisnik;
 import tim73.isa_2020.model.Lek;
+import tim73.isa_2020.model.Pacijent;
 import tim73.isa_2020.model.Pregled;
 import tim73.isa_2020.model.RadnoVreme;
 import tim73.isa_2020.securityService.TokenUtils;
@@ -36,6 +37,7 @@ import tim73.isa_2020.service.DermatologService;
 import tim73.isa_2020.service.FarmaceutService;
 import tim73.isa_2020.service.KorisnikService;
 import tim73.isa_2020.service.KorisnikServiceImpl;
+import tim73.isa_2020.service.PacijentService;
 import tim73.isa_2020.service.PregledService;
 
 @RestController
@@ -50,6 +52,9 @@ public class PregledController {
 	
 	@Autowired
 	private FarmaceutService farmaceutService;
+	
+	@Autowired
+	private PacijentService pacijentService;
 	
 	@Autowired
 	private ApotekaService apotekaService;
@@ -70,20 +75,43 @@ public class PregledController {
 		DateTime start=new DateTime(2020, 8, 15, 14, 0, 0);
 		DateTime stop=new DateTime( 2020, 8, 15, 15, 0, 0);
 		Interval interval = new org.joda.time.Interval( start, stop );
-		Pregled pregled = new Pregled(start, stop, interval, "default", null, null);
+		Pregled pregled = new Pregled(start, stop, interval, "odradjen", null, null);
+		
+		DateTime start2=new DateTime(2020, 11, 20, 14, 0, 0);
+		DateTime stop2=new DateTime( 2020, 11, 20, 16, 0, 0);
+		Interval interval2 = new org.joda.time.Interval( start2, stop2 );
+		Pregled pregled2 = new Pregled(start2, stop2, interval2, "default", null, null);
 		
 		DateTime start1=new DateTime(2020, 8, 19, 14, 0, 0);
 		DateTime stop1=new DateTime( 2020, 8, 19, 15, 0, 0);
 		Interval interval1 = new org.joda.time.Interval( start1, stop1 );
 		Pregled pregled1 = new Pregled(start1, stop1, interval1, "default", null, null);
 		
+		DateTime start3=new DateTime(2020, 11, 15, 14, 0, 0);
+		DateTime stop3=new DateTime( 2020, 11, 15, 15, 0, 0);
+		Interval interval3 = new org.joda.time.Interval( start3, stop3 );
+		Pregled pregled3 = new Pregled(start3, stop3, interval3, "odradjen", null, null);
+		
 		Dermatolog dermatolog= dermatologService.findById(2);
-		Apoteka apoteka= apotekaService.findById(1);
+		Apoteka apoteka= apotekaService.findById(2);
+		Apoteka apoteka3= apotekaService.findById(3);
 		Farmaceut farmaceut = farmaceutService.findOne((long)4);
+		Pacijent pacijent = pacijentService.findById((long)3);
+		Pacijent pacijent2 = pacijentService.findById((long)5);
 		
 		pregled.setDermatolog(dermatolog);
 		pregled.setApoteka(apoteka);
+		pregled.setPacijent(pacijent2);
 		pregledService.save(pregled);
+		
+		pregled3.setDermatolog(dermatolog);
+		pregled3.setApoteka(apoteka3);
+		pregled3.setPacijent(pacijent);
+		pregledService.save(pregled3);
+		
+		pregled2.setDermatolog(dermatolog);
+		pregled2.setApoteka(apoteka);
+		pregledService.save(pregled2);
 		
 		pregled1.setFarmaceut(farmaceut);
 		pregled1.setApoteka(apoteka);
@@ -100,35 +128,69 @@ public class PregledController {
         List<PregledDTO> preglediDTO= new ArrayList<>();
 		
 		for(Pregled p: pregledi) {
-			preglediDTO.add(new PregledDTO(p));
+			preglediDTO.add(new PregledDTO(p, p.getPacijent().getIme(), p.getPacijent().getPrezime()));
 		}	
 		
 		return new ResponseEntity<List<PregledDTO>>(preglediDTO, HttpStatus.OK);
 	}
-	@GetMapping(value = "/svi")
-	@PreAuthorize("hasRole('FARMACEUT') or hasRole('DERMATOLOG')")
-	public ResponseEntity<List<PregledDTO>> findAll(HttpServletRequest request) {
+	@GetMapping(value = "/svi/{id}")
+	@PreAuthorize("hasRole('DERMATOLOG')")
+	public ResponseEntity<List<PregledDTO>> findAll(@PathVariable Long id, HttpServletRequest request) {
 		
-		Set<Pregled> pregledi = null;
+		Set<Pregled> pregledi = new HashSet<Pregled>();
+		
 		
 		String token = tokenUtils.getToken(request);
 		String username = this.tokenUtils.getUsernameFromToken(token);
 		Korisnik k = (Korisnik) this.korisnikDetails.loadUserByUsername(username);
 		
-		List<Authority> authority = (List<Authority>) k.getAuthorities();
-		String role = authority.get(0).getName();
 		
 		List<PregledDTO> preglediDTO= new ArrayList<>();
 		
-		if(role.equals("ROLE_DERMATOLOG")) {
+		
 			Dermatolog d = (Dermatolog) k;
-			pregledi = d.getPregledi();
+			
+			for(Pregled p:d.getPregledi()) {
+				if(p.getApoteka().getId().equals(id)) {
+			       pregledi.add(p);
+				}
+			}
+			
+		for(Pregled p: pregledi) {
+			if(p.getPacijent()!=null) {
+			preglediDTO.add(new PregledDTO(p, p.getPacijent().getIme(), p.getPacijent().getPrezime()));
 		}else {
+			preglediDTO.add(new PregledDTO(p));
+		}
+		}
+	 
+		
+		return new ResponseEntity<List<PregledDTO>>(preglediDTO, HttpStatus.OK);
+	}
+	@GetMapping(value = "/svi")
+	@PreAuthorize("hasRole('FARMACEUT')")
+	public ResponseEntity<List<PregledDTO>> findPreglediFarmaceut(HttpServletRequest request) {
+		
+		Set<Pregled> pregledi = new HashSet<Pregled>();
+		
+		
+		String token = tokenUtils.getToken(request);
+		String username = this.tokenUtils.getUsernameFromToken(token);
+		Korisnik k = (Korisnik) this.korisnikDetails.loadUserByUsername(username);
+		
+		
+		List<PregledDTO> preglediDTO= new ArrayList<>();
+		
+		
 			Farmaceut f = (Farmaceut) k;
 			pregledi = f.getPregledi();
-		}
+			
 		for(Pregled p: pregledi) {
+			if(p.getPacijent()!=null) {
+			preglediDTO.add(new PregledDTO(p, p.getPacijent().getIme(), p.getPacijent().getPrezime()));
+		}else {
 			preglediDTO.add(new PregledDTO(p));
+		}
 		}
 	 
 		
