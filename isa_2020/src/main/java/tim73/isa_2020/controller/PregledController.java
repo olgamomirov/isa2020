@@ -16,6 +16,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,6 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 import tim73.isa_2020.dto.ApotekaDTO;
 import tim73.isa_2020.dto.LekDTO;
 import tim73.isa_2020.dto.PregledDTO;
+import tim73.isa_2020.dto.PregledZaPacijentaDTO;
 import tim73.isa_2020.model.Apoteka;
 import tim73.isa_2020.model.Authority;
 import tim73.isa_2020.model.Dermatolog;
@@ -34,6 +37,7 @@ import tim73.isa_2020.model.Lek;
 import tim73.isa_2020.model.Pacijent;
 import tim73.isa_2020.model.Pregled;
 import tim73.isa_2020.model.RadnoVreme;
+import tim73.isa_2020.model.TipPregleda;
 import tim73.isa_2020.securityService.TokenUtils;
 import tim73.isa_2020.service.ApotekaService;
 import tim73.isa_2020.service.DermatologService;
@@ -125,7 +129,7 @@ public class PregledController {
 	}
 	
 	@GetMapping(value = "/{id}")
-	ResponseEntity<List<PregledDTO>> findOne(@PathVariable Long id) {
+	public ResponseEntity<List<PregledDTO>> findOne(@PathVariable Long id) {
 		
 		List<Pregled> pregledi= pregledService.findByApotekaId(id);
 		
@@ -238,6 +242,66 @@ public class PregledController {
 	 
 		
 		return new ResponseEntity<List<PregledDTO>>(preglediDTO, HttpStatus.OK);
+	}
+	
+	//metoda kojoj pristupa pacijent da bi video istoriju pregleda kod dermatologa
+	
+	@GetMapping(value = "/istorijaDermatolozi")
+	@PreAuthorize("hasRole('PACIJENT')")
+	public ResponseEntity<List<PregledZaPacijentaDTO>> preglediKodDermatologa(HttpServletRequest request) {
+
+		String token = tokenUtils.getToken(request);
+		String username = this.tokenUtils.getUsernameFromToken(token);
+		Pacijent p = (Pacijent) this.korisnikDetails.loadUserByUsername(username);
+		
+		List<PregledZaPacijentaDTO> preglediDTO= new ArrayList<PregledZaPacijentaDTO>();
+		
+		
+		Set<Pregled> pregledi=p.getPregledi();
+		
+		for (Pregled pregled:pregledi) {
+			if(pregled.getDermatolog()!=null && pregled.getStatus().equals("odradjen")) {
+				double cena=0;
+				for (TipPregleda tip : pregled.getTipovi()) {
+					cena += tip.getCena();
+				}
+				double trajanje= (pregled.getInterval().getEndMillis()-pregled.getInterval().getStartMillis())/60000; //pretvaranje u minute
+				preglediDTO.add(new PregledZaPacijentaDTO(pregled,
+						(pregled.getDermatolog().getIme() + " " + pregled.getDermatolog().getPrezime()), pregled.getInterval().getStart().toString("dd/MM/yyyy"), cena, trajanje));
+			}
+		}
+		
+		return new ResponseEntity<List<PregledZaPacijentaDTO>>(preglediDTO, HttpStatus.OK);
+		
+	}
+	
+	@GetMapping(value = "/istorijaFarmaceuti")
+	@PreAuthorize("hasRole('PACIJENT')")
+	public ResponseEntity<List<PregledZaPacijentaDTO>> preglediKodFarmaceuta(HttpServletRequest request) {
+
+		String token = tokenUtils.getToken(request);
+		String username = this.tokenUtils.getUsernameFromToken(token);
+		Pacijent p = (Pacijent) this.korisnikDetails.loadUserByUsername(username);
+		
+		List<PregledZaPacijentaDTO> preglediDTO= new ArrayList<PregledZaPacijentaDTO>();
+		
+		
+		Set<Pregled> pregledi=p.getPregledi();
+		
+		for (Pregled pregled:pregledi) {
+			if(pregled.getFarmaceut()!=null && pregled.getStatus().equals("odradjen")) {
+				double cena=0;
+				for (TipPregleda tip : pregled.getTipovi()) {
+					cena += tip.getCena();
+				}
+				double trajanje= (pregled.getInterval().getEndMillis()-pregled.getInterval().getStartMillis())/60000; //pretvaranje u minute
+				preglediDTO.add(new PregledZaPacijentaDTO(pregled,
+						(pregled.getFarmaceut().getIme() + " " + pregled.getFarmaceut().getPrezime()), pregled.getInterval().getStart().toString("dd/MM/yyyy"), cena, trajanje));
+			}
+		}
+		
+		return new ResponseEntity<List<PregledZaPacijentaDTO>>(preglediDTO, HttpStatus.OK);
+		
 	}
 
 }
