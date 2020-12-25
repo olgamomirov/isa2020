@@ -38,6 +38,7 @@ public class KorisnikServiceImpl implements  UserDetailsService , KorisnikServic
 		Korisnik u = korisnikRepository.findByEmail(email);
 		return u;
 	}
+	
 
 	public Korisnik findById(Long id) throws AccessDeniedException {
 		Korisnik u = korisnikRepository.findById(id).orElseGet(null);

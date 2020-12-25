@@ -22,12 +22,11 @@ public class PregledDTO {
 	
 	private String terapija;
 	
-	private String pacijentIme;
+	private String pacijentEmail;
 	
-	private String pacijentPrezime;
 	
-	public PregledDTO (Pregled pregled, String ime, String prezime) {
-		this(pregled.getId(), pregled.getInterval(), pregled.getStatus(), pregled.getDijagnoza(), pregled.getTerapija(), ime, prezime);
+	public PregledDTO (Pregled pregled, String email) {
+		this(pregled.getId(), pregled.getInterval(), pregled.getStatus(), pregled.getDijagnoza(), pregled.getTerapija(), email);
 	}
 	public PregledDTO (Pregled pregled) {
 		this(pregled.getId(), pregled.getInterval(), pregled.getStatus(), pregled.getDijagnoza(), pregled.getTerapija());
@@ -49,63 +48,56 @@ public class PregledDTO {
 		this.terapija = terapija;
 		
 	}
-	public PregledDTO(Long id, Interval interval, String status, String dijagnoza, String terapija, String ime, String prezime) {
+	public PregledDTO(Long id, Interval interval, String status, String dijagnoza, String terapija, String email) {
 		
 		this.id = id;
 		this.interval = interval;
 		this.status = status;
 		this.dijagnoza = dijagnoza;
 		this.terapija = terapija;
-		this.pacijentIme = ime;
-		this.pacijentPrezime = prezime;
+		this.pacijentEmail = email;
 	}
-
 	public Long getId() {
 		return id;
 	}
-
 	public void setId(Long id) {
 		this.id = id;
 	}
-
-	public void setInterval(Interval interval) {
-		this.interval = interval;
+	public DateTime getStop() {
+		return stop;
 	}
-
-	public void setStatus(String status) {
-		this.status = status;
+	public void setStop(DateTime stop) {
+		this.stop = stop;
 	}
-
 	public Interval getInterval() {
 		return interval;
 	}
-
+	public void setInterval(Interval interval) {
+		this.interval = interval;
+	}
 	public String getStatus() {
 		return status;
 	}
-
+	public void setStatus(String status) {
+		this.status = status;
+	}
 	public String getDijagnoza() {
 		return dijagnoza;
 	}
-
+	public void setDijagnoza(String dijagnoza) {
+		this.dijagnoza = dijagnoza;
+	}
 	public String getTerapija() {
 		return terapija;
 	}
-
-	public String getPacijentIme() {
-		return pacijentIme;
+	public void setTerapija(String terapija) {
+		this.terapija = terapija;
+	}
+	public String getPacijentEmail() {
+		return pacijentEmail;
+	}
+	public void setPacijentEmail(String pacijentEmail) {
+		this.pacijentEmail = pacijentEmail;
 	}
 
-	public void setPacijentIme(String pacijentIme) {
-		this.pacijentIme = pacijentIme;
-	}
-
-	public String getPacijentPrezime() {
-		return pacijentPrezime;
-	}
-
-	public void setPacijentPrezime(String pacijentPrezime) {
-		this.pacijentPrezime = pacijentPrezime;
-	}
-	
 }

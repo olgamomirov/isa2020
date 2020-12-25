@@ -20,6 +20,7 @@ public class PregledServiceImpl implements PregledService{
 		pregledRepository.save(pregled);
 		
 	}
+	
 
 	@Override
 	public List<Pregled> findByApotekaId(Long id) {

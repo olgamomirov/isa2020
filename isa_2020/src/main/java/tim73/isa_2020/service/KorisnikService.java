@@ -10,5 +10,6 @@ public interface KorisnikService {
 	Korisnik findById(Long id);
     Korisnik findByEmail(String email);
     List<Korisnik> findAll ();
+    
     void save (Korisnik k);
 }

@@ -6,17 +6,20 @@ import java.util.List;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.websocket.server.PathParam;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Interval;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import tim73.isa_2020.dto.ApotekaDTO;
@@ -72,23 +75,23 @@ public class PregledController {
 	ResponseEntity<String> add(){
 		
 
-		DateTime start=new DateTime(2020, 8, 15, 14, 0, 0);
-		DateTime stop=new DateTime( 2020, 8, 15, 15, 0, 0);
+		DateTime start=new DateTime(2020, 8, 15, 14, 00, 00);
+		DateTime stop=new DateTime( 2020, 8, 15, 15, 00, 00);
 		Interval interval = new org.joda.time.Interval( start, stop );
 		Pregled pregled = new Pregled(start, stop, interval, "odradjen", null, null);
 		
-		DateTime start2=new DateTime(2020, 11, 20, 14, 0, 0);
-		DateTime stop2=new DateTime( 2020, 11, 20, 16, 0, 0);
+		DateTime start2=new DateTime(2020, 11, 20, 14, 00, 00);
+		DateTime stop2=new DateTime( 2020, 11, 20, 16, 00, 00);
 		Interval interval2 = new org.joda.time.Interval( start2, stop2 );
 		Pregled pregled2 = new Pregled(start2, stop2, interval2, "default", null, null);
 		
-		DateTime start1=new DateTime(2020, 8, 19, 14, 0, 0);
-		DateTime stop1=new DateTime( 2020, 8, 19, 15, 0, 0);
+		DateTime start1=new DateTime(2020, 8, 19, 14, 00, 00);
+		DateTime stop1=new DateTime( 2020, 8, 19, 15, 00, 00);
 		Interval interval1 = new org.joda.time.Interval( start1, stop1 );
 		Pregled pregled1 = new Pregled(start1, stop1, interval1, "default", null, null);
 		
-		DateTime start3=new DateTime(2020, 11, 15, 14, 0, 0);
-		DateTime stop3=new DateTime( 2020, 11, 15, 15, 0, 0);
+		DateTime start3=new DateTime(2020, 11, 15, 14, 00, 00);
+		DateTime stop3=new DateTime( 2020, 11, 15, 15, 00, 00);
 		Interval interval3 = new org.joda.time.Interval( start3, stop3 );
 		Pregled pregled3 = new Pregled(start3, stop3, interval3, "odradjen", null, null);
 		
@@ -111,6 +114,7 @@ public class PregledController {
 		
 		pregled2.setDermatolog(dermatolog);
 		pregled2.setApoteka(apoteka);
+		pregled2.setPacijent(pacijent2);
 		pregledService.save(pregled2);
 		
 		pregled1.setFarmaceut(farmaceut);
@@ -128,12 +132,12 @@ public class PregledController {
         List<PregledDTO> preglediDTO= new ArrayList<>();
 		
 		for(Pregled p: pregledi) {
-			preglediDTO.add(new PregledDTO(p, p.getPacijent().getIme(), p.getPacijent().getPrezime()));
+			preglediDTO.add(new PregledDTO(p, p.getPacijent().getEmail()));
 		}	
 		
 		return new ResponseEntity<List<PregledDTO>>(preglediDTO, HttpStatus.OK);
 	}
-	@GetMapping(value = "/svi/{id}")
+	@GetMapping(value = "/svi/{id}") //id apoteke za koju su mu potrebni svi pregledi, jer dermatolog radi u vise apoteka
 	@PreAuthorize("hasRole('DERMATOLOG')")
 	public ResponseEntity<List<PregledDTO>> findAll(@PathVariable Long id, HttpServletRequest request) {
 		
@@ -158,10 +162,49 @@ public class PregledController {
 			
 		for(Pregled p: pregledi) {
 			if(p.getPacijent()!=null) {
-			preglediDTO.add(new PregledDTO(p, p.getPacijent().getIme(), p.getPacijent().getPrezime()));
+			preglediDTO.add(new PregledDTO(p, p.getPacijent().getEmail()));
 		}else {
 			preglediDTO.add(new PregledDTO(p));
 		}
+		}
+	 
+		
+		return new ResponseEntity<List<PregledDTO>>(preglediDTO, HttpStatus.OK);
+	}
+	@GetMapping(value = "/pacijentPregledi", produces = MediaType.APPLICATION_JSON_VALUE) //svi predstojeci (zakazani, neodradjeni) pregledi nekog pacijenta za kog dermatolog zapocinje pregled
+	@PreAuthorize("hasRole('DERMATOLOG')")
+	public ResponseEntity<List<PregledDTO>> findAllForPatient(@RequestParam(value="email") String email,  HttpServletRequest request) { //email pacijenta je jedinstven
+		
+		Set<Pregled> pregledi = new HashSet<Pregled>();
+		System.out.println("email " + email);
+		
+		String token = tokenUtils.getToken(request);
+		String username = this.tokenUtils.getUsernameFromToken(token);
+		Korisnik k = (Korisnik) this.korisnikDetails.loadUserByUsername(username); //preko tokena nalazimo dermatologa
+		
+		
+		List<PregledDTO> preglediDTO= new ArrayList<>();
+		
+		
+			Dermatolog d = (Dermatolog) k;
+			
+			Korisnik pacijent1 =  korisnikService.findByEmail(email);
+			System.out.println(pacijent1.getEmail() + " drzava ");
+			
+			Pacijent pacijent = (Pacijent) pacijent1;
+			
+			for(Pregled p:pacijent.getPregledi()) {
+				if(p.getDermatolog().equals(d)) {
+					if(p.getStatus().equals("zakazan")) {
+			       pregledi.add(p);
+					}
+				}
+			}
+			
+		for(Pregled p: pregledi) {
+			
+			preglediDTO.add(new PregledDTO(p, pacijent.getEmail()));
+		
 		}
 	 
 		
@@ -187,7 +230,7 @@ public class PregledController {
 			
 		for(Pregled p: pregledi) {
 			if(p.getPacijent()!=null) {
-			preglediDTO.add(new PregledDTO(p, p.getPacijent().getIme(), p.getPacijent().getPrezime()));
+			preglediDTO.add(new PregledDTO(p, p.getPacijent().getEmail()));
 		}else {
 			preglediDTO.add(new PregledDTO(p));
 		}

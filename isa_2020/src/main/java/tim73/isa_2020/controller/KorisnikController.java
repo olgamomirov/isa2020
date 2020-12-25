@@ -1,6 +1,7 @@
 package tim73.isa_2020.controller;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -23,7 +24,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
+
 
 import tim73.isa_2020.dto.ApotekaDTO;
 import tim73.isa_2020.dto.DermatologDTO;
@@ -38,9 +43,11 @@ import tim73.isa_2020.model.Korisnik;
 import tim73.isa_2020.model.Pacijent;
 import tim73.isa_2020.model.Pregled;
 import tim73.isa_2020.model.UserTokenState;
+import tim73.isa_2020.repository.PacijentRepository;
 import tim73.isa_2020.securityService.TokenUtils;
 import tim73.isa_2020.service.KorisnikService;
 import tim73.isa_2020.service.KorisnikServiceImpl;
+import tim73.isa_2020.service.PacijentService;
 import tim73.isa_2020.token.JwtAuthenticationRequest;
 
 @RestController
@@ -55,12 +62,12 @@ public class KorisnikController {
 
 	@Autowired
 	private KorisnikServiceImpl userDetailsService;
-
-	
-	
 	
 	@Autowired
 	private KorisnikService korisnikService;
+	
+	@Autowired
+	private PacijentService pacijentService;
 	
 	/*
 	@PostMapping(value = "/login", consumes=MediaType.APPLICATION_JSON_VALUE)
@@ -143,7 +150,7 @@ public class KorisnikController {
 		return new ResponseEntity<PacijentPodaciDTO>(pacijent,HttpStatus.OK);
 	}
 	
-	@GetMapping(value = "/sviPacijenti")
+	@GetMapping(value = "/sviPacijenti") //svi pregledani pacijenti odredjenog dermatologa...u svim apotekama...promeniti na odredjenu apoteku
 	@PreAuthorize("hasRole('DERMATOLOG')")
 	public ResponseEntity<List<PacijentPodaciDTO>> findAll(HttpServletRequest request) {
 		
@@ -202,5 +209,21 @@ public class KorisnikController {
 		
 		return new ResponseEntity<FarmaceutDTO>(farmaceutDTO, HttpStatus.OK);
 	}
+	
+	@RequestMapping(value="/search", method=RequestMethod.GET)
+  	@ResponseBody
+  	public ResponseEntity<List<PacijentPodaciDTO>> getPacijenti(@RequestParam("ime") String ime, @RequestParam("prezime") String prezime){
+  		List<Pacijent> pacijenti = pacijentService.searchByImeLikeOrPrezimeLike(ime, prezime);
+  	
+  		List<PacijentPodaciDTO> pacijentiDTO= new ArrayList<>();
+  		
+  			
+  			for(Pacijent p: pacijenti)
+  			{
+  				pacijentiDTO.add(new PacijentPodaciDTO(p));
+  			}
+  		
+  		return new ResponseEntity<List<PacijentPodaciDTO>>(pacijentiDTO, HttpStatus.OK);
+  	}
 
 }
