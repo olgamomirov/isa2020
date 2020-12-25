@@ -14,7 +14,7 @@ import tim73.isa_2020.model.Pacijent;
 public interface PacijentRepository extends JpaRepository<Pacijent, Long>{
 
 
-	//@Query("SELECT k FROM Pacijent k where ime like %?1%")
+	@Query("SELECT k FROM Pacijent k where ime like %?1%")
 	List<Pacijent> findByImeAndPrezime(String ime, String prezime);
 	
 	@Query("SELECT m FROM Pacijent m WHERE lower(m.ime) LIKE %:ime% and lower(m.prezime) LIKE %:prezime%")
