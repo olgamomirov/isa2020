@@ -303,5 +303,32 @@ public class PregledController {
 		return new ResponseEntity<List<PregledZaPacijentaDTO>>(preglediDTO, HttpStatus.OK);
 		
 	}
+	
+	@GetMapping(value = "/detaljiPregleda/{id}")
+	@PreAuthorize("hasRole('PACIJENT')")
+	public ResponseEntity<PregledZaPacijentaDTO> detaljiPregleda( @PathVariable Long id ) {
+
+		Pregled pregled= pregledService.findOne(id);
+		PregledZaPacijentaDTO pregledDTO=null;
+		
+		double cena=0;
+		for (TipPregleda tip : pregled.getTipovi()) {
+			cena += tip.getCena();
+		}
+		double trajanje= (pregled.getInterval().getEndMillis()-pregled.getInterval().getStartMillis())/60000; 
+		
+		if(pregled.getDermatolog()!=null) {
+		
+			pregledDTO= new PregledZaPacijentaDTO(pregled, (pregled.getDermatolog().getIme()+" "+pregled.getDermatolog().getPrezime()),
+				pregled.getInterval().getStart().toString("dd/MM/yyyy"),cena, trajanje);
+		}
+		else {
+			pregledDTO= new PregledZaPacijentaDTO(pregled, (pregled.getFarmaceut().getIme()+" "+pregled.getFarmaceut().getPrezime()),
+					pregled.getInterval().getStart().toString("dd/MM/yyyy"),cena, trajanje);
+			
+		}
+		return new ResponseEntity<PregledZaPacijentaDTO>(pregledDTO, HttpStatus.OK);
+		
+	}
 
 }
