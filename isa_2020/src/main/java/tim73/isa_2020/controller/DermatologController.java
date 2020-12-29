@@ -3,16 +3,20 @@ package tim73.isa_2020.controller;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import tim73.isa_2020.dto.DermatologDTO;
@@ -41,6 +45,7 @@ public class DermatologController {
 	
 	@Autowired
 	private KorisnikService korisnikService;
+	
 	
 	@GetMapping(value = "{id}")
 	ResponseEntity<Dermatolog> findById(@PathVariable long id){
@@ -99,6 +104,19 @@ public class DermatologController {
 		DermatologDTO dermatologDTO = new DermatologDTO(ulogovan);
 		
 		return new ResponseEntity<DermatologDTO>(dermatologDTO, HttpStatus.OK);
+	}
+	
+	@RequestMapping(method=RequestMethod.GET, value = "/comparePassword")
+	@PreAuthorize("hasRole('DERMATOLOG')")
+	public boolean getPassword(@RequestParam("password")  String password, HttpServletRequest request){
+		
+		boolean result = false;
+
+		String token = tokenUtils.getToken(request);
+		String username = this.tokenUtils.getUsernameFromToken(token);
+		Korisnik ulogovan = (Korisnik) this.userDetailsService.loadUserByUsername(username);
+		//password.passwordEncoder();
+		return result;
 	}
 	
 }
