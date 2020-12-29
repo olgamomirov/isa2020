@@ -27,10 +27,6 @@ public class LekServiceImpl implements LekService {
 		return lekRepository.findByApotekaId(id);
 	}
 
-	@Override
-	public Set<Lek> findByNaziv(String naziv) {
-		
-		return lekRepository.findByNaziv(naziv);
-	}
+	
 
 }

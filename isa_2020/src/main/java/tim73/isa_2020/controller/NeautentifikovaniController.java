@@ -61,6 +61,7 @@ public class NeautentifikovaniController {
 		
 		return new ResponseEntity<List<ApotekaDTO>>(apotekeDTO, HttpStatus.OK);
 	}
+	/*
 	@GetMapping(value = "/lekovi/{id}/{pretraga}")
 	public ResponseEntity<List<LekDTO>> lekoviPretraga(@PathVariable String pretraga, @PathVariable Long id) {
 		
@@ -78,4 +79,5 @@ public class NeautentifikovaniController {
 		
 		return new ResponseEntity<List<LekDTO>>(lekoviDTO, HttpStatus.OK);
 	}
+	*/
 }

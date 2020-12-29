@@ -7,7 +7,7 @@ public class LekZaAlergijeDTO {
 	private String naziv;
 
 	public LekZaAlergijeDTO(Lek lek) {
-		this(lek.getNaziv());
+		this(lek.getSifrarnikLekova().getNaziv());
 	}
 
 	public LekZaAlergijeDTO(String naziv) {

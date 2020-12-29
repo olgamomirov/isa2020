@@ -26,8 +26,8 @@ public class Alergije {
 	private Pacijent pacijent;
 	
 	@ManyToMany
-	@JoinTable(name ="alergije_na_lek", joinColumns = @JoinColumn(name="alergija_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name="lek_id", referencedColumnName = "id"))
-	private Set<Lek> lekovi = new HashSet<Lek>(); 
+	@JoinTable(name ="alergije_na_lek", joinColumns = @JoinColumn(name="alergija_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name="sifrarnik_leka_id", referencedColumnName = "id"))
+	private Set<SifrarnikLekova> lekovi = new HashSet<SifrarnikLekova>(); 
 
 	public Alergije() {
 		super();
@@ -46,12 +46,12 @@ public class Alergije {
 		return id;
 	}
 
-	public Set<Lek> getLekovi() {
+	public Set<SifrarnikLekova> getLekovi() {
 		return lekovi;
 	}
 
-	public void setLekovi(Set<Lek> lekovi) {
-		this.lekovi = lekovi;
+	public void setLekovi(Set<SifrarnikLekova> sifrarniciLekova) {
+		this.lekovi = sifrarniciLekova;
 	}
 
 }

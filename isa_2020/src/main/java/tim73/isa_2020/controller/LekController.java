@@ -82,7 +82,7 @@ public class LekController {
 		
 		return new ResponseEntity<List<LekDTO>>(lekoviDTO, HttpStatus.OK);
 	}
-	
+	/*
 	@GetMapping(value = "/pacijent/{id}")
 	public ResponseEntity<List<LekDTO>> findAlergije(@PathVariable Long id) {
 		
@@ -97,7 +97,8 @@ public class LekController {
 		}	
 		return new ResponseEntity<List<LekDTO>>(lekoviDTO, HttpStatus.OK);
 	}
-	
+	*/
+	/*
 	@GetMapping(value = "/jedinstveniNazivi")
 	@PreAuthorize("hasRole('PACIJENT')")
 	public ResponseEntity<ArrayList<LekZaAlergijeDTO>> jedinstveniNaziviLekova (){
@@ -114,7 +115,8 @@ public class LekController {
 		
 		return new ResponseEntity<ArrayList<LekZaAlergijeDTO>>(lekoviDTO, HttpStatus.OK);
 	}
-	
+	*/
+	/*
 	@PostMapping(value = "/spisakZaAlergije")
 	@PreAuthorize("hasRole('PACIJENT')")
 	public ResponseEntity<ArrayList<LekZaAlergijeDTO>> jedinstveniNaziviLekova (@RequestBody List<LekZaAlergijeDTO> lekoviDTO, HttpServletRequest request){
@@ -126,6 +128,7 @@ public class LekController {
 		Set<Lek> lekoviZaAlergije= new HashSet<Lek>();
 		
 		for(LekZaAlergijeDTO lek:lekoviDTO) {
+		//sifrarnikRepository
 			for (Lek l:lekService.findByNaziv(lek.getNaziv())) {
 				lekoviZaAlergije.add(l);
 			}
@@ -142,6 +145,9 @@ public class LekController {
 		pacijentService.save(pacijent);
 		return null;
 	}
+	*/
+	
+	/*
 	
 	@GetMapping(value = "/imaAlergije")
 	@PreAuthorize("hasRole('PACIJENT')")
@@ -167,7 +173,7 @@ public class LekController {
 		return new ResponseEntity<ArrayList<LekZaAlergijeDTO>>(lekZaAlegijeDTO, HttpStatus.OK);
 	}
 		
-	
+	*/
 	
 
 }

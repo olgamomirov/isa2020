@@ -12,5 +12,4 @@ public interface LekService {
 	
 	List<Lek> findByApotekaId(Long id);
 	
-	Set<Lek> findByNaziv(String naziv);
 }

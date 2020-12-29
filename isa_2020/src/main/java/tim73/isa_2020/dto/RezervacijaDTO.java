@@ -17,7 +17,7 @@ public class RezervacijaDTO {
 	
 	
 	public RezervacijaDTO (Rezervacija rezervacija) {
-		this(rezervacija.getId(), rezervacija.getDatumPreuzimanja(), rezervacija.getLek().getNaziv(), rezervacija.getLek().getApoteka().getNaziv());
+		this(rezervacija.getId(), rezervacija.getDatumPreuzimanja(), rezervacija.getLek().getSifrarnikLekova().getNaziv(), rezervacija.getLek().getApoteka().getNaziv());
 	}
 
 
