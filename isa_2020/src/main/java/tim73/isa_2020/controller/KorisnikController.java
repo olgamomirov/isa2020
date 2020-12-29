@@ -165,8 +165,12 @@ public class KorisnikController {
 		Dermatolog d = (Dermatolog) k;
 		
 		for(Pregled p: d.getPregledi()) {
+			if(p.getInterval().equals(null)) {
+				System.out.println("nema datuma");
+			}else {
 			if(p.getStatus().equals("odradjen")) {
 				pacijenti.add(p.getPacijent());
+			}
 			}
 		}
 		
