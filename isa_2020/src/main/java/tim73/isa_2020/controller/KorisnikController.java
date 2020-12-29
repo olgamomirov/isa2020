@@ -52,6 +52,7 @@ import tim73.isa_2020.token.JwtAuthenticationRequest;
 
 @RestController
 @RequestMapping(value = "/korisnici")
+@CrossOrigin(origins = "http://localhost:3000")
 public class KorisnikController {
 	
 	@Autowired
@@ -128,7 +129,7 @@ public class KorisnikController {
 		return ResponseEntity.ok(pacijentdto);
 	}
 	
-	@PostMapping(value="/promeniPodatke", consumes=MediaType.APPLICATION_JSON_VALUE)
+	@PutMapping(value="/promeniPodatke", consumes=MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasRole('PACIJENT')")
 	public ResponseEntity<PacijentPodaciDTO> setPodaci(@RequestBody PacijentPodaciDTO pacijent, HttpServletRequest request){
 		
