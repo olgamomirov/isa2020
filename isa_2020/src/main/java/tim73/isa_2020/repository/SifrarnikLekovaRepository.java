@@ -6,4 +6,6 @@ import tim73.isa_2020.model.SifrarnikLekova;
 
 public interface SifrarnikLekovaRepository extends JpaRepository<SifrarnikLekova, Long>{
 
+	SifrarnikLekova findByNaziv(String naziv);
+	
 }
