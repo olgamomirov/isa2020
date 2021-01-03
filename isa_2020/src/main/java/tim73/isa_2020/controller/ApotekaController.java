@@ -22,8 +22,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import tim73.isa_2020.dto.ApotekaDTO;
+import tim73.isa_2020.dto.LekarDTO;
 import tim73.isa_2020.model.Apoteka;
 import tim73.isa_2020.model.Dermatolog;
+import tim73.isa_2020.model.Farmaceut;
 import tim73.isa_2020.model.Korisnik;
 import tim73.isa_2020.securityService.TokenUtils;
 import tim73.isa_2020.service.ApotekaService;
@@ -108,5 +110,34 @@ public class ApotekaController {
 		apotekaService.save(apoteka1);
 		
 	}
+	//za profil apoteke
+	@GetMapping(value = "/apoteka/{id}")
+	@PreAuthorize("hasRole('PACIJENT')")
+	public ResponseEntity<ApotekaDTO> detaljiApoteke(@PathVariable long id){
+		Apoteka apoteka=apotekaService.findById(id);
+		ApotekaDTO apotekaDTO=new ApotekaDTO(apoteka);
+		return new ResponseEntity<ApotekaDTO>(apotekaDTO, HttpStatus.OK);
+		
+	}
 	
+	//za profil apoteke
+	@GetMapping(value = "/lekari/apoteka/{id}")
+	@PreAuthorize("hasRole('PACIJENT')")
+	public ResponseEntity<List<LekarDTO>> lekariApoteke(@PathVariable long id) {
+		Apoteka apoteka = apotekaService.findById(id);
+		List<LekarDTO> lekari = new ArrayList<LekarDTO>();
+		for (Dermatolog d : apoteka.getDermatolozi()) {
+			if (d != null) {
+				lekari.add(new LekarDTO(d.getIme() + " " + d.getPrezime(), "dermatolog"));
+			}
+		}
+		for (Farmaceut f : apoteka.getFarmaceuti()) {
+			if (f != null) {
+				lekari.add(new LekarDTO(f.getIme() + " " + f.getPrezime(), "farmaceut"));
+			}
+		}
+
+		return new ResponseEntity<List<LekarDTO>>(lekari, HttpStatus.OK);
+	}
+
 }

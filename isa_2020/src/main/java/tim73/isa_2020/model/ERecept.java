@@ -28,6 +28,8 @@ public class ERecept {
 	
 	private DateTime datumIzdavanja;
 	
+	private String status;
+	
 	@ManyToMany
 	@JoinTable(name ="eRecepti", joinColumns = @JoinColumn(name="eRecept_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name="sifra_leka_id", referencedColumnName = "id"))
 	private Set<SifrarnikLekova> sifrarnici;
@@ -37,11 +39,12 @@ public class ERecept {
 		// TODO Auto-generated constructor stub
 	}
 
-	public ERecept(Pacijent pacijent, DateTime datumIzdavanja, Set<SifrarnikLekova> sifrarnici) {
+	public ERecept(Pacijent pacijent, DateTime datumIzdavanja, Set<SifrarnikLekova> sifrarnici, String status) {
 		super();
 		this.pacijent = pacijent;
 		this.datumIzdavanja = datumIzdavanja;
 		this.sifrarnici = sifrarnici;
+		this.status= status;
 	}
 
 	public Pacijent getPacijent() {
@@ -70,6 +73,14 @@ public class ERecept {
 
 	public Long getId() {
 		return id;
+	}
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
 	}
 	
 	

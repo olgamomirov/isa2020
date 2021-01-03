@@ -7,6 +7,8 @@ insert into "public"."farmaceut" ("id", "apoteka_id") values(4, 1)
 insert into "public"."apoteka" ("drzava", "grad", "naziv", "ocena", "ulica") values(null, 'Ruma', 'Neka', 5, null)
 insert into "public"."apoteka" ("drzava", "grad", "naziv", "ocena", "ulica") values(null, 'Beograd', 'Nova', 4, null)
 
+insert into "public"."zaposleni_dermatolozi" ("apoteka_id", "dermatolog_id") values(1, 2)
+
 insert into "public"."zaposleni_dermatolozi" ("apoteka_id", "dermatolog_id") values(2, 2)
 
 insert into "public"."zaposleni_dermatolozi" ("apoteka_id", "dermatolog_id") values(3, 2)
