@@ -79,8 +79,8 @@ public class PregledController {
 	ResponseEntity<String> add(){
 		
 
-		DateTime start=new DateTime(2020, 8, 15, 14, 00, 00);
-		DateTime stop=new DateTime( 2020, 8, 15, 15, 00, 00);
+		DateTime start=new DateTime(2021, 12, 3, 14, 00, 00);
+		DateTime stop=new DateTime( 2021, 12, 3, 15, 00, 00);
 		Interval interval = new org.joda.time.Interval( start, stop );
 		Pregled pregled = new Pregled(start, stop, interval, "odradjen", null, null);
 		

@@ -96,7 +96,7 @@ public class KorisnikController {
 		Authentication authentication = authenticationManager
 				.authenticate(new UsernamePasswordAuthenticationToken(authenticationRequest.getEmail(),
 						authenticationRequest.getLozinka()));
-
+		
 		// Ubaci korisnika u trenutni security kontekst
 		SecurityContextHolder.getContext().setAuthentication(authentication);
 
@@ -104,12 +104,12 @@ public class KorisnikController {
 		Korisnik user = (Korisnik) authentication.getPrincipal();
 		List<Authority> authority = (List<Authority>) user.getAuthorities();
 		String role = authority.get(0).getName();
-		
+		System.out.println(" status  " + user.getStatus());
 		String jwt = tokenUtils.generateToken(user.getUsername());
 		int expiresIn = tokenUtils.getExpiredIn();
 
 		// Vrati token kao odgovor na uspesnu autentifikaciju
-		return ResponseEntity.ok(new UserTokenState(jwt, expiresIn, role));
+		return ResponseEntity.ok(new UserTokenState(jwt, expiresIn, role, user.getStatus()));
 	}
 	
 	@GetMapping("/getPodaci")

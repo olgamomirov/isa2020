@@ -32,8 +32,8 @@ public class Dermatolog extends Korisnik{
 	}
 
 	public Dermatolog(String ime, String prezime, String email, String lozinka, String ulica, String grad,
-			String drzava, String telefon) {
-		super(ime, prezime, email, lozinka, ulica, grad, drzava, telefon);
+			String drzava, String telefon, String status) {
+		super(ime, prezime, email, lozinka, ulica, grad, drzava, telefon, status);
 		// TODO Auto-generated constructor stub
 	}
 
