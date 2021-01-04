@@ -13,4 +13,5 @@ public interface ApotekaService {
 	void delete(long id);
 	
 	void save(Apoteka apoteka);
+	
 }

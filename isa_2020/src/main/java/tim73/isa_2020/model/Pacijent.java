@@ -25,6 +25,10 @@ public class Pacijent extends Korisnik{
 	@OneToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name = "alergija_id", referencedColumnName = "id")
 	private Alergije alergija;
+	
+	@OneToMany(mappedBy = "pacijent", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	private Set<ERecept> eRecept;
+
 
 	public Pacijent() {
 		super();
@@ -59,6 +63,14 @@ public class Pacijent extends Korisnik{
 
 	public void setAlergija(Alergije alergija) {
 		this.alergija = alergija;
+	}
+
+	public Set<ERecept> geteRecept() {
+		return eRecept;
+	}
+
+	public void seteRecept(Set<ERecept> eRecept) {
+		this.eRecept = eRecept;
 	}
 
 }
