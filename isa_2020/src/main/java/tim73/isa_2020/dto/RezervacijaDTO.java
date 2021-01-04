@@ -17,6 +17,8 @@ public class RezervacijaDTO {
 	
 	private String nazivApoteke;
 	
+	private String status;
+	
 	
 	public RezervacijaDTO() {
 		super();
@@ -25,15 +27,17 @@ public class RezervacijaDTO {
 
 
 	public RezervacijaDTO (Rezervacija rezervacija) {
-		this(rezervacija.getId(), rezervacija.getDatumPreuzimanja(), rezervacija.getLek().getSifrarnikLekova().getNaziv(), rezervacija.getLek().getApoteka().getNaziv());
+		this(rezervacija.getId(), rezervacija.getDatumPreuzimanja(), rezervacija.getStatus(), rezervacija.getLek().getSifrarnikLekova().getNaziv(), rezervacija.getLek().getApoteka().getNaziv());
 	}
 
 
-	public RezervacijaDTO(Long id, DateTime datumPreuzimanja, String nazivLeka, String nazivApoteke) {
+	public RezervacijaDTO(Long id, DateTime datumPreuzimanja, String status, String nazivLeka, String nazivApoteke) {
 		
 		this.id = id;
 		
 		this.datumPreuzimanja = datumPreuzimanja;
+		
+		this.status = status;
 		
 		this.nazivLeka = nazivLeka;
 		
@@ -58,6 +62,11 @@ public class RezervacijaDTO {
 
 	public String getNazivApoteke() {
 		return nazivApoteke;
+	}
+
+
+	public String getStatus() {
+		return status;
 	}
 
 	

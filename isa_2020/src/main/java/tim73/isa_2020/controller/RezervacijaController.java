@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.MailException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -33,9 +34,11 @@ import tim73.isa_2020.model.Apoteka;
 import tim73.isa_2020.model.Farmaceut;
 import tim73.isa_2020.model.Korisnik;
 import tim73.isa_2020.model.Lek;
+import tim73.isa_2020.model.Pacijent;
 import tim73.isa_2020.model.Rezervacija;
 import tim73.isa_2020.securityService.TokenUtils;
 import tim73.isa_2020.service.ApotekaService;
+import tim73.isa_2020.service.EmailService;
 import tim73.isa_2020.service.KorisnikService;
 import tim73.isa_2020.service.KorisnikServiceImpl;
 import tim73.isa_2020.service.RezervacijaService;
@@ -59,13 +62,16 @@ public class RezervacijaController {
 	@Autowired
 	private KorisnikServiceImpl korisnikDetails;
 	
+	@Autowired
+	private EmailService mailService;
+	
 	
 	@GetMapping(value = "/setTime/{id}")
 	ResponseEntity <RezervacijaDTO>  setTime(@PathVariable Long id) {
 		
 		Rezervacija rezervacija = rezervacijaService.findOne(id);
 		
-		rezervacija.setDatumPreuzimanja(new DateTime(2021, 1, 5, 14, 00, 00));
+		rezervacija.setDatumPreuzimanja(new DateTime(2021, 1, 6, 14, 00, 00));
 		
 		RezervacijaDTO rezervacijaDTO = new RezervacijaDTO(rezervacija);
 		rezervacijaService.save(rezervacija);
@@ -97,6 +103,7 @@ public class RezervacijaController {
 		
 		if(rezervacija!=null) {
 			if(f.getApoteka().equals(rezervacija.getLek().getApoteka())) {
+				if(rezervacija.getStatus().equals("izdavanje")) {
 				System.out.println(rezervacija.getDatumPreuzimanja().getMillis());
 				System.out.println(System.currentTimeMillis());
 				System.out.println((rezervacija.getDatumPreuzimanja().getMillis()-System.currentTimeMillis())/3600000);
@@ -105,6 +112,7 @@ public class RezervacijaController {
 				}else {
 					
 					System.out.println("nemaa");
+				}
 				}
 		}else {
 			
@@ -120,19 +128,29 @@ public class RezervacijaController {
 	}
 	@RequestMapping(value = "/izdavanje", method = RequestMethod.POST, produces = "application/json" ,  consumes = "application/json")
 	@PreAuthorize("hasRole('FARMACEUT')")
-	ResponseEntity <RezervacijaDTO> preuzimanjeLeka(@RequestBody Body body, HttpServletRequest request) throws ParseException {
+	ResponseEntity <RezervacijaDTO> preuzimanjeLeka(@RequestBody Body body, HttpServletRequest request) throws ParseException, MailException, InterruptedException {
 		
 		String token = tokenUtils.getToken(request);
 		String username = this.tokenUtils.getUsernameFromToken(token);
 		Korisnik k = (Korisnik) this.korisnikDetails.loadUserByUsername(username);
 		
 		Rezervacija rezervacija = rezervacijaService.findOne(body.id);
-		
+		if(rezervacija.getStatus().equals("izdavanje")) {
+		//	if(rezervacija.getLek().getKolicina()>=kolicina///)
 		rezervacija.getLek().setKolicina(rezervacija.getLek().getKolicina()-1);
+		}
+		rezervacija.setStatus("preuzeto");
 		
 		rezervacijaService.save(rezervacija);
 		
 		RezervacijaDTO rezervacijaDTO = new RezervacijaDTO(rezervacija);
+		
+		Pacijent pacijent = rezervacija.getPacijent();
+		
+		
+		
+		mailService.sendSimpleMessage(pacijent.getEmail(), "Potvrda", "Uspesno ste pruzeli lek: "
+				+ rezervacija.getLek().getSifrarnikLekova().getNaziv() + " u apoteci: " + rezervacija.getLek().getApoteka().getNaziv());
 				
 		return new ResponseEntity<RezervacijaDTO>(rezervacijaDTO, HttpStatus.OK);
 	}

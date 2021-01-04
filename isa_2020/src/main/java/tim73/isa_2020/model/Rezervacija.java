@@ -22,6 +22,8 @@ public class Rezervacija {
 	
 	private DateTime datumPreuzimanja;
 	
+	private String status;
+	
 	@ManyToOne
 	private Lek lek;
 	
@@ -33,9 +35,10 @@ public class Rezervacija {
 		// TODO Auto-generated constructor stub
 	}
 
-	public Rezervacija(DateTime datumPreuzimanja, Lek lek, Pacijent pacijent) {
+	public Rezervacija(DateTime datumPreuzimanja, String status, Lek lek, Pacijent pacijent) {
 		super();
 		this.datumPreuzimanja = datumPreuzimanja;
+		this.status = status;
 		this.lek = lek;
 		this.pacijent = pacijent;
 	}
@@ -67,6 +70,13 @@ public class Rezervacija {
 	public Long getId() {
 		return id;
 	}
-	
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
 	
 }

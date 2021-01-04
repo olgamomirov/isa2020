@@ -29,4 +29,5 @@ public class EmailService {
 		javaMailSender.send(mail);
 		System.out.println("poslao");
 	}
+
 }

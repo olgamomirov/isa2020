@@ -25,12 +25,6 @@ insert into "public"."pacijent" ("id") values(3)
 insert into "public"."pacijent" ("id") values(5)
 
 
-
---insert into "public"."rezervacija" ("id", "datum_preuzimanja", "lek_id", "pacijent_id") values(1, null, 1, 3)
-
---insert into "public"."rezervacija" ("id", "datum_preuzimanja", "lek_id", "pacijent_id") values(2, null, 3, 3)
-
-
 insert into "public"."authority" ("name") values ('ROLE_PACIJENT')
 insert into "public"."authority" ("name") values ('ROLE_DERMATOLOG')
 insert into "public"."authority" ("name") values ('ROLE_FARMACEUT')
@@ -64,6 +58,10 @@ insert into "public"."lek" ( "kolicina", "apoteka_id", "sifra_leka_id") values( 
 insert into "public"."lek" ( "kolicina", "apoteka_id", "sifra_leka_id") values( 4, 1, 3)
 insert into "public"."lek" ( "kolicina", "apoteka_id", "sifra_leka_id") values( 5, 2, 3)
 insert into "public"."lek" ( "kolicina", "apoteka_id", "sifra_leka_id") values( 7, 3, 3)
+
+insert into "public"."rezervacija" ("id", "datum_preuzimanja","status", "lek_id", "pacijent_id") values(1, null,'izdavanje', 1, 3)
+
+insert into "public"."rezervacija" ("id", "datum_preuzimanja", "status", "lek_id", "pacijent_id") values(2, null,'preuzeto', 3, 3)
 
 
 
