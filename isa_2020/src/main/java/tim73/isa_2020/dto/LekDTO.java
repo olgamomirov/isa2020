@@ -7,17 +7,17 @@ public class LekDTO {
 
 	private Long id;
 	
-	private String sifra;
+	private Long sifra;
 	
 	private String naziv;
 	
 	private Long idApoteka;
 	
 	public LekDTO (Lek lek) {
-		this(lek.getId(), lek.getNaziv(), lek.getSifra(), lek.getApoteka().getId());
+		this(lek.getId(), lek.getSifrarnikLekova().getNaziv(), lek.getSifrarnikLekova().getId(), lek.getApoteka().getId());
 	}
 
-	public LekDTO(Long id, String naziv, String sifra, Long idApoteka) {
+	public LekDTO(Long id, String naziv, Long sifra, Long idApoteka) {
 
           this.id = id;
           
@@ -32,7 +32,7 @@ public class LekDTO {
 		return id;
 	}
 
-	public String getSifra() {
+	public Long getSifra() {
 		return sifra;
 	}
 

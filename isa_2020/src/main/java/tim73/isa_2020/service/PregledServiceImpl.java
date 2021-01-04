@@ -24,20 +24,23 @@ public class PregledServiceImpl implements PregledService{
 
 	@Override
 	public List<Pregled> findByApotekaId(Long id) {
-		// TODO Auto-generated method stub
 		return pregledRepository.findByApotekaId(id);
 	}
 
 	@Override
 	public List<Pregled> findAll() {
-		// TODO Auto-generated method stub
 		return pregledRepository.findAll();
 	}
 
 	@Override
 	public Pregled findOne(Long id) {
-		// TODO Auto-generated method stub
 		return pregledRepository.findById(id).orElse(null);
+	}
+
+
+	@Override
+	public List<Pregled> findByApotekaIdAndStatus(Long id, String status) {
+		return pregledRepository.findByApotekaIdAndStatus(id, status);
 	}
 
 }

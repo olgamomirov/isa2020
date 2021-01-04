@@ -14,6 +14,8 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Transient;
 
+import org.hibernate.annotations.Columns;
+import org.hibernate.annotations.Type;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Interval;
@@ -33,7 +35,8 @@ public class Pregled {
 	@Transient
 	private DateTime stop = new DateTime();
 	
-	private Interval interval  = new org.joda.time.Interval( start, stop );
+	
+	private Interval interval  = new Interval( start, stop );
 	
 	private String status = "default";
 	

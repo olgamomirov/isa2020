@@ -33,6 +33,7 @@ import org.springframework.web.bind.annotation.RestController;
 import tim73.isa_2020.dto.ApotekaDTO;
 import tim73.isa_2020.dto.DermatologDTO;
 import tim73.isa_2020.dto.FarmaceutDTO;
+import tim73.isa_2020.dto.LekarDTO;
 import tim73.isa_2020.dto.PacijentPodaciDTO;
 import tim73.isa_2020.dto.PregledDTO;
 import tim73.isa_2020.model.Apoteka;
@@ -45,6 +46,7 @@ import tim73.isa_2020.model.Pregled;
 import tim73.isa_2020.model.UserTokenState;
 import tim73.isa_2020.repository.PacijentRepository;
 import tim73.isa_2020.securityService.TokenUtils;
+import tim73.isa_2020.service.ApotekaService;
 import tim73.isa_2020.service.KorisnikService;
 import tim73.isa_2020.service.KorisnikServiceImpl;
 import tim73.isa_2020.service.PacijentService;
@@ -52,6 +54,7 @@ import tim73.isa_2020.token.JwtAuthenticationRequest;
 
 @RestController
 @RequestMapping(value = "/korisnici")
+@CrossOrigin(origins = "http://localhost:3000")
 public class KorisnikController {
 	
 	@Autowired
@@ -128,7 +131,7 @@ public class KorisnikController {
 		return ResponseEntity.ok(pacijentdto);
 	}
 	
-	@PostMapping(value="/promeniPodatke", consumes=MediaType.APPLICATION_JSON_VALUE)
+	@PutMapping(value="/promeniPodatke", consumes=MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasRole('PACIJENT')")
 	public ResponseEntity<PacijentPodaciDTO> setPodaci(@RequestBody PacijentPodaciDTO pacijent, HttpServletRequest request){
 		
@@ -230,4 +233,5 @@ public class KorisnikController {
   		return new ResponseEntity<List<PacijentPodaciDTO>>(pacijentiDTO, HttpStatus.OK);
   	}
 
+	
 }

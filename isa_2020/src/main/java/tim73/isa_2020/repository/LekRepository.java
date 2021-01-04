@@ -13,5 +13,4 @@ public interface LekRepository extends JpaRepository<Lek, Long> {
 
 	List<Lek> findByApotekaId(Long id);
 	
-	Set<Lek> findByNaziv(String naziv);
 }

@@ -7,14 +7,16 @@ insert into "public"."farmaceut" ("id", "apoteka_id") values(4, 1)
 insert into "public"."apoteka" ("drzava", "grad", "naziv", "ocena", "ulica") values(null, 'Ruma', 'Neka', 5, null)
 insert into "public"."apoteka" ("drzava", "grad", "naziv", "ocena", "ulica") values(null, 'Beograd', 'Nova', 4, null)
 
+insert into "public"."zaposleni_dermatolozi" ("apoteka_id", "dermatolog_id") values(1, 2)
+
 insert into "public"."zaposleni_dermatolozi" ("apoteka_id", "dermatolog_id") values(2, 2)
 
 insert into "public"."zaposleni_dermatolozi" ("apoteka_id", "dermatolog_id") values(3, 2)
 
-insert into "public"."lek" ("id", "kolicina", "naziv", "sifra", "apoteka_id") values(1, 1, 'bromazepam', '123', 1)
+--insert into "public"."lek" ("id", "kolicina", "naziv", "sifra", "apoteka_id") values(1, 1, 'bromazepam', '123', 1)
 
-insert into "public"."lek" ("id", "kolicina", "naziv", "sifra", "apoteka_id") values(2, 1, 'bromazepam', '123', 2)
-insert into "public"."lek" ("id", "kolicina", "naziv", "sifra", "apoteka_id") values(3, 1, 'fervex', '12345', 2)
+--insert into "public"."lek" ("id", "kolicina", "naziv", "sifra", "apoteka_id") values(2, 1, 'bromazepam', '123', 2)
+--insert into "public"."lek" ("id", "kolicina", "naziv", "sifra", "apoteka_id") values(3, 1, 'fervex', '12345', 2)
 
 insert into "public"."korisnik" ("id", "drzava", "email", "grad", "ime", "lozinka", "prezime", "telefon", "ulica", "enabled") values(3, 'nedodjija', 'ivica@gmail.com', 'neki', 'Ivica', '$2a$04$Vbug2lwwJGrvUXTj6z7ff.97IzVBkrJ1XfApfGNl.Z695zqcnPYra', 'ivic', '772885', 'slepa', true)
 
@@ -26,9 +28,9 @@ insert into "public"."pacijent" ("id") values(5)
 
 
 
-insert into "public"."rezervacija" ("id", "datum_preuzimanja", "lek_id", "pacijent_id") values(1, '2020-10-09', 1, 3)
+--insert into "public"."rezervacija" ("id", "datum_preuzimanja", "lek_id", "pacijent_id") values(1, '2020-10-09', 1, 3)
 
-insert into "public"."rezervacija" ("id", "datum_preuzimanja", "lek_id", "pacijent_id") values(2, '2020-10-09', 3, 3)
+--insert into "public"."rezervacija" ("id", "datum_preuzimanja", "lek_id", "pacijent_id") values(2, '2020-10-09', 3, 3)
 
 
 insert into "public"."authority" ("name") values ('ROLE_PACIJENT')
@@ -42,8 +44,28 @@ insert into "public"."korisnik_authority"  ("korisnik_id", "authority_id") value
 
 
 insert into "public"."tip_pregleda" ( "cena", "tip") values( 1000.0, 'pregled mladeza')
-insert into "public"."tip_pregleda" ( "cena", "tip") values( 500.0, 'kontrola')insert into "public"."pregled" ( "dijagnoza", "interval", "status", "terapija", "apoteka_id", "dermatolog_id", "farmaceut_id", "pacijent_id") values( 'zdravo', '', 'odradjen', 'nema', 2, 2, null, 3)
+insert into "public"."tip_pregleda" ( "cena", "tip") values( 500.0, 'kontrola')
+insert into "public"."pregled" ( "dijagnoza", "interval", "status", "terapija", "apoteka_id", "dermatolog_id", "farmaceut_id", "pacijent_id") values( 'zdravo', '', 'odradjen', 'nema', 2, 2, null, 3)
 insert into "public"."pregled" ( "dijagnoza", "interval", "status", "terapija", "apoteka_id", "dermatolog_id", "farmaceut_id", "pacijent_id") values( 'kontrola', '', 'odradjen', 'nema', 2, 2, null, 3)
 insert into "public"."pregled" ( "dijagnoza", "interval", "status", "terapija", "apoteka_id", "dermatolog_id", "farmaceut_id", "pacijent_id") values( 'strasno', '', 'odradjen', 'cccc', 2, null, 4, 3)
 insert into "public"."tipovi_pregledi" ("pregled_id", "tip_pregleda_id") values(1, 1)
 insert into "public"."tipovi_pregledi" ("pregled_id", "tip_pregleda_id") values(2, 2)
+
+
+insert into "public"."sifrarnik_lekova" ( "dodatne_napomene", "naziv", "oblik_leka", "proizvodjac", "recept", "sastav", "vrsta_leka") values( null, 'bromazepam', '', null, 'true', null, null)
+insert into "public"."sifrarnik_lekova" ( "dodatne_napomene", "naziv", "oblik_leka", "proizvodjac", "recept", "sastav", "vrsta_leka") values( null, 'fervex', null, null, 'false', null, null)
+insert into "public"."sifrarnik_lekova" ( "dodatne_napomene", "naziv", "oblik_leka", "proizvodjac", "recept", "sastav", "vrsta_leka") values( null, 'panadol', null, null, 'false', null, null)
+
+
+insert into "public"."lek" ( "kolicina", "apoteka_id", "sifra_leka_id") values( 5, 1, 1)
+insert into "public"."lek" ( "kolicina", "apoteka_id", "sifra_leka_id") values( 10, 2, 1)
+insert into "public"."lek" ( "kolicina", "apoteka_id", "sifra_leka_id") values( 3, 3, 1)
+insert into "public"."lek" ( "kolicina", "apoteka_id", "sifra_leka_id") values( 6, 1, 2)
+insert into "public"."lek" ( "kolicina", "apoteka_id", "sifra_leka_id") values( 1, 2, 2)
+insert into "public"."lek" ( "kolicina", "apoteka_id", "sifra_leka_id") values( 9, 3, 2)
+insert into "public"."lek" ( "kolicina", "apoteka_id", "sifra_leka_id") values( 4, 1, 3)
+insert into "public"."lek" ( "kolicina", "apoteka_id", "sifra_leka_id") values( 5, 2, 3)
+insert into "public"."lek" ( "kolicina", "apoteka_id", "sifra_leka_id") values( 7, 3, 3)
+
+
+

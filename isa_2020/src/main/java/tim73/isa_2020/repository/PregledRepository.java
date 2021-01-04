@@ -11,4 +11,7 @@ import tim73.isa_2020.model.Pregled;
 public interface PregledRepository extends JpaRepository<Pregled, Long>{
 
 	List<Pregled> findByApotekaId(Long id);
+	
+	List<Pregled> findByApotekaIdAndStatus(Long id, String status);
+	
 }
