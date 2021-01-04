@@ -11,6 +11,7 @@ public class FarmaceutDTO {
 	private String grad;
 	private String drzava;
 	private String telefon;
+	private String status;
 	
 	public FarmaceutDTO() {
 		super();
@@ -18,11 +19,11 @@ public class FarmaceutDTO {
 	}
 	
 	public FarmaceutDTO (Korisnik k) {
-		this(k.getEmail(), k.getIme(), k.getPrezime(), k.getUlica(), k.getGrad(), k.getDrzava(), k.getTelefon());
+		this(k.getEmail(), k.getIme(), k.getPrezime(), k.getUlica(), k.getGrad(), k.getDrzava(), k.getTelefon(), k.getStatus());
 	}
 	
 	public FarmaceutDTO(String email, String ime, String prezime, String ulica, String grad, String drzava,
-			String telefon) {
+			String telefon, String status) {
 		super();
 		this.email = email;
 		this.ime = ime;
@@ -31,6 +32,7 @@ public class FarmaceutDTO {
 		this.grad = grad;
 		this.drzava = drzava;
 		this.telefon = telefon;
+		this.status = status;
 	}
 	
 	public String getEmail() {
@@ -54,5 +56,9 @@ public class FarmaceutDTO {
 	public String getTelefon() {
 		return telefon;
 	}
-	
+
+	public String getStatus() {
+		return status;
+	}
+
 }

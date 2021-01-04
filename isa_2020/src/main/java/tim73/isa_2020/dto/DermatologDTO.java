@@ -11,6 +11,7 @@ public class DermatologDTO {
 	private String grad;
 	private String drzava;
 	private String telefon;
+	private String status;
 	
 	public DermatologDTO() {
 		super();
@@ -19,12 +20,12 @@ public class DermatologDTO {
 	
 
 	public DermatologDTO (Korisnik k) {
-		this(k.getEmail(), k.getIme(), k.getPrezime(), k.getUlica(), k.getGrad(), k.getDrzava(), k.getTelefon());
+		this(k.getEmail(), k.getIme(), k.getPrezime(), k.getUlica(), k.getGrad(), k.getDrzava(), k.getTelefon(), k.getStatus());
 	}
 
 
 	public DermatologDTO(String email, String ime, String prezime, String ulica, String grad, String drzava,
-			String telefon) {
+			String telefon, String status) {
 		
 		this.email = email;
 		this.ime = ime;
@@ -33,6 +34,7 @@ public class DermatologDTO {
 		this.grad = grad;
 		this.drzava = drzava;
 		this.telefon = telefon;
+		this.status = status;
 	}
 
 
@@ -68,6 +70,11 @@ public class DermatologDTO {
 
 	public String getTelefon() {
 		return telefon;
+	}
+
+
+	public String getStatus() {
+		return status;
 	}
 	
 }

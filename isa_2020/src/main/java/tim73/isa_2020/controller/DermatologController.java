@@ -1,23 +1,42 @@
 package tim73.isa_2020.controller;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCrypt;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import tim73.isa_2020.dto.DermatologDTO;
+import tim73.isa_2020.model.Authority;
 import tim73.isa_2020.model.Dermatolog;
 import tim73.isa_2020.model.Korisnik;
+import tim73.isa_2020.model.UserTokenState;
+import tim73.isa_2020.repository.KorisnikRepository;
 import tim73.isa_2020.securityService.TokenUtils;
 import tim73.isa_2020.service.DermatologService;
 import tim73.isa_2020.service.KorisnikService;
@@ -26,7 +45,7 @@ import tim73.isa_2020.service.KorisnikServiceImpl;
 @RestController
 @RequestMapping(value = "/dermatolozi")
 public class DermatologController {
-	
+
 	@Autowired
 	private TokenUtils tokenUtils;
 
@@ -38,67 +57,136 @@ public class DermatologController {
 
 	@Autowired
 	private DermatologService dermatologService;
-	
+
 	@Autowired
 	private KorisnikService korisnikService;
-	
+
+	@Bean
+	public PasswordEncoder encoder() {
+		return new BCryptPasswordEncoder();
+	}
+
+	protected final Log LOGGER = LogFactory.getLog(getClass());
+
+	@Autowired
+	private KorisnikRepository rep;
+
+	@Autowired
+	private PasswordEncoder passwordEncoder;
+
 	@GetMapping(value = "{id}")
-	ResponseEntity<Dermatolog> findById(@PathVariable long id){
+	ResponseEntity<Dermatolog> findById(@PathVariable long id) {
 		return new ResponseEntity<>(dermatologService.findById(id), HttpStatus.OK);
 	}
-	
-	@RequestMapping(method=RequestMethod.POST, value = "/changeData", consumes="application/json", produces = "application/json")
+
+	@RequestMapping(method = RequestMethod.POST, value = "/changeData", consumes = "application/json", produces = "application/json")
 	@PreAuthorize("hasRole('DERMATOLOG')")
-	public ResponseEntity<DermatologDTO> changeData(@RequestBody Korisnik korisnik, HttpServletRequest request){
-		
+	public ResponseEntity<DermatologDTO> changeData(@RequestBody Korisnik korisnik, HttpServletRequest request) {
 
 		String token = tokenUtils.getToken(request);
 		String username = this.tokenUtils.getUsernameFromToken(token);
 		Korisnik ulogovan = (Korisnik) this.userDetailsService.loadUserByUsername(username);
 
 		Korisnik userEdited = ulogovan;
-		if(korisnik.getIme()!=null) {
-		userEdited.setIme(korisnik.getIme());
+		if (korisnik.getIme() != null) {
+			userEdited.setIme(korisnik.getIme());
 		}
-		if(korisnik.getPrezime()!=null) {
-		userEdited.setPrezime(korisnik.getPrezime());
+		if (korisnik.getPrezime() != null) {
+			userEdited.setPrezime(korisnik.getPrezime());
 		}
-		if(korisnik.getEmail()!=null) {
-		userEdited.setEmail(korisnik.getEmail());
+		if (korisnik.getEmail() != null) {
+			userEdited.setEmail(korisnik.getEmail());
 		}
-		if(korisnik.getUlica()!=null) {
-		userEdited.setUlica(korisnik.getUlica());
+		if (korisnik.getUlica() != null) {
+			userEdited.setUlica(korisnik.getUlica());
 		}
-		if(korisnik.getGrad()!=null) {
-		userEdited.setGrad(korisnik.getGrad());
+		if (korisnik.getGrad() != null) {
+			userEdited.setGrad(korisnik.getGrad());
 		}
-		if(korisnik.getDrzava()!=null) {
-		userEdited.setDrzava(korisnik.getDrzava());
+		if (korisnik.getDrzava() != null) {
+			userEdited.setDrzava(korisnik.getDrzava());
 		}
-		if(korisnik.getTelefon()!=null) {
-		userEdited.setTelefon(korisnik.getTelefon());
+		if (korisnik.getTelefon() != null) {
+			userEdited.setTelefon(korisnik.getTelefon());
 		}
 		korisnikService.save(userEdited);
-		
+
 		Dermatolog d = (Dermatolog) userEdited;
-		
+
 		DermatologDTO dto = new DermatologDTO(d);
-		
+
 		return new ResponseEntity<DermatologDTO>(dto, HttpStatus.OK);
 	}
-	
-	@RequestMapping(method=RequestMethod.GET, value = "/getData")
+
+	@RequestMapping(method = RequestMethod.GET, value = "/getData")
 	@PreAuthorize("hasRole('DERMATOLOG')")
-	public ResponseEntity<DermatologDTO> getData(HttpServletRequest request){
-		
+	public ResponseEntity<DermatologDTO> getData(HttpServletRequest request) {
 
 		String token = tokenUtils.getToken(request);
 		String username = this.tokenUtils.getUsernameFromToken(token);
 		Korisnik ulogovan = (Korisnik) this.userDetailsService.loadUserByUsername(username);
 
 		DermatologDTO dermatologDTO = new DermatologDTO(ulogovan);
-		
+
 		return new ResponseEntity<DermatologDTO>(dermatologDTO, HttpStatus.OK);
 	}
+
+	@RequestMapping(value = "/change-password", method = RequestMethod.POST)
+	@PreAuthorize("hasRole('DERMATOLOG')")
+	public ResponseEntity<DermatologDTO> changePassword(@RequestBody PasswordChanger passwordChanger,
+			HttpServletRequest request) {
+		// Ocitavamo trenutno ulogovanog korisnika
+		String token = tokenUtils.getToken(request);
+		String username = this.tokenUtils.getUsernameFromToken(token);
+		Korisnik user = (Korisnik) this.userDetailsService.loadUserByUsername(username);
+		;
+        user.setStatus("ulogovan");
+		DermatologDTO dermatologDTO = new DermatologDTO(user);
+
+		if (BCrypt.checkpw(passwordChanger.oldPassword, user.getLozinka())) {
+
+			user.setLozinka(passwordEncoder.encode(passwordChanger.newPassword));
+			korisnikService.save(user);
+			return new ResponseEntity<DermatologDTO>(dermatologDTO, HttpStatus.OK);
+		} else {
+
+			return new ResponseEntity<DermatologDTO>(dermatologDTO, HttpStatus.NOT_MODIFIED);
+		}
+
+	}
+
+	static class PasswordChanger {
+		public String oldPassword;
+		public String newPassword;
+	}
+	static class StatusBody {
+		public String statusNovi;
+		
+	}
+	@RequestMapping(value = "/change-status", method = RequestMethod.POST)
+	@PreAuthorize("hasRole('DERMATOLOG')")
+	public ResponseEntity<DermatologDTO> changeStatus(@RequestBody StatusBody status, HttpServletRequest request) {
+		// Ocitavamo trenutno ulogovanog korisnika
+		String token = tokenUtils.getToken(request);
+		String username = this.tokenUtils.getUsernameFromToken(token);
+		Korisnik user = (Korisnik) this.userDetailsService.loadUserByUsername(username);
+		List<Authority> authority = (List<Authority>) user.getAuthorities();
+		
+		//new UserTokenState(token, tokenUtils.getExpiredIn(), authority.get(0).getName(), "ulogovan");
 	
+		System.out.println(status.statusNovi  + " sta cita?");
+		String status1 = status.statusNovi;
+		user.setStatus(status1);
+
+		korisnikService.save(user);
+	
+		System.out.println(user.getStatus() + " kakooo" + user.getIme() + " " + user.getTelefon());
+		
+		Dermatolog d = (Dermatolog) user;
+		
+		DermatologDTO dto = new DermatologDTO(d);
+		
+     return new ResponseEntity<DermatologDTO>(dto, HttpStatus.OK); 
+	}
+
 }
