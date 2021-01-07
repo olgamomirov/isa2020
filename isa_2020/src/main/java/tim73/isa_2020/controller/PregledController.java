@@ -86,10 +86,10 @@ public class PregledController {
 	ResponseEntity<String> add(){
 		
 
-		DateTime start=new DateTime(2020, 8, 15, 14, 00, 00);
-		DateTime stop=new DateTime( 2020, 8, 15, 15, 00, 00);
+		DateTime start=new DateTime(2021, 1, 7, 8, 00, 00);
+		DateTime stop=new DateTime( 2021, 1, 7, 15, 00, 00);
 		Interval interval = new Interval( start, stop );
-		Pregled pregled = new Pregled(start, stop, interval, "odradjen", null, null);
+		Pregled pregled = new Pregled(start, stop, interval, "f", null, null);
 		
 		DateTime start2=new DateTime(2020, 11, 20, 14, 00, 00);
 		DateTime stop2=new DateTime( 2020, 11, 20, 16, 00, 00);
@@ -431,5 +431,7 @@ public class PregledController {
 					+ pregled.getInterval().getStart().toString("dd/MM/yyyy HH:mm"));
 		}
 	}
+	
+	
 
 }
