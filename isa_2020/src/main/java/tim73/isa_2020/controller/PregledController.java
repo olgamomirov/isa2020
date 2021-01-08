@@ -1,5 +1,6 @@
 package tim73.isa_2020.controller;
 
+import java.awt.TextArea;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
@@ -22,6 +23,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -86,10 +89,10 @@ public class PregledController {
 	ResponseEntity<String> add(){
 		
 
-		DateTime start=new DateTime(2020, 8, 15, 14, 00, 00);
-		DateTime stop=new DateTime( 2020, 8, 15, 15, 00, 00);
+		DateTime start=new DateTime(2020, 12, 20, 14, 00, 00);
+		DateTime stop=new DateTime( 2020, 12, 20, 15, 00, 00);
 		Interval interval = new Interval( start, stop );
-		Pregled pregled = new Pregled(start, stop, interval, "odradjen", null, null);
+		Pregled pregled = new Pregled(start, stop, interval, "rezervisan", null, null);
 		
 		DateTime start2=new DateTime(2020, 11, 20, 14, 00, 00);
 		DateTime stop2=new DateTime( 2020, 11, 20, 16, 00, 00);
@@ -104,13 +107,13 @@ public class PregledController {
 		DateTime start1=new DateTime(2020, 12, 28, 23, 00, 00);
 		DateTime stop1=new DateTime( 2020, 12, 28, 23, 15, 00);
 		Interval interval1 = new org.joda.time.Interval( start1, stop1 );
-		Pregled pregled1 = new Pregled(start1, stop1, interval1, "default", null, null);
+		Pregled pregled1 = new Pregled(start1, stop1, interval1, "rezervisan", null, null);
 		
 		
-		DateTime start3=new DateTime(2020, 11, 15, 14, 00, 00);
-		DateTime stop3=new DateTime( 2020, 11, 15, 15, 00, 00);
+		DateTime start3=new DateTime(2021, 1, 15, 14, 00, 00);
+		DateTime stop3=new DateTime( 2021, 1, 15, 15, 00, 00);
 		Interval interval3 = new org.joda.time.Interval( start3, stop3 );
-		Pregled pregled3 = new Pregled(start3, stop3, interval3, "odradjen", null, null);
+		Pregled pregled3 = new Pregled(start3, stop3, interval3, "rezervisan", null, null);
 		
 		Dermatolog dermatolog= dermatologService.findById(2);
 		Apoteka apoteka= apotekaService.findById(2);
@@ -136,12 +139,14 @@ public class PregledController {
 		
 		pregled1.setFarmaceut(farmaceut);
 		pregled1.setApoteka(apoteka);
+		pregled1.setPacijent(pacijent2);
 		pregledService.save(pregled1);
 		
 		return new ResponseEntity<>(pregled.toString(), HttpStatus.OK);
 	}
 	
 	@GetMapping(value = "/{id}")
+	@PreAuthorize("hasRole('DERMATOLOG')")
 	public ResponseEntity<List<PregledDTO>> findOne(@PathVariable Long id) {
 		
 		List<Pregled> pregledi= pregledService.findByApotekaId(id);
@@ -153,6 +158,16 @@ public class PregledController {
 		}	
 		
 		return new ResponseEntity<List<PregledDTO>>(preglediDTO, HttpStatus.OK);
+	}
+	@GetMapping(value = "/pregled/{id}")
+	@PreAuthorize("hasRole('DERMATOLOG')")
+	public ResponseEntity <PregledDTO> findOneById(@PathVariable Long id) {
+		
+		Pregled pregled = pregledService.findOne(id);
+		
+		PregledDTO pregledDTO = new PregledDTO(pregled);
+		
+		return new ResponseEntity <PregledDTO>(pregledDTO, HttpStatus.OK);
 	}
 	@GetMapping(value = "/svi/{id}") //id apoteke za koju su mu potrebni svi pregledi, jer dermatolog radi u vise apoteka
 	@PreAuthorize("hasRole('DERMATOLOG')")
@@ -430,6 +445,49 @@ public class PregledController {
 			mailService.sendSimpleMessage(p.getEmail(), "REZERVACIJA", "Uspesno ste rezervisali pregled za "
 					+ pregled.getInterval().getStart().toString("dd/MM/yyyy HH:mm"));
 		}
+	}
+	
+	@GetMapping(value = "/pregledi")
+	@PreAuthorize("hasRole('DERMATOLOG')")
+	public ResponseEntity<List<PregledDTO>> preglediPacijent(@RequestParam("email") String email){
+      List<PregledDTO> preglediDTO= new ArrayList<PregledDTO>();
+		Pacijent p = (Pacijent) korisnikService.findByEmail(email);
+		
+		Set<Pregled> pregledi=p.getPregledi();
+		
+		for (Pregled pregled:pregledi) {
+			if(pregled.getStatus().equals("rezervisan")) {
+				
+				
+				
+							preglediDTO.add(new PregledDTO(pregled));
+				}
+				
+			}
+	
+		return new ResponseEntity<List<PregledDTO>>(preglediDTO,HttpStatus.OK);
+		
+	}
+	static class PregledKraj{
+		public String informacije;
+		public Long pregledID;
+	}
+	
+	@PostMapping(value = "/zavrsiPregled")
+	@PreAuthorize("hasRole('DERMATOLOG')")
+	public ResponseEntity<PregledDTO> zavrsiPregled(@RequestBody PregledKraj p){
+     
+		Pregled pregled = pregledService.findOne(p.pregledID);
+		
+		pregled.setDijagnoza(p.informacije);
+		
+		pregled.setStatus("odradjen");
+		
+		pregledService.save(pregled);		
+			
+		PregledDTO dto = new PregledDTO(pregled);
+		return new ResponseEntity<PregledDTO>(dto,HttpStatus.OK);
+		
 	}
 
 }

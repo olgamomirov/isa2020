@@ -71,7 +71,7 @@ public class RezervacijaController {
 		
 		Rezervacija rezervacija = rezervacijaService.findOne(id);
 		
-		rezervacija.setDatumPreuzimanja(new DateTime(2021, 1, 6, 14, 00, 00));
+		rezervacija.setDatumPreuzimanja(new DateTime(2021, 1, 8, 14, 00, 00));
 		
 		RezervacijaDTO rezervacijaDTO = new RezervacijaDTO(rezervacija);
 		rezervacijaService.save(rezervacija);

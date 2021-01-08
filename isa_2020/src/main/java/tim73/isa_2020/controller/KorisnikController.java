@@ -16,6 +16,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -50,6 +51,7 @@ import tim73.isa_2020.service.ApotekaService;
 import tim73.isa_2020.service.KorisnikService;
 import tim73.isa_2020.service.KorisnikServiceImpl;
 import tim73.isa_2020.service.PacijentService;
+import tim73.isa_2020.service.PregledService;
 import tim73.isa_2020.token.JwtAuthenticationRequest;
 
 @RestController
@@ -71,6 +73,9 @@ public class KorisnikController {
 	
 	@Autowired
 	private PacijentService pacijentService;
+	
+	@Autowired
+	private PregledService pregledService;
 	
 	/*
 	@PostMapping(value = "/login", consumes=MediaType.APPLICATION_JSON_VALUE)
@@ -153,7 +158,7 @@ public class KorisnikController {
 		return new ResponseEntity<PacijentPodaciDTO>(pacijent,HttpStatus.OK);
 	}
 	
-	@GetMapping(value = "/sviPacijenti") //svi pregledani pacijenti odredjenog dermatologa...u svim apotekama...promeniti na odredjenu apoteku
+	@GetMapping(value = "/sviPregledaniPacijenti") //svi pregledani pacijenti odredjenog dermatologa...u svim apotekama...promeniti na odredjenu apoteku
 	@PreAuthorize("hasRole('DERMATOLOG')")
 	public ResponseEntity<List<PacijentPodaciDTO>> findAll(HttpServletRequest request) {
 		
@@ -182,6 +187,64 @@ public class KorisnikController {
 		}
 		
 		return new ResponseEntity<List<PacijentPodaciDTO>>(pacijentiDTO, HttpStatus.OK);
+	}
+	@GetMapping(value = "/sviPacijenti") //svi pregledani pacijenti odredjenog dermatologa...u svim apotekama...promeniti na odredjenu apoteku
+	@PreAuthorize("hasRole('DERMATOLOG')")
+	public ResponseEntity<List<PacijentPodaciDTO>> findAll1(HttpServletRequest request) {
+		
+        
+		
+		List<Korisnik> korisnici = korisnikService.findAll();
+		
+		List<Korisnik> pacijenti = new ArrayList<Korisnik>();
+		
+		for(Korisnik k: korisnici) {
+			for(GrantedAuthority a: k.getAuthorities()) {
+				if(a.getAuthority().equals("ROLE_PACIJENT")) {
+					pacijenti.add((Pacijent)k);
+				}
+			}
+		}
+		List<PacijentPodaciDTO> dto = new ArrayList<PacijentPodaciDTO>();
+		for(Korisnik k: pacijenti) {
+			dto.add(new PacijentPodaciDTO(k));
+		}
+		
+		return new ResponseEntity<List<PacijentPodaciDTO>>(dto, HttpStatus.OK);
+	}
+	@GetMapping(value = "/pacijent")
+	@PreAuthorize("hasRole('DERMATOLOG') or hasRole('FARMACEUT')")
+	public ResponseEntity<PacijentPodaciDTO> getOne(@RequestParam(value="email") String email, HttpServletRequest request) {
+		
+     
+		Pacijent p = (Pacijent) korisnikService.findByEmail(email);
+		PacijentPodaciDTO dto = new PacijentPodaciDTO(p);
+	
+		
+		return new ResponseEntity<PacijentPodaciDTO>(dto, HttpStatus.OK);
+	}
+static class PenalBody{
+	public String email;
+	public Long id;
+}
+	@RequestMapping(value = "/penal", method = RequestMethod.POST, consumes = "application/json", produces = "application/json")
+	@PreAuthorize("hasRole('DERMATOLOG') or hasRole('FARMACEUT')")
+	public ResponseEntity<PacijentPodaciDTO> setPenal(@RequestBody PenalBody penal, HttpServletRequest request) {
+		
+     
+		Pacijent p = (Pacijent) korisnikService.findByEmail(penal.email);
+		p.setPenal(p.getPenal()+1);
+		korisnikService.save(p);
+		PacijentPodaciDTO dto = new PacijentPodaciDTO(p);
+		
+		Pregled pregled = pregledService.findOne(penal.id);
+		
+		pregled.setStatus("default");
+		pregled.setPacijent(null);
+	    pregledService.save(pregled);
+	    
+		
+		return new ResponseEntity<PacijentPodaciDTO>(dto, HttpStatus.OK);
 	}
 	
 	@GetMapping(value = "/dermatolog")

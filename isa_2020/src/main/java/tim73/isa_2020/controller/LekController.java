@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import tim73.isa_2020.dto.ApotekaDTO;
@@ -31,11 +32,13 @@ import tim73.isa_2020.model.Dermatolog;
 import tim73.isa_2020.model.Korisnik;
 import tim73.isa_2020.model.Lek;
 import tim73.isa_2020.model.Pacijent;
+import tim73.isa_2020.model.Pregled;
 import tim73.isa_2020.model.SifrarnikLekova;
 import tim73.isa_2020.securityService.TokenUtils;
 import tim73.isa_2020.service.KorisnikServiceImpl;
 import tim73.isa_2020.service.LekService;
 import tim73.isa_2020.service.PacijentService;
+import tim73.isa_2020.service.PregledService;
 import tim73.isa_2020.service.SifrarnikLekovaService;
 
 @RestController
@@ -56,7 +59,9 @@ public class LekController {
 	
 	@Autowired
 	private SifrarnikLekovaService sifrarnikLekovaService;
-
+	
+	@Autowired
+	private PregledService pregledService;
 	
 	@GetMapping(value = "/sviLekovi")
 	public ResponseEntity<List<LekDTO>> findAll() {
@@ -104,7 +109,7 @@ public class LekController {
 	
 	
 	@GetMapping(value = "/jedinstveniNazivi")
-	@PreAuthorize("hasRole('PACIJENT')")
+	@PreAuthorize("hasRole('PACIJENT') or hasRole('DERMATOLOG')")
 	public ResponseEntity<ArrayList<LekZaAlergijeDTO>> jedinstveniNaziviLekova (){
 		List<SifrarnikLekova> sviLekovi = sifrarnikLekovaService.findAll();
 		ArrayList<LekZaAlergijeDTO> lekoviDTO = new ArrayList<LekZaAlergijeDTO>();
@@ -113,7 +118,37 @@ public class LekController {
 		}	
 		return new ResponseEntity<ArrayList<LekZaAlergijeDTO>>(lekoviDTO, HttpStatus.OK);
 	}
-	
+	@GetMapping(value = "/jedinstveniNazivi/bezAlergija")
+	@PreAuthorize("hasRole('DERMATOLOG')")
+	public ResponseEntity<ArrayList<LekZaAlergijeDTO>> jedinstveniNaziviBezAlergija (@RequestParam("email") String email){
+		List<SifrarnikLekova> sviLekovi = sifrarnikLekovaService.findAll();
+		ArrayList<LekZaAlergijeDTO> lekoviDTO = new ArrayList<LekZaAlergijeDTO>();
+		Pacijent p = (Pacijent) userDetailsService.findByEmail(email);
+		Set<SifrarnikLekova> sviLekoviAlergija = new HashSet<SifrarnikLekova>();
+		if(p.getAlergija()!=null) {
+			sviLekoviAlergija = p.getAlergija().getLekovi();
+		}
+		
+		boolean flag; //nije alergican na lek
+		for(SifrarnikLekova sl : sviLekovi) {
+			flag = false;
+			for (SifrarnikLekova lekovi: sviLekoviAlergija) {
+			if(lekovi.getId().equals(sl.getId())){
+				flag = true;
+				break;
+			}
+				
+			
+		}
+			if(flag==false) {
+			lekoviDTO.add(new LekZaAlergijeDTO(sl.getNaziv()));
+		}	
+		}
+		
+		
+		
+		return new ResponseEntity<ArrayList<LekZaAlergijeDTO>>(lekoviDTO, HttpStatus.OK);
+	}
 	
 	@PostMapping(value = "/spisakZaAlergije")
 	@PreAuthorize("hasRole('PACIJENT')")
@@ -160,7 +195,54 @@ public class LekController {
 		return new ResponseEntity<ArrayList<LekZaAlergijeDTO>>(lekZaAlegijeDTO, HttpStatus.OK);
 	}
 		
-	
-	
+	@GetMapping(value = "/lek/{nazivLeka}/{pregledID}")
+	public ResponseEntity<LekDTO> findOne(@PathVariable String nazivLeka, @PathVariable long pregledID) {
+		
+		Apoteka apoteka = pregledService.findOne(pregledID).getApoteka();
+		
+		Set<Lek> lekApoteka = apoteka.getLekovi();
+		
+		 LekDTO lekDTO= null;
+		
+		for(Lek l: lekApoteka) {
+			if(l.getSifrarnikLekova().getNaziv().equals(nazivLeka)) {
+				lekDTO = new LekDTO(l);
+			}
+		}
+		
+		
+		return new ResponseEntity<LekDTO>(lekDTO, HttpStatus.OK);
+	}
+	@GetMapping(value = "/dostupnost/{naziv}/{id}") //lekar proverava da li je trazeni lek dostupan u apoteci u kojoj vrsi pregled
+	public boolean proveriDostupnost(@PathVariable String naziv, @PathVariable long id) {
+		
+		boolean flag = false;
+		
+		Pregled p = pregledService.findOne(id);
+		
+		
+		Apoteka a = p.getApoteka();
+		
+		Set<Lek> lekovi = a.getLekovi();
+		
+		
+		
+		for(Lek l: lekovi) {
+			flag = false;
+			if(l.getSifrarnikLekova().getNaziv().equals(naziv)) { // da li uopste prodaju taj lek u apoteci
+				if(l.getKolicina()>0) {
+					
+					return true;
+				}
+				
+				
+			}
+			
+		}
+		
+			
+			return flag;
+		
+	}
 
 }

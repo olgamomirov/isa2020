@@ -15,6 +15,8 @@ public class Pacijent extends Korisnik{
 	
 	
 	private static final long serialVersionUID = 1L;
+	
+	private int penal = 0;
 
 	@OneToMany(mappedBy = "pacijent", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	private Set<Rezervacija> rezervacije = new HashSet<Rezervacija>();
@@ -36,9 +38,10 @@ public class Pacijent extends Korisnik{
 	}
 
 	public Pacijent(String ime, String prezime, String email, String lozinka, String ulica, String grad, String drzava,
-			String telefon, String status) {
+			String telefon, String status, int penal) {
 		super(ime, prezime, email, lozinka, ulica, grad, drzava, telefon, status);
 		// TODO Auto-generated constructor stub
+		this.penal = penal;
 	}
 
 	public Set<Rezervacija> getRezervacije() {
@@ -71,6 +74,14 @@ public class Pacijent extends Korisnik{
 
 	public void seteRecept(Set<ERecept> eRecept) {
 		this.eRecept = eRecept;
+	}
+
+	public int getPenal() {
+		return penal;
+	}
+
+	public void setPenal(int penal) {
+		this.penal = penal;
 	}
 
 }
