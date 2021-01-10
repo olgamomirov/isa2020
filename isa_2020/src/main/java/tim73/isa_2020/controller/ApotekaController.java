@@ -154,8 +154,6 @@ public class ApotekaController {
 		String datum = datumIVreme.split("T")[0];
 		String vremeString = datumIVreme.split("T")[1];
 
-		System.out.println(datum);
-		System.out.println(vremeString);
 		
 		Set<ApotekaDTO> apotekeSaSlobodnimFarmaceutom = new HashSet<ApotekaDTO>();
 		
@@ -184,7 +182,7 @@ public class ApotekaController {
 				if (slobodanPregled == 0 && slobodanUTokuRadnogVremena != 0) {
 					slobodanFarmaceut++;
 				}
-			}
+			} 
 			if (slobodanFarmaceut > 0) {
 				apotekeSaSlobodnimFarmaceutom.add(new ApotekaDTO(apoteka));
 			}
