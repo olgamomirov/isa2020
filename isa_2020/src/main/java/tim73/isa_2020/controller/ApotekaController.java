@@ -153,7 +153,8 @@ public class ApotekaController {
 	public ResponseEntity<Set<ApotekaDTO>> apotekeKojeImajuSlobodneTermine(@RequestBody String datumIVreme) {
 		String datum = datumIVreme.split("T")[0];
 		String vremeString = datumIVreme.split("T")[1];
-
+		System.out.println(datum);
+		System.out.println(vremeString);
 		
 		Set<ApotekaDTO> apotekeSaSlobodnimFarmaceutom = new HashSet<ApotekaDTO>();
 		

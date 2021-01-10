@@ -43,4 +43,10 @@ public class PregledServiceImpl implements PregledService{
 		return pregledRepository.findByApotekaIdAndStatus(id, status);
 	}
 
+
+	@Override
+	public List<Pregled> findByFarmaceutId(Long id) {
+		return pregledRepository.findByFarmaceutId(id);
+	}
+
 }

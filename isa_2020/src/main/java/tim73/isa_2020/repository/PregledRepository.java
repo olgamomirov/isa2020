@@ -14,4 +14,5 @@ public interface PregledRepository extends JpaRepository<Pregled, Long>{
 	
 	List<Pregled> findByApotekaIdAndStatus(Long id, String status);
 	
+	List<Pregled> findByFarmaceutId(Long id);
 }
