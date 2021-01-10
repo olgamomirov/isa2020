@@ -2,11 +2,19 @@ package tim73.isa_2020.service;
 
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
@@ -17,6 +25,7 @@ import tim73.isa_2020.securityService.AuthorityService;
 @Service
 public class KorisnikServiceImpl implements  UserDetailsService , KorisnikService{
 	
+	
 	@Autowired
 	private KorisnikRepository korisnikRepository;
 	
@@ -24,7 +33,7 @@ public class KorisnikServiceImpl implements  UserDetailsService , KorisnikServic
 	private PasswordEncoder passwordEncoder;
 
 	@Autowired
-	private AuthorityService authService;
+	private AuthenticationManager authenticationManager;
 	
 
 	@Override

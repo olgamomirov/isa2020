@@ -31,10 +31,12 @@ import tim73.isa_2020.model.Dermatolog;
 import tim73.isa_2020.model.Korisnik;
 import tim73.isa_2020.model.Lek;
 import tim73.isa_2020.model.Pacijent;
+import tim73.isa_2020.model.SifrarnikLekova;
 import tim73.isa_2020.securityService.TokenUtils;
 import tim73.isa_2020.service.KorisnikServiceImpl;
 import tim73.isa_2020.service.LekService;
 import tim73.isa_2020.service.PacijentService;
+import tim73.isa_2020.service.SifrarnikLekovaService;
 
 @RestController
 @RequestMapping(value = "/lekovi")
@@ -52,7 +54,8 @@ public class LekController {
 	@Autowired
 	private KorisnikServiceImpl userDetailsService;
 	
-
+	@Autowired
+	private SifrarnikLekovaService sifrarnikLekovaService;
 
 	
 	@GetMapping(value = "/sviLekovi")
@@ -98,25 +101,20 @@ public class LekController {
 		return new ResponseEntity<List<LekDTO>>(lekoviDTO, HttpStatus.OK);
 	}
 	*/
-	/*
+	
+	
 	@GetMapping(value = "/jedinstveniNazivi")
 	@PreAuthorize("hasRole('PACIJENT')")
 	public ResponseEntity<ArrayList<LekZaAlergijeDTO>> jedinstveniNaziviLekova (){
-		List<Lek> sviLekovi = lekService.findAll();
+		List<SifrarnikLekova> sviLekovi = sifrarnikLekovaService.findAll();
 		ArrayList<LekZaAlergijeDTO> lekoviDTO = new ArrayList<LekZaAlergijeDTO>();
-		ArrayList<String> jedinstveniNazivi= new ArrayList<String>();
-		for (Lek l : sviLekovi) {
-			if(!jedinstveniNazivi.contains(l.getNaziv())) {
-				jedinstveniNazivi.add(l.getNaziv());
-				lekoviDTO.add(new LekZaAlergijeDTO(l.getNaziv()));
-
-			}
-		}
-		
+		for (SifrarnikLekova sl : sviLekovi) {
+			lekoviDTO.add(new LekZaAlergijeDTO(sl.getNaziv()));
+		}	
 		return new ResponseEntity<ArrayList<LekZaAlergijeDTO>>(lekoviDTO, HttpStatus.OK);
 	}
-	*/
-	/*
+	
+	
 	@PostMapping(value = "/spisakZaAlergije")
 	@PreAuthorize("hasRole('PACIJENT')")
 	public ResponseEntity<ArrayList<LekZaAlergijeDTO>> jedinstveniNaziviLekova (@RequestBody List<LekZaAlergijeDTO> lekoviDTO, HttpServletRequest request){
@@ -125,13 +123,10 @@ public class LekController {
 		String username = this.tokenUtils.getUsernameFromToken(token);
 		Pacijent pacijent = (Pacijent) this.userDetailsService.loadUserByUsername(username);
 		
-		Set<Lek> lekoviZaAlergije= new HashSet<Lek>();
+		Set<SifrarnikLekova> lekoviZaAlergije= new HashSet<SifrarnikLekova>();
 		
 		for(LekZaAlergijeDTO lek:lekoviDTO) {
-		//sifrarnikRepository
-			for (Lek l:lekService.findByNaziv(lek.getNaziv())) {
-				lekoviZaAlergije.add(l);
-			}
+				lekoviZaAlergije.add(sifrarnikLekovaService.findByNaziv(lek.getNaziv()));	
 		}
 		if (pacijent.getAlergija() != null) {
 			pacijent.getAlergija().setLekovi(lekoviZaAlergije);
@@ -145,9 +140,9 @@ public class LekController {
 		pacijentService.save(pacijent);
 		return null;
 	}
-	*/
 	
-	/*
+	
+	
 	
 	@GetMapping(value = "/imaAlergije")
 	@PreAuthorize("hasRole('PACIJENT')")
@@ -157,23 +152,15 @@ public class LekController {
 		Pacijent pacijent=(Pacijent) userDetailsService.findByEmail(tokenUtils.getUsernameFromToken(authentication.getCredentials().toString()));
 		
 		ArrayList<LekZaAlergijeDTO> lekZaAlegijeDTO= new ArrayList<LekZaAlergijeDTO>();
-		ArrayList<String> jedinstveniNazivi= new ArrayList<String>();
-		if(pacijent.getAlergija()!=null) {
-			for (Lek l : pacijent.getAlergija().getLekovi()) {
-				if (!jedinstveniNazivi.contains(l.getNaziv())) {
-					jedinstveniNazivi.add(l.getNaziv());
-					lekZaAlegijeDTO.add(new LekZaAlergijeDTO(l.getNaziv()));
-				}
+		if (pacijent.getAlergija() != null) {
+			for (SifrarnikLekova sl : pacijent.getAlergija().getLekovi()) {
+				lekZaAlegijeDTO.add(new LekZaAlergijeDTO(sl.getNaziv()));
 			}
-		}
-		
-		for(LekZaAlergijeDTO l:lekZaAlegijeDTO) {
-			System.out.println("lekovi "+l.getNaziv());
-		}
+		}	
 		return new ResponseEntity<ArrayList<LekZaAlergijeDTO>>(lekZaAlegijeDTO, HttpStatus.OK);
 	}
 		
-	*/
+	
 	
 
 }

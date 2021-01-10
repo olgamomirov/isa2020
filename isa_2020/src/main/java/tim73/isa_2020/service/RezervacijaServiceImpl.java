@@ -32,4 +32,9 @@ public class RezervacijaServiceImpl implements RezervacijaService{
 		return rezervacijaRepository.findByPacijentId(id);
 	}
 
+	@Override
+	public void save(Rezervacija rezervacija) {
+		rezervacijaRepository.save(rezervacija);
+	}
+
 }

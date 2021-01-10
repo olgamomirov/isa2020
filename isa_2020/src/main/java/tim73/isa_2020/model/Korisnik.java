@@ -51,6 +51,8 @@ public class Korisnik implements UserDetails {
 	
 	private String telefon;
 	
+	private String status;
+	
 	@Column(name = "enabled")
     private boolean enabled=true;
 	
@@ -67,7 +69,7 @@ public class Korisnik implements UserDetails {
 	}
 
 	public Korisnik(String ime, String prezime, String email, String lozinka, String ulica, String grad, String drzava,
-			String telefon) {
+			String telefon, String status) {
 		super();
 		this.ime = ime;
 		this.prezime = prezime;
@@ -77,6 +79,7 @@ public class Korisnik implements UserDetails {
 		this.grad = grad;
 		this.drzava = drzava;
 		this.telefon = telefon;
+		this.status= status;
 	}
 
 	public String getIme() {
@@ -197,5 +200,13 @@ public class Korisnik implements UserDetails {
 	public void setEnabled(boolean enabled) {
         this.enabled = enabled;
     }
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
 	
 }

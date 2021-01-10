@@ -9,6 +9,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 
+import org.joda.time.DateTime;
+
 @Entity
 public class Rezervacija {
 
@@ -18,7 +20,9 @@ public class Rezervacija {
 	@Column(unique=true, nullable=false)
 	private Long id; //jedinstveni broj rezervacije preko koje ce se izdavati lek
 	
-	private Date datumPreuzimanja;
+	private DateTime datumPreuzimanja;
+	
+	private String status;
 	
 	@ManyToOne
 	private Lek lek;
@@ -31,18 +35,19 @@ public class Rezervacija {
 		// TODO Auto-generated constructor stub
 	}
 
-	public Rezervacija(Date datumPreuzimanja, Lek lek, Pacijent pacijent) {
+	public Rezervacija(DateTime datumPreuzimanja, String status, Lek lek, Pacijent pacijent) {
 		super();
 		this.datumPreuzimanja = datumPreuzimanja;
+		this.status = status;
 		this.lek = lek;
 		this.pacijent = pacijent;
 	}
 
-	public Date getDatumPreuzimanja() {
+	public DateTime getDatumPreuzimanja() {
 		return datumPreuzimanja;
 	}
 
-	public void setDatumPreuzimanja(Date datumPreuzimanja) {
+	public void setDatumPreuzimanja(DateTime datumPreuzimanja) {
 		this.datumPreuzimanja = datumPreuzimanja;
 	}
 
@@ -65,6 +70,13 @@ public class Rezervacija {
 	public Long getId() {
 		return id;
 	}
-	
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
 	
 }
