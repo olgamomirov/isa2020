@@ -2,6 +2,8 @@ package tim73.isa_2020.dto;
 
 import java.sql.Date;
 
+import org.joda.time.DateTime;
+
 import tim73.isa_2020.model.Lek;
 import tim73.isa_2020.model.Rezervacija;
 
@@ -9,23 +11,33 @@ public class RezervacijaDTO {
 
 	private Long id;
 	
-	private Date datumPreuzimanja;
+	private DateTime datumPreuzimanja;
 	
 	private String nazivLeka;
 	
 	private String nazivApoteke;
 	
+	private String status;
 	
-	public RezervacijaDTO (Rezervacija rezervacija) {
-		this(rezervacija.getId(), rezervacija.getDatumPreuzimanja(), rezervacija.getLek().getSifrarnikLekova().getNaziv(), rezervacija.getLek().getApoteka().getNaziv());
+	
+	public RezervacijaDTO() {
+		super();
+		// TODO Auto-generated constructor stub
 	}
 
 
-	public RezervacijaDTO(Long id, Date datumPreuzimanja, String nazivLeka, String nazivApoteke) {
+	public RezervacijaDTO (Rezervacija rezervacija) {
+		this(rezervacija.getId(), rezervacija.getDatumPreuzimanja(), rezervacija.getStatus(), rezervacija.getLek().getSifrarnikLekova().getNaziv(), rezervacija.getLek().getApoteka().getNaziv());
+	}
+
+
+	public RezervacijaDTO(Long id, DateTime datumPreuzimanja, String status, String nazivLeka, String nazivApoteke) {
 		
 		this.id = id;
 		
 		this.datumPreuzimanja = datumPreuzimanja;
+		
+		this.status = status;
 		
 		this.nazivLeka = nazivLeka;
 		
@@ -38,7 +50,7 @@ public class RezervacijaDTO {
 	}
 
 
-	public Date getDatumPreuzimanja() {
+	public DateTime getDatumPreuzimanja() {
 		return datumPreuzimanja;
 	}
 
@@ -50,6 +62,11 @@ public class RezervacijaDTO {
 
 	public String getNazivApoteke() {
 		return nazivApoteke;
+	}
+
+
+	public String getStatus() {
+		return status;
 	}
 
 	
