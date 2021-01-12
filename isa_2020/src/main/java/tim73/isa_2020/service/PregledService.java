@@ -16,4 +16,6 @@ public interface PregledService {
 	Pregled findOne(Long id);
 	
 	List<Pregled> findByApotekaIdAndStatus(Long id, String status);
+	
+	List<Pregled> findByFarmaceutId (Long id);
 }

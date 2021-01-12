@@ -1,10 +1,16 @@
 package tim73.isa_2020.controller;
 
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.joda.time.DateTime;
+import org.joda.time.Interval;
+import org.joda.time.Period;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -27,6 +33,8 @@ import tim73.isa_2020.model.Apoteka;
 import tim73.isa_2020.model.Dermatolog;
 import tim73.isa_2020.model.Farmaceut;
 import tim73.isa_2020.model.Korisnik;
+import tim73.isa_2020.model.Pregled;
+import tim73.isa_2020.model.RadnoVreme;
 import tim73.isa_2020.securityService.TokenUtils;
 import tim73.isa_2020.service.ApotekaService;
 import tim73.isa_2020.service.DermatologService;
@@ -140,4 +148,47 @@ public class ApotekaController {
 		return new ResponseEntity<List<LekarDTO>>(lekari, HttpStatus.OK);
 	}
 
+	@PostMapping(value = "/slobodneApoteke")
+	@PreAuthorize("hasRole('PACIJENT')")
+	public ResponseEntity<Set<ApotekaDTO>> apotekeKojeImajuSlobodneTermine(@RequestBody String datumIVreme) {
+		String datum = datumIVreme.split("T")[0];
+		String vremeString = datumIVreme.split("T")[1];
+		System.out.println(datum);
+		System.out.println(vremeString);
+		
+		Set<ApotekaDTO> apotekeSaSlobodnimFarmaceutom = new HashSet<ApotekaDTO>();
+		
+		DateTime vreme = new DateTime(Integer.parseInt(datum.split("-")[0]), Integer.parseInt(datum.split("-")[1]),
+				Integer.parseInt(datum.split("-")[2]), Integer.parseInt(vremeString.split("%3A")[0]), Integer.parseInt(vremeString.split("%3A")[1].substring(0, vremeString.split("%3A")[1].length()-1)));
+		Interval noviPregled= new Interval(vreme, new Period(1800000)); // pola sata za pregled
+		for(Apoteka apoteka:apotekaService.findAll()) {
+			int slobodanFarmaceut=0;
+			for(Farmaceut farmaceut:apoteka.getFarmaceuti()) {
+				int slobodanPregled=0;
+				int slobodanUTokuRadnogVremena=0;
+				for(Pregled pregled:farmaceut.getPregledi()) {
+					if(pregled!=null && pregled.getApoteka().equals(apoteka) && (pregled.getInterval().contains(noviPregled)|| pregled.getInterval().overlaps(noviPregled))) {
+						slobodanPregled++;
+					}
+				}
+				for(RadnoVreme rv:farmaceut.getRadnoVreme()) {
+					if(rv!=null && rv.getApoteka().equals(apoteka) && rv.getInterval().contains(noviPregled)) {
+						slobodanUTokuRadnogVremena++;
+
+					}
+				}
+				System.out.println("slobodan pregled: " + slobodanPregled);
+				System.out.println("slobodanUTokuRadnogVremena: " + slobodanUTokuRadnogVremena);
+
+				if (slobodanPregled == 0 && slobodanUTokuRadnogVremena != 0) {
+					slobodanFarmaceut++;
+				}
+			} 
+			if (slobodanFarmaceut > 0) {
+				apotekeSaSlobodnimFarmaceutom.add(new ApotekaDTO(apoteka));
+			}
+		}
+
+		return new ResponseEntity<Set<ApotekaDTO>>(apotekeSaSlobodnimFarmaceutom, HttpStatus.OK);
+	}
 }

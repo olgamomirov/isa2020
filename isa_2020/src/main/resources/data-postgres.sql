@@ -41,7 +41,7 @@ insert into "public"."korisnik_authority"  ("korisnik_id", "authority_id") value
 
 insert into "public"."tip_pregleda" ( "cena", "tip") values( 1000.0, 'pregled mladeza')
 insert into "public"."tip_pregleda" ( "cena", "tip") values( 500.0, 'kontrola')
-insert into "public"."pregled" ( "dijagnoza", "interval", "status", "terapija", "apoteka_id", "dermatolog_id", "farmaceut_id", "pacijent_id") values( 'zdravo', '', 'odradjen', 'nema', 2, 2, null, 3)
+insert into "public"."pregled" ( "dijagnoza", "interval", "status", "terapija", "apoteka_id", "dermatolog_id", "farmaceut_id", "pacijent_id") values( 'zdravo', '2021-01-07T08:00:00.000+01:00/2021-01-07T15:00:00.000+01:00', 'odradjen', 'nema', 2, 2, null, 3)
 insert into "public"."pregled" ( "dijagnoza", "interval", "status", "terapija", "apoteka_id", "dermatolog_id", "farmaceut_id", "pacijent_id") values( 'kontrola', '', 'odradjen', 'nema', 2, 2, null, 3)
 insert into "public"."pregled" ( "dijagnoza", "interval", "status", "terapija", "apoteka_id", "dermatolog_id", "farmaceut_id", "pacijent_id") values( 'strasno', '', 'odradjen', 'cccc', 2, null, 4, 3)
 insert into "public"."tipovi_pregledi" ("pregled_id", "tip_pregleda_id") values(1, 1)
