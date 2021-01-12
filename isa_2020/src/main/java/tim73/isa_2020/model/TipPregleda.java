@@ -3,12 +3,15 @@ package tim73.isa_2020.model;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 
 @Entity
 public class TipPregleda {
@@ -22,7 +25,7 @@ public class TipPregleda {
 	
 	private double cena = 0;
 	
-	@ManyToMany(mappedBy = "tipovi")
+	@OneToMany(mappedBy = "tip", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	private Set<Pregled> pregledi= new HashSet<Pregled>();
 
 	public TipPregleda() {

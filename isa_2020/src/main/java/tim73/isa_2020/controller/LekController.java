@@ -1,5 +1,6 @@
 package tim73.isa_2020.controller;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -11,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.MailException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
@@ -20,22 +22,31 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import tim73.isa_2020.controller.RezervacijaController.Body;
 import tim73.isa_2020.dto.ApotekaDTO;
 import tim73.isa_2020.dto.LekDTO;
 import tim73.isa_2020.dto.LekZaAlergijeDTO;
+import tim73.isa_2020.dto.RezervacijaDTO;
+import tim73.isa_2020.model.AdministratorApoteke;
 import tim73.isa_2020.model.Alergije;
 import tim73.isa_2020.model.Apoteka;
 import tim73.isa_2020.model.Dermatolog;
 import tim73.isa_2020.model.Korisnik;
 import tim73.isa_2020.model.Lek;
 import tim73.isa_2020.model.Pacijent;
+import tim73.isa_2020.model.Pregled;
+import tim73.isa_2020.model.Rezervacija;
 import tim73.isa_2020.model.SifrarnikLekova;
 import tim73.isa_2020.securityService.TokenUtils;
+import tim73.isa_2020.service.EmailService;
 import tim73.isa_2020.service.KorisnikServiceImpl;
 import tim73.isa_2020.service.LekService;
 import tim73.isa_2020.service.PacijentService;
+import tim73.isa_2020.service.PregledService;
 import tim73.isa_2020.service.SifrarnikLekovaService;
 
 @RestController
@@ -56,7 +67,12 @@ public class LekController {
 	
 	@Autowired
 	private SifrarnikLekovaService sifrarnikLekovaService;
-
+	
+	@Autowired
+	private PregledService pregledService;
+	
+	@Autowired
+	private EmailService mailService;
 	
 	@GetMapping(value = "/sviLekovi")
 	public ResponseEntity<List<LekDTO>> findAll() {
@@ -104,7 +120,7 @@ public class LekController {
 	
 	
 	@GetMapping(value = "/jedinstveniNazivi")
-	@PreAuthorize("hasRole('PACIJENT')")
+	@PreAuthorize("hasRole('PACIJENT') or hasRole('DERMATOLOG')")
 	public ResponseEntity<ArrayList<LekZaAlergijeDTO>> jedinstveniNaziviLekova (){
 		List<SifrarnikLekova> sviLekovi = sifrarnikLekovaService.findAll();
 		ArrayList<LekZaAlergijeDTO> lekoviDTO = new ArrayList<LekZaAlergijeDTO>();
@@ -113,7 +129,37 @@ public class LekController {
 		}	
 		return new ResponseEntity<ArrayList<LekZaAlergijeDTO>>(lekoviDTO, HttpStatus.OK);
 	}
-	
+	@GetMapping(value = "/jedinstveniNazivi/bezAlergija")
+	@PreAuthorize("hasRole('DERMATOLOG')")
+	public ResponseEntity<ArrayList<LekZaAlergijeDTO>> jedinstveniNaziviBezAlergija (@RequestParam("email") String email){
+		List<SifrarnikLekova> sviLekovi = sifrarnikLekovaService.findAll();
+		ArrayList<LekZaAlergijeDTO> lekoviDTO = new ArrayList<LekZaAlergijeDTO>();
+		Pacijent p = (Pacijent) userDetailsService.findByEmail(email);
+		Set<SifrarnikLekova> sviLekoviAlergija = new HashSet<SifrarnikLekova>();
+		if(p.getAlergija()!=null) {
+			sviLekoviAlergija = p.getAlergija().getLekovi();
+		}
+		
+		boolean flag; //nije alergican na lek
+		for(SifrarnikLekova sl : sviLekovi) {
+			flag = false;
+			for (SifrarnikLekova lekovi: sviLekoviAlergija) {
+			if(lekovi.getId().equals(sl.getId())){
+				flag = true;
+				break;
+			}
+				
+			
+		}
+			if(flag==false) {
+			lekoviDTO.add(new LekZaAlergijeDTO(sl.getNaziv()));
+		}	
+		}
+		
+		
+		
+		return new ResponseEntity<ArrayList<LekZaAlergijeDTO>>(lekoviDTO, HttpStatus.OK);
+	}
 	
 	@PostMapping(value = "/spisakZaAlergije")
 	@PreAuthorize("hasRole('PACIJENT')")
@@ -160,7 +206,156 @@ public class LekController {
 		return new ResponseEntity<ArrayList<LekZaAlergijeDTO>>(lekZaAlegijeDTO, HttpStatus.OK);
 	}
 		
+	@GetMapping(value = "/lek/{nazivLeka}/{pregledID}")
+	public ResponseEntity<LekDTO> findOne(@PathVariable String nazivLeka, @PathVariable long pregledID) {
+		
+		Apoteka apoteka = pregledService.findOne(pregledID).getApoteka();
+		
+		Set<Lek> lekApoteka = apoteka.getLekovi();
+		
+		 LekDTO lekDTO= null;
+		
+		for(Lek l: lekApoteka) {
+			if(l.getSifrarnikLekova().getNaziv().equals(nazivLeka)) {
+				lekDTO = new LekDTO(l);
+			}
+		}
+		
+		
+		return new ResponseEntity<LekDTO>(lekDTO, HttpStatus.OK);
+	}
+	@GetMapping(value = "/dostupnost/{naziv}/{id}") //lekar proverava da li je trazeni lek dostupan u apoteci u kojoj vrsi pregled
+	public boolean proveriDostupnost(@PathVariable String naziv, @PathVariable long id) throws MailException, InterruptedException {
+		
+		boolean flag = false;
+		
+		Pregled p = pregledService.findOne(id);
+		
+		
+		Apoteka a = p.getApoteka();
+		
+		Set<Lek> lekovi = a.getLekovi();
+		
+		
+		
+		for(Lek l: lekovi) {
+			flag = false;
+			if(l.getSifrarnikLekova().getNaziv().equals(naziv)) { // da li uopste prodaju taj lek u apoteci
+				if(l.getKolicina()>0) {
+					
+					return true;
+				}
+				
+				
+			}
+			
+		}
+	/*	Set<AdministratorApoteke> admini = a.getAdministratorApoteke();
+		if(!flag) {
+			String email = null;
+		for(AdministratorApoteke admin: admini) {
+			 email = admin.getEmail();  //salje prvom adminu kog nadje
+			break;
+		}
+		mailService.sendSimpleMessage(email, "NEDOSTUPAN LEK", "Lek  "
+				+ naziv + " nije dostupan.");
+		}*/
 	
-	
+			
+			return flag;
+		
+	}
+	static class Lek1{
+		public String naziv;
+		public Long id;
+	}
+	@RequestMapping(value = "/prepisiLek", method = RequestMethod.POST, produces = "application/json" ,  consumes = "application/json")
+	@PreAuthorize("hasRole('DERMATOLOG')")
+	void prepisivanjeLeka(@RequestBody Lek1 lek1, HttpServletRequest request) throws ParseException, MailException, InterruptedException {
+		
+		
+		Pregled p = pregledService.findOne(lek1.id);
+		
+		
+		Apoteka a = p.getApoteka();
+		
+		Set<Lek> lekovi = a.getLekovi();
+		
+		for(Lek l: lekovi) {
+			
+			if(l.getSifrarnikLekova().getNaziv().equals(lek1.naziv)) {
+				if(l.getKolicina()>0) {
+					
+					l.setKolicina(l.getKolicina()-1);
+					lekService.save(l);
+				}
+				
+				
+			}
+			
+		}
+					
+		
+	}
+	@GetMapping(value = "/zamenskiLekovi/{naziv}/{id}")
+	@PreAuthorize("hasRole('DERMATOLOG')")
+	public ResponseEntity<ArrayList<LekDTO>> zamenskiLekovi(@PathVariable String naziv, @PathVariable Long id){
+		SifrarnikLekova lek = sifrarnikLekovaService.findByNaziv(naziv);
+		Set<SifrarnikLekova> zamenski = new HashSet<SifrarnikLekova>();
+		ArrayList<LekDTO> lekoviDTO = new ArrayList<LekDTO>();
+		
+		Pregled p = pregledService.findOne(id);
+		
+		Apoteka a = p.getApoteka();
+		
+		Set<Lek> lekovi = a.getLekovi();
+		
+		Pacijent pacijent = p.getPacijent();
+		
+		List<Lek> lekoviZamena = new ArrayList<Lek>();
+		boolean flag = false;
+		
+		if(lek.getZamenskiLekovi()!=null) {
+			zamenski = lek.getZamenskiLekovi();
+		
+		for(SifrarnikLekova sifra: zamenski) {
+			  flag = false;
+		  for(Lek l: lekovi) {
+			  flag = false;
+			 if(l.getSifrarnikLekova().getNaziv().equals(sifra.getNaziv())) {
+				  flag = true; 
+				 // break;
+			 }
+			 if(flag) {
+				 lekoviZamena.add(l);
+			 }
+			 
+		  }
+		}
+		Set<SifrarnikLekova> alergije = pacijent.getAlergija().getLekovi();
+		List<Lek> konacnaLista = new ArrayList<Lek>();
+		boolean flag2 = true;
+		for(SifrarnikLekova sl: alergije) {
+			flag2 = true;
+			for(Lek l: lekoviZamena) {
+				flag2 = true;
+				if(l.getSifrarnikLekova().getNaziv().equals(sl.getNaziv())) {
+					flag2 = false;
+					//break;
+				}
+				if(flag2) {
+					konacnaLista.add(l);
+				}
+			}
+		}
+		
+		for(Lek l: konacnaLista) {
+			lekoviDTO.add(new LekDTO(l));
+		}
+		
+		}
+		
+		return new ResponseEntity<ArrayList<LekDTO>>(lekoviDTO, HttpStatus.OK);
+	}
 
 }
