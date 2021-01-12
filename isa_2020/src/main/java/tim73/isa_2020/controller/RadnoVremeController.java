@@ -87,7 +87,13 @@ public class RadnoVremeController {
 		
 		rv.setDermatolog(dermatolog);
 		rv.setApoteka(apoteka);
+		rv1.setDermatolog(dermatolog);
+		rv1.setApoteka(apoteka);
+		rv2.setDermatolog(dermatolog);
+		rv2.setApoteka(apoteka);
 		radnoVremeService.save(rv);
+		radnoVremeService.save(rv1);
+		radnoVremeService.save(rv2);
 		return new ResponseEntity<>(rv.toString(), HttpStatus.OK);
 	}
 	@GetMapping(value = "/getRadnoVreme")
