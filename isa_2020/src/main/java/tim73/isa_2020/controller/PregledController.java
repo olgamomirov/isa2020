@@ -431,7 +431,7 @@ public class PregledController {
 			pregled.setStatus("rezervisan");
 			pregled.setPacijent(p);
 			pregledService.save(pregled);
-			mailService.sendSimpleMessage(p.getEmail(), "REZERVACIJA", "Uspesno ste rezervisali pregled za "
+			mailService.sendSimpleMessage(p.getEmail(), "REZERVACIJA", "Uspesno ste rezervisali pregled kod dermatologa za "
 					+ pregled.getInterval().getStart().toString("dd/MM/yyyy HH:mm"));
 		}
 	}
@@ -466,6 +466,8 @@ public class PregledController {
 		pregled.setPacijent(p);
 		
 		pregledService.save(pregled);
+		
+		mailService.sendSimpleMessage(p.getEmail(), "REZERVACIJA", "Uspesno ste rezervisali pregled kod farmaceuta za "+datum+" u "+vremeString+".");
 		return new ResponseEntity<String>("ok", HttpStatus.OK);
  
 	}

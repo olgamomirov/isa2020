@@ -167,7 +167,7 @@ public class ApotekaController {
 				int slobodanPregled=0;
 				int slobodanUTokuRadnogVremena=0;
 				for(Pregled pregled:farmaceut.getPregledi()) {
-					if(pregled!=null && pregled.getApoteka().equals(apoteka) && pregled.getInterval().contains(noviPregled)) {
+					if(pregled!=null && pregled.getApoteka().equals(apoteka) && (pregled.getInterval().contains(noviPregled)|| pregled.getInterval().overlaps(noviPregled))) {
 						slobodanPregled++;
 					}
 				}
