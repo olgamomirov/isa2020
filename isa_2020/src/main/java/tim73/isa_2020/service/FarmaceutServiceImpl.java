@@ -1,4 +1,7 @@
 package tim73.isa_2020.service;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,8 +17,12 @@ public class FarmaceutServiceImpl implements FarmaceutService{
 	
 	@Override
 	public Farmaceut findOne(Long id) {
-		// TODO Auto-generated method stub
 		return farmaceutRepository.findById(id).orElse(null);
+	}
+
+	@Override
+	public List<Farmaceut> findByApotekaId(Long id) {
+		return farmaceutRepository.findByApotekaId(id);
 	}
 
 }

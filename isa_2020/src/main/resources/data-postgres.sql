@@ -24,6 +24,7 @@ insert into "public"."korisnik" ("id", "drzava", "email", "grad", "ime", "lozink
 
 insert into "public"."korisnik" ("id", "drzava", "email", "grad", "ime", "lozinka", "prezime", "telefon", "ulica", "enabled", "status") values(5, 'Srbija', 'aca@gmail.com', 'neki', 'Aca', '$2a$04$Vbug2lwwJGrvUXTj6z7ff.97IzVBkrJ1XfApfGNl.Z695zqcnPYra', 'Stevic', '772555', 'Rumska', true, 'registrovan')
 
+insert into "public"."pacijent" ("id", "penal") values(3,0)
 
 
 insert into "public"."pacijent" ("id", "penal") values(5,0)
