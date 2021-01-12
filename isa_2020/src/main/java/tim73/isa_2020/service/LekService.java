@@ -11,5 +11,7 @@ public interface LekService {
 	List<Lek> findAll();
 	
 	List<Lek> findByApotekaId(Long id);
+
+	void save(Lek lek);
 	
 }

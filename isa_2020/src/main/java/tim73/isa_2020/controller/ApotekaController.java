@@ -79,7 +79,7 @@ public class ApotekaController {
 		
 		return new ResponseEntity<List<ApotekaDTO>>(apotekeDTO, HttpStatus.OK);
 	}
-	@GetMapping(value = "/sve")
+	@GetMapping(value = "/sve") //sve apoteke u kojima DERMATOLOG radi
 	@PreAuthorize("hasRole('DERMATOLOG')")
 	public ResponseEntity<List<ApotekaDTO>> findAllD(HttpServletRequest request) {
 		

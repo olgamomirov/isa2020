@@ -27,6 +27,13 @@ public class LekServiceImpl implements LekService {
 		return lekRepository.findByApotekaId(id);
 	}
 
+	@Override
+	public void save(Lek lek) {
+		
+		 lekRepository.save(lek);
+		
+	}
+
 	
 
 }

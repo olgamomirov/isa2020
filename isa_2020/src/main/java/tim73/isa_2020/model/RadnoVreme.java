@@ -24,15 +24,12 @@ public class RadnoVreme {
 	@Column(unique=true, nullable=false)
 	private Long id;
 
-	@Transient
-	private DateTimeZone timeZone = DateTimeZone.forID( "Europe/Paris" );
-
 
 	private DateTime start = new DateTime( );
 	
 	private DateTime stop = new DateTime(  );
 	
-	private Interval interval  = new org.joda.time.Interval( start, stop );
+	private Interval interval  = new Interval( start, stop );
 	
 	
 	@ManyToOne
@@ -51,10 +48,9 @@ public class RadnoVreme {
 	}
 
 
-	public RadnoVreme(DateTime start, DateTime stop, Interval interval) {
+	public RadnoVreme(Interval interval) {
 		super();
-		this.start = start;
-		this.stop = stop;
+		
 		this.interval = interval;
 	}
 

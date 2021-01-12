@@ -56,9 +56,8 @@ public class Pregled {
 	@ManyToOne
 	private Farmaceut farmaceut;
 	
-	@ManyToMany
-	@JoinTable(name ="tipovi_pregledi", joinColumns = @JoinColumn(name="pregled_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name="tipPregleda_id", referencedColumnName = "id"))
-	private Set<TipPregleda> tipovi = new HashSet<TipPregleda>();
+	@ManyToOne
+	private TipPregleda tip;
 
 	public Pregled() {
 		super();
@@ -159,13 +158,12 @@ public class Pregled {
 		return id;
 	}
 
-	public Set<TipPregleda> getTipovi() {
-		return tipovi;
+	public TipPregleda getTip() {
+		return tip;
 	}
 
-	public void setTipovi(Set<TipPregleda> tipovi) {
-		this.tipovi = tipovi;
+	public void setTip(TipPregleda tip) {
+		this.tip = tip;
 	}
-
 	
 }

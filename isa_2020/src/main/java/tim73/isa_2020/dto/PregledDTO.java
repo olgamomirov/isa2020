@@ -24,12 +24,15 @@ public class PregledDTO {
 	
 	private String pacijentEmail;
 	
+	private String tipPregleda;
+	
+	private double cena;
 	
 	public PregledDTO (Pregled pregled, String email) {
 		this(pregled.getId(), pregled.getInterval(), pregled.getStatus(), pregled.getDijagnoza(), pregled.getTerapija(), email);
 	}
 	public PregledDTO (Pregled pregled) {
-		this(pregled.getId(), pregled.getInterval(), pregled.getStatus(), pregled.getDijagnoza(), pregled.getTerapija());
+		this(pregled.getId(), pregled.getInterval(), pregled.getStatus(), pregled.getDijagnoza(), pregled.getTerapija(),pregled.getTip().getTip(),pregled.getTip().getCena());
 	}
 
 	public DateTime getStart() {
@@ -39,13 +42,15 @@ public class PregledDTO {
 	public void setStart(DateTime start) {
 		this.start = start;
 	}
-    public PregledDTO(Long id, Interval interval, String status, String dijagnoza, String terapija) {
+    public PregledDTO(Long id, Interval interval, String status, String dijagnoza, String terapija, String tip, double cena) {
 		
 		this.id = id;
 		this.interval = interval;
 		this.status = status;
 		this.dijagnoza = dijagnoza;
 		this.terapija = terapija;
+		this.tipPregleda = tip;
+		this.cena = cena;
 		
 	}
 	public PregledDTO(Long id, Interval interval, String status, String dijagnoza, String terapija, String email) {
@@ -99,5 +104,16 @@ public class PregledDTO {
 	public void setPacijentEmail(String pacijentEmail) {
 		this.pacijentEmail = pacijentEmail;
 	}
-
+	public String getTipPregleda() {
+		return tipPregleda;
+	}
+	public void setTipPregleda(String tipPregleda) {
+		this.tipPregleda = tipPregleda;
+	}
+	public double getCena() {
+		return cena;
+	}
+	public void setCena(double cena) {
+		this.cena = cena;
+	}
 }
