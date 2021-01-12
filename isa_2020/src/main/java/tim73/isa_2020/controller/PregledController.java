@@ -111,7 +111,7 @@ public class PregledController {
 		DateTime start1=new DateTime(2020, 12, 28, 23, 00, 00);
 		DateTime stop1=new DateTime( 2020, 12, 28, 23, 15, 00);
 		Interval interval1 = new org.joda.time.Interval( start1, stop1 );
-		Pregled pregled1 = new Pregled(start1, stop1, interval1, "rezervisan", null, null);
+		Pregled pregled1 = new Pregled(start1, stop1, interval1, "odradjen", null, null);
 		
 		
 		DateTime start3=new DateTime(2021, 1, 15, 14, 00, 00);

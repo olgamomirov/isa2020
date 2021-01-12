@@ -158,7 +158,7 @@ public class KorisnikController {
 		return new ResponseEntity<PacijentPodaciDTO>(pacijent,HttpStatus.OK);
 	}
 	
-	@GetMapping(value = "/sviPregledaniPacijenti") //svi pregledani pacijenti odredjenog dermatologa...u svim apotekama...promeniti na odredjenu apoteku
+	@GetMapping(value = "/sviPregledaniPacijenti") //svi pregledani pacijenti odredjenog dermatologa...u svim apotekama...
 	@PreAuthorize("hasRole('DERMATOLOG')")
 	public ResponseEntity<List<PacijentPodaciDTO>> findAll(HttpServletRequest request) {
 		
@@ -173,6 +173,36 @@ public class KorisnikController {
 		Dermatolog d = (Dermatolog) k;
 		
 		for(Pregled p: d.getPregledi()) {
+			if(p.getInterval().equals(null)) {
+				System.out.println("nema datuma");
+			}else {
+			if(p.getStatus().equals("odradjen")) {
+				pacijenti.add(p.getPacijent());
+			}
+			}
+		}
+		
+		for(Pacijent p: pacijenti) {
+			pacijentiDTO.add(new PacijentPodaciDTO(p));
+		}
+		
+		return new ResponseEntity<List<PacijentPodaciDTO>>(pacijentiDTO, HttpStatus.OK);
+	}
+	@GetMapping(value = "/sviPregledaniPacijentiFarmaceuta") //svi pregledani pacijenti odredjenog dermatologa...u svim apotekama...
+	@PreAuthorize("hasRole('FARMACEUT')")
+	public ResponseEntity<List<PacijentPodaciDTO>> findAllFromFarmaceut(HttpServletRequest request) {
+		
+        List<Pacijent> pacijenti = new ArrayList<Pacijent>();
+		
+		String token = tokenUtils.getToken(request);
+		String username = this.tokenUtils.getUsernameFromToken(token);
+		Korisnik k = (Korisnik) this.userDetailsService.loadUserByUsername(username);
+		
+		List<PacijentPodaciDTO> pacijentiDTO= new ArrayList<>();
+		
+		Farmaceut f = (Farmaceut) k;
+		
+		for(Pregled p: f.getPregledi()) {
 			if(p.getInterval().equals(null)) {
 				System.out.println("nema datuma");
 			}else {
