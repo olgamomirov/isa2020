@@ -53,6 +53,7 @@ import tim73.isa_2020.service.KorisnikService;
 import tim73.isa_2020.service.KorisnikServiceImpl;
 import tim73.isa_2020.service.PacijentService;
 import tim73.isa_2020.service.PregledService;
+import tim73.isa_2020.service.TipPregledaService;
 
 @RestController
 @RequestMapping(value = "/pregledi")
@@ -84,6 +85,9 @@ public class PregledController {
 	
 	@Autowired
 	private EmailService mailService;
+	
+	@Autowired
+	private TipPregledaService tipService;
 	
 	@GetMapping(value = "/addPregled")
 	ResponseEntity<String> add(){
@@ -122,6 +126,10 @@ public class PregledController {
 		Pacijent pacijent = pacijentService.findById((long)3);
 		Pacijent pacijent2 = pacijentService.findById((long)5);
 		
+		TipPregleda tip = new TipPregleda("pregled mladeza", 1000.0);
+		
+		TipPregleda tip1 = new TipPregleda("savetovanje o nuspojavama bromazepama", 1000.0);
+		
 		pregled.setDermatolog(dermatolog);
 		pregled.setApoteka(apoteka);
 		pregled.setPacijent(pacijent2);
@@ -131,6 +139,20 @@ public class PregledController {
 		pregled3.setApoteka(apoteka3);
 		pregled3.setPacijent(pacijent);
 		pregledService.save(pregled3);
+		
+		Set<Pregled> pregledi = new HashSet<Pregled>();
+		pregledi.add(pregled);
+		pregledi.add(pregled3);
+		
+		
+		tipService.save(tip);
+		tipService.save(tip1);
+		
+		
+		pregled.setTip(tip);
+		pregled3.setTip(tip);
+		pregled2.setTip(tip);
+		pregled1.setTip(tip1);
 		
 		pregled2.setDermatolog(dermatolog);
 		pregled2.setApoteka(apoteka);
@@ -274,7 +296,7 @@ public class PregledController {
 	
 	//metoda kojoj pristupa pacijent da bi video istoriju pregleda kod dermatologa
 	
-	@GetMapping(value = "/istorijaDermatolozi")
+	/*@GetMapping(value = "/istorijaDermatolozi")
 	@PreAuthorize("hasRole('PACIJENT')")
 	public ResponseEntity<List<PregledZaPacijentaDTO>> preglediKodDermatologa(HttpServletRequest request) {
 
@@ -357,7 +379,7 @@ public class PregledController {
 		}
 		return new ResponseEntity<PregledZaPacijentaDTO>(pregledDTO, HttpStatus.OK);
 		
-	}
+	}*/
 
 	@GetMapping(value = "/zakazaniPregledi")
 	@PreAuthorize("hasRole('PACIJENT')")
@@ -449,18 +471,23 @@ public class PregledController {
 	
 	@GetMapping(value = "/pregledi")
 	@PreAuthorize("hasRole('DERMATOLOG')")
-	public ResponseEntity<List<PregledDTO>> preglediPacijent(@RequestParam("email") String email){
+	public ResponseEntity<List<PregledDTO>> preglediPacijent(@RequestParam("email") String email, HttpServletRequest request){
       List<PregledDTO> preglediDTO= new ArrayList<PregledDTO>();
 		Pacijent p = (Pacijent) korisnikService.findByEmail(email);
-		
+
+		String token = tokenUtils.getToken(request);
+		String username = this.tokenUtils.getUsernameFromToken(token);
+		Korisnik k = (Korisnik) this.korisnikDetails.loadUserByUsername(username);
+		Dermatolog d = (Dermatolog) k;
 		Set<Pregled> pregledi=p.getPregledi();
 		
 		for (Pregled pregled:pregledi) {
 			if(pregled.getStatus().equals("rezervisan")) {
 				
-				
+				if(pregled.getDermatolog()!=null&&pregled.getDermatolog().equals(d)) {
 				
 							preglediDTO.add(new PregledDTO(pregled));
+				}
 				}
 				
 			}
@@ -471,6 +498,7 @@ public class PregledController {
 	static class PregledKraj{
 		public String informacije;
 		public Long pregledID;
+		public String terapija;
 	}
 	
 	@PostMapping(value = "/zavrsiPregled")
@@ -480,6 +508,8 @@ public class PregledController {
 		Pregled pregled = pregledService.findOne(p.pregledID);
 		
 		pregled.setDijagnoza(p.informacije);
+		
+		pregled.setTerapija(p.terapija);
 		
 		pregled.setStatus("odradjen");
 		
