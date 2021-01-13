@@ -31,11 +31,11 @@ public class RezervacijaDTO {
 	}
 
 
-	public RezervacijaDTO(Long id, DateTime datumPreuzimanja, String status, String nazivLeka, String nazivApoteke) {
+	public RezervacijaDTO(Long id, String datumPreuzimanja, String status, String nazivLeka, String nazivApoteke) {
 		
 		this.id = id;
 		
-		this.datumPreuzimanja = datumPreuzimanja;
+		this.datumPreuzimanja = new DateTime (datumPreuzimanja);
 		
 		this.status = status;
 		

@@ -44,6 +44,7 @@ public class RadnoVremeController {
 	@Autowired
 	private ApotekaService apotekaService;
 	
+
 	@Autowired
 	private KorisnikService korisnikService;
 	
@@ -52,6 +53,9 @@ public class RadnoVremeController {
 	
 	@Autowired
 	private KorisnikServiceImpl korisnikDetails;
+
+	/*
+>>>>>>> refs/remotes/origin/main
 	
 	@GetMapping(value = "/add")
 	ResponseEntity<String> add(){
@@ -96,6 +100,7 @@ public class RadnoVremeController {
 		radnoVremeService.save(rv2);
 		return new ResponseEntity<>(rv.toString(), HttpStatus.OK);
 	}
+	*/
 	@GetMapping(value = "/getRadnoVreme")
 	ResponseEntity<List<RadnoVremeDTO>> get(HttpServletRequest request){
 		String token = tokenUtils.getToken(request);
@@ -109,7 +114,8 @@ public class RadnoVremeController {
 		
 		Set<RadnoVreme> rv =  new HashSet<RadnoVreme>();
 		for(RadnoVreme radno: dermatolog.getRadnoVreme()) {
-			System.out.println(radno.getInterval().getStart().getDayOfMonth());
+			Interval interval = new Interval(radno.getInterval());
+			System.out.println(interval.getStart().getDayOfMonth());
 			  rv.add(radno);
 		}
 		for(RadnoVreme radno: rv) {

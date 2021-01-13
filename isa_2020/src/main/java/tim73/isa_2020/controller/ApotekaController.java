@@ -167,12 +167,14 @@ public class ApotekaController {
 				int slobodanPregled=0;
 				int slobodanUTokuRadnogVremena=0;
 				for(Pregled pregled:farmaceut.getPregledi()) {
-					if(pregled!=null && pregled.getApoteka().equals(apoteka) && (pregled.getInterval().contains(noviPregled)|| pregled.getInterval().overlaps(noviPregled))) {
+					Interval interval=new Interval(pregled.getInterval());
+					if(pregled!=null && pregled.getApoteka().equals(apoteka) && (interval.contains(noviPregled)|| interval.overlaps(noviPregled))) {
 						slobodanPregled++;
 					}
 				}
 				for(RadnoVreme rv:farmaceut.getRadnoVreme()) {
-					if(rv!=null && rv.getApoteka().equals(apoteka) && rv.getInterval().contains(noviPregled)) {
+					Interval interval=new Interval(rv.getInterval());
+					if(rv!=null && rv.getApoteka().equals(apoteka) && interval.contains(noviPregled)) {
 						slobodanUTokuRadnogVremena++;
 
 					}

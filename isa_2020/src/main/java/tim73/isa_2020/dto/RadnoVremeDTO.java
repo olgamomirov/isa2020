@@ -10,19 +10,15 @@ public class RadnoVremeDTO {
 	
 
 	private Long id;
-	
-	private DateTime start = new DateTime();
-	
-	private DateTime stop = new DateTime();
-	
-	private Interval interval  = new org.joda.time.Interval( start, stop );
+		
+	private Interval interval;  
 	
 	public RadnoVremeDTO (RadnoVreme rv) {
-		this(rv.getInterval(), rv.getId());
+		this(rv.getInterval());
 	}
 
-	public RadnoVremeDTO(Interval interval2, Long id) {
-		this.interval = interval2;
+	public RadnoVremeDTO(String interval2) {
+		this.interval = new Interval(interval2);
 		this.id = id;
 	}
 
