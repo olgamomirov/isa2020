@@ -224,8 +224,8 @@ public class KorisnikController {
 		
 		return new ResponseEntity<List<PacijentPodaciDTO>>(pacijentiDTO, HttpStatus.OK);
 	}
-	@GetMapping(value = "/sviPacijenti") //svi pregledani pacijenti odredjenog dermatologa...u svim apotekama...promeniti na odredjenu apoteku
-	@PreAuthorize("hasRole('DERMATOLOG')")
+	@GetMapping(value = "/sviPacijenti") //svi pregledani pacijenti odredjenog dermatologa...u svim apotekama...i farmaceuta
+	@PreAuthorize("hasRole('DERMATOLOG') or hasRole('FARMACEUT')")
 	public ResponseEntity<List<PacijentPodaciDTO>> findAll1(HttpServletRequest request) {
 		
         

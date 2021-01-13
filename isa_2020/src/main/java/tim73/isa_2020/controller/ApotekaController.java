@@ -104,6 +104,25 @@ public class ApotekaController {
 		
 		return new ResponseEntity<List<ApotekaDTO>>(apotekeDTO, HttpStatus.OK);
 	}
+	@GetMapping(value = "/apotekaFarmaceut") //apoteka u kojoj farmaceut radi
+	@PreAuthorize("hasRole('FARMACEUT')")
+	public ResponseEntity<ApotekaDTO> findAllF(HttpServletRequest request) {
+		
+		
+		String token = tokenUtils.getToken(request);
+		String username = this.tokenUtils.getUsernameFromToken(token);
+		Korisnik k = (Korisnik) this.userDetailsService.loadUserByUsername(username);
+		
+		Farmaceut f = (Farmaceut) k;
+		
+		Apoteka apoteka= f.getApoteka();
+		
+		ApotekaDTO apotekaDTO= null;
+		
+		apotekaDTO = new ApotekaDTO(apoteka);
+		
+		return new ResponseEntity<ApotekaDTO>(apotekaDTO, HttpStatus.OK);
+	}
 	@DeleteMapping(value = "/{apotekaId}")
 	public void deleteApoteka(@PathVariable long apotekaId) {
 		

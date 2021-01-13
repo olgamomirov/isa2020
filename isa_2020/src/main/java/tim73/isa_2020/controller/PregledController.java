@@ -563,6 +563,32 @@ public class PregledController {
 		return new ResponseEntity<List<PregledDTO>>(preglediDTO,HttpStatus.OK);
 		
 	}
+	@GetMapping(value = "/preglediKodFarmaceuta") 
+	@PreAuthorize("hasRole('FARMACEUT')")
+	public ResponseEntity<List<PregledDTO>> preglediPacijentKodFarmaceuta(@RequestParam("email") String email, HttpServletRequest request){
+      List<PregledDTO> preglediDTO= new ArrayList<PregledDTO>();
+		Pacijent p = (Pacijent) korisnikService.findByEmail(email);
+
+		String token = tokenUtils.getToken(request);
+		String username = this.tokenUtils.getUsernameFromToken(token);
+		Korisnik k = (Korisnik) this.korisnikDetails.loadUserByUsername(username);
+		Farmaceut f = (Farmaceut) k;
+		Set<Pregled> pregledi=p.getPregledi();
+		
+		for (Pregled pregled:pregledi) {
+			if(pregled.getStatus().equals("rezervisan")) {
+				
+				if(pregled.getFarmaceut()!=null&&pregled.getFarmaceut().equals(f)) {
+				
+							preglediDTO.add(new PregledDTO(pregled));
+				}
+				}
+				
+			}
+	
+		return new ResponseEntity<List<PregledDTO>>(preglediDTO,HttpStatus.OK);
+		
+	}
 	static class PregledKraj{
 		public String informacije;
 		public Long pregledID;
