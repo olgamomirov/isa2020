@@ -36,7 +36,7 @@ public class Pregled {
 	private DateTime stop = new DateTime();
 	
 	
-	private Interval interval  = new Interval( start, stop );
+	private String interval ;
 	
 	private String status = "default";
 	
@@ -64,7 +64,7 @@ public class Pregled {
 		// TODO Auto-generated constructor stub
 	}
 
-	public Pregled(DateTime start, DateTime stop, Interval interval, String status, String dijagnoza, String terapija) {
+	public Pregled(DateTime start, DateTime stop, String interval, String status, String dijagnoza, String terapija) {
 		super();
 		this.start = start;
 		this.stop = stop;
@@ -90,11 +90,11 @@ public class Pregled {
 		this.stop = stop;
 	}
 
-	public Interval getInterval() {
+	public String getInterval() {
 		return interval;
 	}
 
-	public void setInterval(Interval interval) {
+	public void setInterval(String interval) {
 		this.interval = interval;
 	}
 

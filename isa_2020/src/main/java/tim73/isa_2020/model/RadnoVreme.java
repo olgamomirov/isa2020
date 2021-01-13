@@ -25,11 +25,9 @@ public class RadnoVreme {
 	private Long id;
 
 
-	private DateTime start = new DateTime( );
 	
-	private DateTime stop = new DateTime(  );
 	
-	private Interval interval  = new Interval( start, stop );
+	private String interval  ;
 	
 	
 	@ManyToOne
@@ -48,39 +46,22 @@ public class RadnoVreme {
 	}
 
 
-	public RadnoVreme(Interval interval) {
+	public RadnoVreme(String interval) {
 		super();
 		
 		this.interval = interval;
 	}
 
 
-	public DateTime getStart() {
-		return start;
-	}
+	
 
 
-	public void setStart(DateTime start) {
-		this.start = start;
-	}
-
-
-	public DateTime getStop() {
-		return stop;
-	}
-
-
-	public void setStop(DateTime stop) {
-		this.stop = stop;
-	}
-
-
-	public Interval getInterval() {
+	public String getInterval() {
 		return interval;
 	}
 
 
-	public void setInterval(Interval interval) {
+	public void setInterval(String interval) {
 		this.interval = interval;
 	}
 
@@ -123,11 +104,7 @@ public class RadnoVreme {
 	}
 
 
-	@Override
-	public String toString() {
-		return "RadnoVreme [start=" + start.toString("dd-MM-yyyy") + ", stop=" + stop + ", interval=" + interval + "]";
-	}
-
+	
 
 	
 	

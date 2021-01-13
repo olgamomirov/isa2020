@@ -186,12 +186,14 @@ System.out.println(vremeString);
 			int slobodanPregled=0;
 			int slobodanUTokuRadnogVremena=0;
 			for(Pregled pregled:farmaceut.getPregledi()) {
-				if(pregled!=null && pregled.getApoteka().getId().equals(idApoteke) && (pregled.getInterval().contains(noviPregled)) || pregled.getInterval().overlaps(noviPregled)){
+				Interval interval= new Interval(pregled.getInterval());
+				if(pregled!=null && pregled.getApoteka().getId().equals(idApoteke) && (interval.contains(noviPregled)) || interval.overlaps(noviPregled)){
 					slobodanPregled++;
 				}
 			}
 			for(RadnoVreme rv:farmaceut.getRadnoVreme()) {
-				if(rv!=null && rv.getApoteka().getId().equals(idApoteke) && rv.getInterval().contains(noviPregled)) {
+				Interval interval=new Interval(rv.getInterval());
+				if(rv!=null && rv.getApoteka().getId().equals(idApoteke) && interval.contains(noviPregled)) {
 					slobodanUTokuRadnogVremena++;
 
 				}

@@ -42,10 +42,10 @@ public class PregledDTO {
 	public void setStart(DateTime start) {
 		this.start = start;
 	}
-    public PregledDTO(Long id, Interval interval, String status, String dijagnoza, String terapija, String tip, double cena) {
+    public PregledDTO(Long id, String interval, String status, String dijagnoza, String terapija, String tip, double cena) {
 		
 		this.id = id;
-		this.interval = interval;
+		this.interval = new Interval(interval);
 		this.status = status;
 		this.dijagnoza = dijagnoza;
 		this.terapija = terapija;
@@ -53,10 +53,10 @@ public class PregledDTO {
 		this.cena = cena;
 		
 	}
-	public PregledDTO(Long id, Interval interval, String status, String dijagnoza, String terapija, String email) {
+	public PregledDTO(Long id, String interval, String status, String dijagnoza, String terapija, String email) {
 		
 		this.id = id;
-		this.interval = interval;
+		this.interval = new Interval(interval);
 		this.status = status;
 		this.dijagnoza = dijagnoza;
 		this.terapija = terapija;

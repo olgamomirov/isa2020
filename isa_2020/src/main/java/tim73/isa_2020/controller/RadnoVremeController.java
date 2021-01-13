@@ -38,6 +38,7 @@ public class RadnoVremeController {
 	@Autowired
 	private ApotekaService apotekaService;
 	
+	/*
 	
 	@GetMapping(value = "/add")
 	ResponseEntity<String> add(){
@@ -64,6 +65,7 @@ public class RadnoVremeController {
 		radnoVremeService.save(rv);
 		return new ResponseEntity<>(rv.toString(), HttpStatus.OK);
 	}
+	*/
 	@GetMapping(value = "/getRadnoVreme")
 	ResponseEntity<List<RadnoVremeDTO>> get(){
 		
@@ -78,7 +80,8 @@ public class RadnoVremeController {
 		ArrayList<RadnoVremeDTO> rvDTO = new ArrayList<RadnoVremeDTO>();
 		Set<RadnoVreme> rv =  new HashSet<RadnoVreme>();
 		for(RadnoVreme radno: dermatolog.getRadnoVreme()) {
-			System.out.println(radno.getInterval().getStart().getDayOfMonth());
+			Interval interval = new Interval(radno.getInterval());
+			System.out.println(interval.getStart().getDayOfMonth());
 			  rv.add(radno);
 		}
 		for(RadnoVreme radno: rv) {

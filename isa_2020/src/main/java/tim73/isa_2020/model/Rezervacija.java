@@ -20,7 +20,7 @@ public class Rezervacija {
 	@Column(unique=true, nullable=false)
 	private Long id; //jedinstveni broj rezervacije preko koje ce se izdavati lek
 	
-	private DateTime datumPreuzimanja;
+	private String datumPreuzimanja;
 	
 	private String status;
 	
@@ -35,7 +35,7 @@ public class Rezervacija {
 		// TODO Auto-generated constructor stub
 	}
 
-	public Rezervacija(DateTime datumPreuzimanja, String status, Lek lek, Pacijent pacijent) {
+	public Rezervacija(String datumPreuzimanja, String status, Lek lek, Pacijent pacijent) {
 		super();
 		this.datumPreuzimanja = datumPreuzimanja;
 		this.status = status;
@@ -43,11 +43,11 @@ public class Rezervacija {
 		this.pacijent = pacijent;
 	}
 
-	public DateTime getDatumPreuzimanja() {
+	public String getDatumPreuzimanja() {
 		return datumPreuzimanja;
 	}
 
-	public void setDatumPreuzimanja(DateTime datumPreuzimanja) {
+	public void setDatumPreuzimanja(String datumPreuzimanja) {
 		this.datumPreuzimanja = datumPreuzimanja;
 	}
 

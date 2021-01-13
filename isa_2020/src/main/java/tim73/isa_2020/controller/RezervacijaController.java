@@ -71,8 +71,8 @@ public class RezervacijaController {
 		
 		Rezervacija rezervacija = rezervacijaService.findOne(id);
 		
-		rezervacija.setDatumPreuzimanja(new DateTime(2021, 1, 8, 14, 00, 00));
-		
+		rezervacija.setDatumPreuzimanja("2021-01-08T14:00:00.000+01:00");
+		//System.out.println(rezervacija.getDatumPreuzimanja().toString());
 		RezervacijaDTO rezervacijaDTO = new RezervacijaDTO(rezervacija);
 		rezervacijaService.save(rezervacija);
 		
@@ -104,10 +104,11 @@ public class RezervacijaController {
 		if(rezervacija!=null) {
 			if(f.getApoteka().equals(rezervacija.getLek().getApoteka())) {
 				if(rezervacija.getStatus().equals("izdavanje")) {
-				System.out.println(rezervacija.getDatumPreuzimanja().getMillis());
+					DateTime datumPreuzimanja= new DateTime (rezervacija.getDatumPreuzimanja());
+				System.out.println(datumPreuzimanja.getMillis());
 				System.out.println(System.currentTimeMillis());
-				System.out.println((rezervacija.getDatumPreuzimanja().getMillis()-System.currentTimeMillis())/3600000);
-				if((rezervacija.getDatumPreuzimanja().getMillis()-System.currentTimeMillis())/3600000>=24){
+				System.out.println((datumPreuzimanja.getMillis()-System.currentTimeMillis())/3600000);
+				if((datumPreuzimanja.getMillis()-System.currentTimeMillis())/3600000>=24){
 				rezervacijaDTO = new RezervacijaDTO(rezervacija);
 				}else {
 					
