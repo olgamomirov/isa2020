@@ -596,7 +596,7 @@ public class PregledController {
 	}
 	
 	@PostMapping(value = "/zavrsiPregled")
-	@PreAuthorize("hasRole('DERMATOLOG')")
+	@PreAuthorize("hasRole('DERMATOLOG') or hasRole('FARMACEUT')")
 	public ResponseEntity<PregledDTO> zavrsiPregled(@RequestBody PregledKraj p){
      
 		Pregled pregled = pregledService.findOne(p.pregledID);
