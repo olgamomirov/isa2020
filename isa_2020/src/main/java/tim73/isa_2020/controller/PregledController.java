@@ -11,8 +11,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.websocket.server.PathParam;
 
 import org.joda.time.DateTime;
+import org.joda.time.DateTime.Property;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Interval;
+import org.joda.time.Months;
 import org.joda.time.Period;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -476,6 +478,21 @@ public class PregledController {
 		return new ResponseEntity<List<PregledZaPacijentaDTO>>(preglediDTO,HttpStatus.OK);
 		
 	}
+	//prikaz unapreg kreiranih pregleda kod dermatologa pri zakazivanju novog pregleda pacijentu
+		@GetMapping(value = "/unapredDefinisaniPregledi")
+		@PreAuthorize("hasRole('DERMATOLOG')")
+		public ResponseEntity<List<PregledDTO>> unapredDefinisaniPreglediKodDermatologa(@RequestParam("email") String email,@RequestParam("pregled") long pregled, HttpServletRequest request){
+			List<PregledDTO> preglediDTO= new ArrayList<PregledDTO>();
+			Pregled pregleD = pregledService.findOne(pregled);
+			for(Pregled p:pregledService.findByApotekaIdAndStatus(pregleD.getApoteka().getId(), "default")) {
+				
+				if(p.getDermatolog()!=null) {
+					preglediDTO.add(new PregledDTO(p));
+				}
+			}
+			return new ResponseEntity<List<PregledDTO>>(preglediDTO,HttpStatus.OK);
+			
+		}
 	
 	@GetMapping(value="/rezervisi/{id}")
 	@PreAuthorize("hasRole('PACIJENT')")
@@ -614,5 +631,119 @@ public class PregledController {
 		
 
 	}
+	static class ZakaziPregled{//email pacijenta i id unapred definisanog pregleda koji se zakazuje
+		public String email;
+		public long id;
+	}
+	@PostMapping(value = "/zakazi")
+	@PreAuthorize("hasRole('DERMATOLOG')")
+	public ResponseEntity<PregledDTO> zakaziPregled(@RequestBody ZakaziPregled p){
+     
+		Pregled pregled = pregledService.findOne(p.id);
+		
+		Korisnik k = korisnikService.findByEmail(p.email);
+		
+		Pacijent pacijent = (Pacijent) k;
+		
+		pregled.setStatus("rezervisan");
+		
+		pregled.setPacijent(pacijent);
+		
+		pregledService.save(pregled);		
+			
+		PregledDTO dto = new PregledDTO(pregled);
+		return new ResponseEntity<PregledDTO>(dto,HttpStatus.OK);
+		
 
+	}
+    static class NoviPregled{
+    	public String email; //mejl pacijenta kom se zakazuje novi pregled
+    	public long id; //id pregleda da bi se doslo do apoteke u kojoj se vrsi pregled 
+    	public String datumStart; //pocetak pregleda
+    }
+	@PostMapping(value = "/zakaziNovi")
+	@PreAuthorize("hasRole('DERMATOLOG')")
+	public ResponseEntity<PregledDTO> zakaziNoviPregled(@RequestBody NoviPregled p, HttpServletRequest request){
+     
+		String token = tokenUtils.getToken(request);
+		String username = this.tokenUtils.getUsernameFromToken(token);
+		Korisnik k = (Korisnik) this.korisnikDetails.loadUserByUsername(username);
+		
+		Pregled trenutni = pregledService.findOne(p.id);
+		
+		Apoteka a = trenutni.getApoteka();
+		
+		Dermatolog d = (Dermatolog) k;
+		
+		Korisnik korisnik = korisnikService.findByEmail(p.email);
+		
+		Pacijent pacijent = (Pacijent) korisnik;
+		
+		boolean flag = false;
+		
+		Interval interval = new Interval(p.datumStart + ":00.000+01:00" + "/" + p.datumStart + ":00.000+01:00");
+		DateTime end = interval.getEnd();
+		DateTime endNovi = end.plusMinutes(30);
+		
+		Interval interval2 = new Interval(p.datumStart + "/" + endNovi);
+		
+        for(Pregled p1: pacijent.getPregledi()) {
+            
+        	Interval i = new Interval(p1.getInterval());
+        	
+		   if(i.overlaps(interval2)){
+			   System.out.println("preklapa se kod pacijenta");
+			   flag=true;
+			   break;
+			   
+		   }
+		   }
+        for(Pregled p2: d.getPregledi()) {
+        	
+        	Interval i = new Interval(p2.getInterval());
+        	if(i.overlaps(interval2)){
+        		System.out.println("preklapa se kod lekara");
+        		flag = true;
+        		break;
+        	}
+        	
+        }
+        boolean flag2 = false;
+        for(RadnoVreme radnoVreme: d.getRadnoVreme()) {
+        	Interval i = new Interval(radnoVreme.getInterval());
+        	if(i.overlaps(interval2)){
+        	flag2 = true;
+        	break;
+        	}
+        }
+        PregledDTO dto = null;
+			if(!flag&&flag2) {
+		
+		Pregled noviPregled = new Pregled(interval2.toString() , "rezervisan", "", "");
+		
+		noviPregled.setPacijent(pacijent);
+		
+		
+		noviPregled.setTip(trenutni.getTip());
+		
+		noviPregled.setApoteka(a);
+
+		noviPregled.setDermatolog(d);
+		
+		pregledService.save(noviPregled);		
+		
+			
+	     dto = new PregledDTO(noviPregled);
+	     
+	     //POSLATI MEJL PACIJENTU
+			
+			}
+			if(!flag2) {
+				System.out.println("nije u radnom vremenu");
+			}
+			
+		return new ResponseEntity<PregledDTO>(dto,HttpStatus.OK);
+		
+
+	}
 }

@@ -181,6 +181,7 @@ public class RezervacijaController {
 	static class RezervacijaLeka {
 		public String naziv; //naziv leka
 		public String email; //email pacijenta
+		public String datumPreuzimanja;
 		public Long id; //id pregleda
 	}
 	@PostMapping(value = "/rezervisi")
@@ -201,9 +202,9 @@ public class RezervacijaController {
 		}
 		
 		
-		Rezervacija rezervisi = new Rezervacija("2021-01-28T14:00:00.000+01:00", "izdavanje" , lek, p);
+		Rezervacija rezervisi = new Rezervacija(rezervacija.datumPreuzimanja + ":00.000+01:00", "izdavanje" , lek, p);
 		rezervacijaService.save(rezervisi);
-
+		
 		RezervacijaDTO rezervacijaDTO = new RezervacijaDTO(rezervisi);
 		
 			
