@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.websocket.server.PathParam;
 
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,12 +37,15 @@ import tim73.isa_2020.model.Korisnik;
 import tim73.isa_2020.model.Lek;
 import tim73.isa_2020.model.Pacijent;
 import tim73.isa_2020.model.Rezervacija;
+import tim73.isa_2020.model.SifrarnikLekova;
 import tim73.isa_2020.securityService.TokenUtils;
 import tim73.isa_2020.service.ApotekaService;
 import tim73.isa_2020.service.EmailService;
 import tim73.isa_2020.service.KorisnikService;
 import tim73.isa_2020.service.KorisnikServiceImpl;
+import tim73.isa_2020.service.LekService;
 import tim73.isa_2020.service.RezervacijaService;
+import tim73.isa_2020.service.SifrarnikLekovaService;
 
 @RestController
 @RequestMapping(value = "/rezervacije")
@@ -64,6 +68,12 @@ public class RezervacijaController {
 	
 	@Autowired
 	private EmailService mailService;
+	
+	@Autowired
+	private LekService lekService;
+	
+	@Autowired
+	private SifrarnikLekovaService sifrarnikSevice;
 	
 	
 	@GetMapping(value = "/setTime/{id}")
@@ -171,4 +181,28 @@ public class RezervacijaController {
 		
 		return new ResponseEntity<List<RezervacijaDTO>>(rezervacijeDTO, HttpStatus.OK);
 	}
+	
+	static class NovaRezervacija{
+		public String nazivLeka;
+		public Long apoteka;
+		public String vreme;
+	}
+	
+	@PostMapping(value = "/novaRezervacija")
+	@PreAuthorize("hasRole('PACIJENT')")
+	public void novaRezervacija (@RequestBody NovaRezervacija novaRezervacija, HttpServletRequest request) throws MailException, InterruptedException {
+		String token = tokenUtils.getToken(request);
+		String username = this.tokenUtils.getUsernameFromToken(token);
+		Pacijent p = (Pacijent) this.korisnikDetails.loadUserByUsername(username);
+		
+		SifrarnikLekova sl= sifrarnikSevice.findByNaziv(novaRezervacija.nazivLeka);
+		
+		Lek lek= lekService.findBySifrarnikLekovaIdAndApotekaId(sl.getId(), novaRezervacija.apoteka);
+		
+		Rezervacija rezervacija = new Rezervacija(novaRezervacija.vreme + ":00.000+01:00", "izdavanje", lek, p);
+		rezervacijaService.save(rezervacija);
+		mailService.sendSimpleMessage(p.getEmail(), "REZERVACIJA LEKA", "Uspesno ste rezervisali lek: "
+				+ novaRezervacija.nazivLeka + ". Vas jedinstveni broj rezervacije je: " + rezervacija.getId() + ".");
+	}
+
 }

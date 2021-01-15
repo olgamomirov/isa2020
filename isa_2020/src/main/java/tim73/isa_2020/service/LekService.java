@@ -14,4 +14,8 @@ public interface LekService {
 
 	void save(Lek lek);
 	
+	List<Lek> findBySifrarnikLekova(Long id);
+
+	Lek findBySifrarnikLekovaIdAndApotekaId(Long sifrarnikId, Long apotekaId);
+	
 }

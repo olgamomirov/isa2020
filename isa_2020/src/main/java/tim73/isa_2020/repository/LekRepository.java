@@ -13,4 +13,7 @@ public interface LekRepository extends JpaRepository<Lek, Long> {
 
 	List<Lek> findByApotekaId(Long id);
 	
+	List<Lek> findBySifrarnikLekovaId(Long id);
+	
+	Lek findBySifrarnikLekovaIdAndApotekaId(Long sifrarnikId, Long apotekaId);
 }

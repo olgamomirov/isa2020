@@ -33,13 +33,17 @@ import tim73.isa_2020.model.Apoteka;
 import tim73.isa_2020.model.Dermatolog;
 import tim73.isa_2020.model.Farmaceut;
 import tim73.isa_2020.model.Korisnik;
+import tim73.isa_2020.model.Lek;
 import tim73.isa_2020.model.Pregled;
 import tim73.isa_2020.model.RadnoVreme;
+import tim73.isa_2020.model.SifrarnikLekova;
 import tim73.isa_2020.securityService.TokenUtils;
 import tim73.isa_2020.service.ApotekaService;
 import tim73.isa_2020.service.DermatologService;
 import tim73.isa_2020.service.KorisnikService;
 import tim73.isa_2020.service.KorisnikServiceImpl;
+import tim73.isa_2020.service.LekService;
+import tim73.isa_2020.service.SifrarnikLekovaService;
 
 //@CrossOrigin(origins = "http://localhost:3000")
 @RestController
@@ -57,6 +61,12 @@ public class ApotekaController {
 
 	@Autowired
 	private KorisnikServiceImpl userDetailsService;
+	
+	@Autowired
+	private SifrarnikLekovaService sifrarnikService;
+	
+	@Autowired
+	private LekService lekService;
 
 	
 	@GetMapping(value = "/{id}")
@@ -193,4 +203,25 @@ public class ApotekaController {
 
 		return new ResponseEntity<Set<ApotekaDTO>>(apotekeSaSlobodnimFarmaceutom, HttpStatus.OK);
 	}
+	
+	//za apoteke koje imaju na stanju lek koji zeli da se rezervise
+	@GetMapping(value = "/rezervacijaLeka/{nazivLeka}")
+	@PreAuthorize("hasRole('PACIJENT')")
+	public ResponseEntity<List<ApotekaDTO>> apotekeSaLekovimaNaStanju(@PathVariable String nazivLeka){
+		
+		List<ApotekaDTO> apotekeSaLekovimaNaStanju = new ArrayList<ApotekaDTO>();
+		SifrarnikLekova sl = sifrarnikService.findByNaziv(nazivLeka);
+
+		for (Lek lek : lekService.findBySifrarnikLekova(sl.getId())) {
+			if (lek.getKolicina() > 0) {
+				apotekeSaLekovimaNaStanju.add(new ApotekaDTO(lek.getApoteka()));
+			}
+		}
+
+		return new ResponseEntity<List<ApotekaDTO>>(apotekeSaLekovimaNaStanju, HttpStatus.OK);
+	}
+	
+	
+	
+	
 }
