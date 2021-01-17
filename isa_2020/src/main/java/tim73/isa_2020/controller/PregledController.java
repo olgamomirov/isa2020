@@ -663,7 +663,7 @@ public class PregledController {
     }
 	@PostMapping(value = "/zakaziNovi")
 	@PreAuthorize("hasRole('DERMATOLOG')")
-	public ResponseEntity<PregledDTO> zakaziNoviPregled(@RequestBody NoviPregled p, HttpServletRequest request){
+	public ResponseEntity<PregledDTO> zakaziNoviPregled(@RequestBody NoviPregled p, HttpServletRequest request) throws MailException, InterruptedException{
      
 		String token = tokenUtils.getToken(request);
 		String username = this.tokenUtils.getUsernameFromToken(token);
@@ -736,7 +736,95 @@ public class PregledController {
 	     dto = new PregledDTO(noviPregled);
 	     
 	     //POSLATI MEJL PACIJENTU
+	    /* mailService.sendSimpleMessage(pacijent.getEmail(), "ZAKAZIVANJE PREGLEDA", "Zakazan Vam je pregled kod dermatologa u "
+					+ interval.getStart().toString("dd/MM/yyyy HH:mm"));*/
 			
+			}
+			if(!flag2) {
+				System.out.println("nije u radnom vremenu");
+			}
+			
+		return new ResponseEntity<PregledDTO>(dto,HttpStatus.OK);
+		
+
+	}
+	@PostMapping(value = "/zakaziNoviFarmaceut")
+	@PreAuthorize("hasRole('FARMACEUT')")
+	public ResponseEntity<PregledDTO> zakaziNoviKodFarmaceuta(@RequestBody NoviPregled p, HttpServletRequest request){
+     
+		String token = tokenUtils.getToken(request);
+		String username = this.tokenUtils.getUsernameFromToken(token);
+		Korisnik k = (Korisnik) this.korisnikDetails.loadUserByUsername(username);
+		
+		Pregled trenutni = pregledService.findOne(p.id);
+		
+		Apoteka a = trenutni.getApoteka();
+		
+		Farmaceut f = (Farmaceut) k;
+		
+		Korisnik korisnik = korisnikService.findByEmail(p.email);
+		
+		Pacijent pacijent = (Pacijent) korisnik;
+		
+		boolean flag = false;
+		
+		Interval interval = new Interval(p.datumStart + ":00.000+01:00" + "/" + p.datumStart + ":00.000+01:00");
+		DateTime end = interval.getEnd();
+		DateTime endNovi = end.plusMinutes(30);
+		
+		Interval interval2 = new Interval(p.datumStart + "/" + endNovi);
+		
+        for(Pregled p1: pacijent.getPregledi()) {
+            
+        	Interval i = new Interval(p1.getInterval());
+        	
+		   if(i.overlaps(interval2)){
+			   System.out.println("preklapa se kod pacijenta");
+			   flag=true;
+			   break;
+			   
+		   }
+		   }
+        for(Pregled p2: f.getPregledi()) {
+        	
+        	Interval i = new Interval(p2.getInterval());
+        	if(i.overlaps(interval2)){
+        		System.out.println("preklapa se kod lekara");
+        		flag = true;
+        		break;
+        	}
+        	
+        }
+        boolean flag2 = false;
+        for(RadnoVreme radnoVreme: f.getRadnoVreme()) {
+        	Interval i = new Interval(radnoVreme.getInterval());
+        	if(i.overlaps(interval2)){
+        	flag2 = true;
+        	break;
+        	}
+        }
+        PregledDTO dto = null;
+			if(!flag&&flag2) {
+		
+		Pregled noviPregled = new Pregled(interval2.toString() , "rezervisan", "", "");
+		
+		noviPregled.setPacijent(pacijent);
+		
+		
+		noviPregled.setTip(trenutni.getTip());
+		
+		noviPregled.setApoteka(a);
+
+		noviPregled.setFarmaceut(f);
+		
+		pregledService.save(noviPregled);		
+		
+			
+	     dto = new PregledDTO(noviPregled);
+	     
+	     //POSLATI MEJL PACIJENTU
+	    /* mailService.sendSimpleMessage(pacijent.getEmail(), "ZAKAZIVANJE PREGLEDA", "Zakazan Vam je pregled kod farmaceuta u "
+					+ interval.getStart().toString("dd/MM/yyyy HH:mm"));*/
 			}
 			if(!flag2) {
 				System.out.println("nije u radnom vremenu");
