@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -36,11 +37,14 @@ import tim73.isa_2020.model.Korisnik;
 import tim73.isa_2020.model.Lek;
 import tim73.isa_2020.model.Pacijent;
 import tim73.isa_2020.model.Rezervacija;
+import tim73.isa_2020.model.SifrarnikLekova;
 import tim73.isa_2020.securityService.TokenUtils;
 import tim73.isa_2020.service.ApotekaService;
 import tim73.isa_2020.service.EmailService;
 import tim73.isa_2020.service.KorisnikService;
 import tim73.isa_2020.service.KorisnikServiceImpl;
+import tim73.isa_2020.service.LekService;
+import tim73.isa_2020.service.PregledService;
 import tim73.isa_2020.service.RezervacijaService;
 
 @RestController
@@ -64,6 +68,9 @@ public class RezervacijaController {
 	
 	@Autowired
 	private EmailService mailService;
+	
+	@Autowired
+	private PregledService pregledService;
 	
 	
 	@GetMapping(value = "/setTime/{id}")
@@ -170,5 +177,38 @@ public class RezervacijaController {
 		}
 		
 		return new ResponseEntity<List<RezervacijaDTO>>(rezervacijeDTO, HttpStatus.OK);
+	}
+	static class RezervacijaLeka {
+		public String naziv; //naziv leka
+		public String email; //email pacijenta
+		public String datumPreuzimanja;
+		public Long id; //id pregleda
+	}
+	@PostMapping(value = "/rezervisi")
+	ResponseEntity <RezervacijaDTO> rezervacijaLeka(@RequestBody RezervacijaLeka rezervacija) {
+		
+		Apoteka apoteka = pregledService.findOne(rezervacija.id).getApoteka();
+		Set<Lek> lekApoteka = apoteka.getLekovi();
+		
+		Korisnik pacijent = korisnikService.findByEmail(rezervacija.email);
+		Pacijent p = (Pacijent) pacijent;
+		
+		 Lek lek= null;
+		
+		for(Lek l: lekApoteka) {
+			if(l.getSifrarnikLekova().getNaziv().equals(rezervacija.naziv)) {
+				lek = l;
+			}
+		}
+		
+		
+		Rezervacija rezervisi = new Rezervacija(rezervacija.datumPreuzimanja + ":00.000+01:00", "izdavanje" , lek, p);
+		rezervacijaService.save(rezervisi);
+		
+		RezervacijaDTO rezervacijaDTO = new RezervacijaDTO(rezervisi);
+		
+			
+		
+		return new ResponseEntity<RezervacijaDTO>(rezervacijaDTO, HttpStatus.OK);
 	}
 }

@@ -73,6 +73,13 @@ public class Pregled {
 		this.dijagnoza = dijagnoza;
 		this.terapija = terapija;
 	}
+	public Pregled(String interval, String status, String dijagnoza, String terapija) {
+		super();
+		this.interval = interval;
+		this.status = status;
+		this.dijagnoza = dijagnoza;
+		this.terapija = terapija;
+	}
 
 	public DateTime getStart() {
 		return start;
