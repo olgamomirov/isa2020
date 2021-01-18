@@ -290,7 +290,6 @@ public class RezervacijaController {
 		}
 		else {
 			return  ResponseEntity.badRequest().body("Rezervaciju mozete otkazati najmanje 24h pre datuma preuzimanja");
-
 		}		
 	}
 
