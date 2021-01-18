@@ -27,7 +27,7 @@ public class SifrarnikLekovaServiceImpl implements SifrarnikLekovaService {
 
 	@Override
 	public SifrarnikLekova findByNaziv(String naziv) {
-		return sifrarnikLekovaRepository.findByNaziv(naziv);
+		return sifrarnikLekovaRepository.searchByNazivLikeIgnoreCase(naziv);
 	}
 
 }

@@ -34,6 +34,16 @@ public class LekServiceImpl implements LekService {
 		
 	}
 
+	@Override
+	public List<Lek> findBySifrarnikLekova(Long id) {
+		return lekRepository.findBySifrarnikLekovaId(id);
+	}
+
+	@Override
+	public Lek findBySifrarnikLekovaIdAndApotekaId(Long sifrarnikId, Long apotekaId) {
+		return lekRepository.findBySifrarnikLekovaIdAndApotekaId(sifrarnikId, apotekaId);
+	}
+
 	
 
 }
