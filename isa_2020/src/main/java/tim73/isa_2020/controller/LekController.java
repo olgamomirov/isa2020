@@ -130,7 +130,7 @@ public class LekController {
 		return new ResponseEntity<ArrayList<LekZaAlergijeDTO>>(lekoviDTO, HttpStatus.OK);
 	}
 	@GetMapping(value = "/jedinstveniNazivi/bezAlergija")
-	@PreAuthorize("hasRole('DERMATOLOG')")
+	@PreAuthorize("hasRole('DERMATOLOG') or hasRole('FARMACEUT')")
 	public ResponseEntity<ArrayList<LekZaAlergijeDTO>> jedinstveniNaziviBezAlergija (@RequestParam("email") String email){
 		List<SifrarnikLekova> sviLekovi = sifrarnikLekovaService.findAll();
 		ArrayList<LekZaAlergijeDTO> lekoviDTO = new ArrayList<LekZaAlergijeDTO>();
@@ -270,7 +270,7 @@ public class LekController {
 		public Long id;
 	}
 	@RequestMapping(value = "/prepisiLek", method = RequestMethod.POST, produces = "application/json" ,  consumes = "application/json")
-	@PreAuthorize("hasRole('DERMATOLOG')")
+	@PreAuthorize("hasRole('DERMATOLOG') or hasRole('FARMACEUT')")
 	void prepisivanjeLeka(@RequestBody Lek1 lek1, HttpServletRequest request) throws ParseException, MailException, InterruptedException {
 		
 		
@@ -298,7 +298,7 @@ public class LekController {
 		
 	}
 	@GetMapping(value = "/zamenskiLekovi/{naziv}/{id}")
-	@PreAuthorize("hasRole('DERMATOLOG')")
+	@PreAuthorize("hasRole('DERMATOLOG') or hasRole('FARMACEUT')")
 	public ResponseEntity<ArrayList<LekDTO>> zamenskiLekovi(@PathVariable String naziv, @PathVariable Long id){
 		SifrarnikLekova lek = sifrarnikLekovaService.findByNaziv(naziv);
 		Set<SifrarnikLekova> zamenski = new HashSet<SifrarnikLekova>();

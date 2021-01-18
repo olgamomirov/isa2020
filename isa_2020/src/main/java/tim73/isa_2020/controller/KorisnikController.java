@@ -8,10 +8,12 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.MailException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -37,6 +39,7 @@ import tim73.isa_2020.dto.FarmaceutDTO;
 import tim73.isa_2020.dto.LekarDTO;
 import tim73.isa_2020.dto.PacijentPodaciDTO;
 import tim73.isa_2020.dto.PregledDTO;
+import tim73.isa_2020.model.AdministratorApoteke;
 import tim73.isa_2020.model.Apoteka;
 import tim73.isa_2020.model.Authority;
 import tim73.isa_2020.model.Dermatolog;
@@ -48,6 +51,7 @@ import tim73.isa_2020.model.UserTokenState;
 import tim73.isa_2020.repository.PacijentRepository;
 import tim73.isa_2020.securityService.TokenUtils;
 import tim73.isa_2020.service.ApotekaService;
+import tim73.isa_2020.service.EmailService;
 import tim73.isa_2020.service.KorisnikService;
 import tim73.isa_2020.service.KorisnikServiceImpl;
 import tim73.isa_2020.service.PacijentService;
@@ -77,6 +81,8 @@ public class KorisnikController {
 	@Autowired
 	private PregledService pregledService;
 	
+	@Autowired
+	private EmailService mailService;
 	/*
 	@PostMapping(value = "/login", consumes=MediaType.APPLICATION_JSON_VALUE)
 	public void login(@RequestBody Korisnik korisnik) {
@@ -218,8 +224,8 @@ public class KorisnikController {
 		
 		return new ResponseEntity<List<PacijentPodaciDTO>>(pacijentiDTO, HttpStatus.OK);
 	}
-	@GetMapping(value = "/sviPacijenti") //svi pregledani pacijenti odredjenog dermatologa...u svim apotekama...promeniti na odredjenu apoteku
-	@PreAuthorize("hasRole('DERMATOLOG')")
+	@GetMapping(value = "/sviPacijenti") //svi pregledani pacijenti odredjenog dermatologa...u svim apotekama...i farmaceuta
+	@PreAuthorize("hasRole('DERMATOLOG') or hasRole('FARMACEUT')")
 	public ResponseEntity<List<PacijentPodaciDTO>> findAll1(HttpServletRequest request) {
 		
         
@@ -326,5 +332,32 @@ static class PenalBody{
   		return new ResponseEntity<List<PacijentPodaciDTO>>(pacijentiDTO, HttpStatus.OK);
   	}
 
+	static class Godisnji{
+		public String pocetak;
+		public String kraj;
+	}
+		@RequestMapping(value = "/godisnji/add", method = RequestMethod.POST, consumes = "application/json", produces = "application/json")
+		@PreAuthorize("hasRole('DERMATOLOG') or hasRole('FARMACEUT')")
+		public String setGodisnji(@RequestBody Godisnji godisnji, HttpServletRequest request) throws MailException, InterruptedException {
+			
+	     
+	     
+	     String token = tokenUtils.getToken(request);
+		 String username = this.tokenUtils.getUsernameFromToken(token);
+		 Korisnik k = (Korisnik) this.userDetailsService.loadUserByUsername(username);
+		
+		/* Set<AdministratorApoteke> admini = a.getAdministratorApoteke();
+			if(!flag) {
+				String email = null;
+			for(AdministratorApoteke admin: admini) {
+				 email = admin.getEmail();  //salje prvom adminu kog nadje
+				break;
+			}*/
+			mailService.sendSimpleMessage("violetamarceta1995@gmail.com", "Zahtev za godisnji odmor od lekara: " + k.getIme() + " " + k.getPrezime(), "Od: "
+					+ godisnji.pocetak.toString() + "do: " + godisnji.kraj.toString());
+			//}
+			
+			return k.getIme();
+		}
 	
 }

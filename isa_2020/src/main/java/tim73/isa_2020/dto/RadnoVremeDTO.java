@@ -8,9 +8,9 @@ import tim73.isa_2020.model.RadnoVreme;
 
 public class RadnoVremeDTO {
 	
-	
-	
-	
+
+	private Long id;
+		
 	private Interval interval;  
 	
 	public RadnoVremeDTO (RadnoVreme rv) {
@@ -19,6 +19,7 @@ public class RadnoVremeDTO {
 
 	public RadnoVremeDTO(String interval2) {
 		this.interval = new Interval(interval2);
+		this.id = id;
 	}
 
 	public Interval getInterval() {
@@ -28,7 +29,13 @@ public class RadnoVremeDTO {
 	public void setInterval(Interval interval) {
 		this.interval = interval;
 	}
-	
-	
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
 
 }
