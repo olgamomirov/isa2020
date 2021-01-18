@@ -20,9 +20,11 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.MailException;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -50,6 +52,7 @@ import tim73.isa_2020.service.RezervacijaService;
 import tim73.isa_2020.service.SifrarnikLekovaService;
 
 @RestController
+@CrossOrigin(origins = "http://localhost:3000")
 @RequestMapping(value = "/rezervacije")
 public class RezervacijaController {
 	
@@ -233,8 +236,7 @@ public class RezervacijaController {
 		
 	}
 	
-
-
+	
 	static class RezervacijaLeka {
 		public String naziv; //naziv leka
 		public String email; //email pacijenta
@@ -268,6 +270,32 @@ public class RezervacijaController {
 		
 		return new ResponseEntity<RezervacijaDTO>(rezervacijaDTO, HttpStatus.OK);
 	}
+	
+	@PutMapping(value ="/otkazivanjeRezervacije/{idRezervacije}")
+	@PreAuthorize("hasRole('PACIJENT')")
+	public ResponseEntity<String> otkazivanjeRezervacije(@PathVariable Long idRezervacije, HttpServletRequest request){
+		String token = tokenUtils.getToken(request);
+		String username = this.tokenUtils.getUsernameFromToken(token);
+		Pacijent p = (Pacijent) this.korisnikDetails.loadUserByUsername(username);
+		
+		Rezervacija rezervacija= rezervacijaService.findOne(idRezervacije);
+		//		if((interval.getStartMillis()-System.currentTimeMillis())/3600000>=24) {
+
+		DateTime datumPreuzimanja = new DateTime(rezervacija.getDatumPreuzimanja());
+		if((datumPreuzimanja.getMillis()-System.currentTimeMillis())/3600000>=24) {
+			System.out.println("otkazivanje");
+			rezervacija.setStatus("otkazan");
+			rezervacijaService.save(rezervacija);
+			return new ResponseEntity<String>("Rezervacija je uspesno otkazana", HttpStatus.OK);
+		}
+		else {
+			return  ResponseEntity.badRequest().body("Rezervaciju mozete otkazati najmanje 24h pre datuma preuzimanja");
+
+		}		
+	}
+
+
+
 
 }
 
