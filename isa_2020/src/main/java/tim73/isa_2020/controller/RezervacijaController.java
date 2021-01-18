@@ -8,9 +8,9 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.websocket.server.PathParam;
 
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,8 +44,8 @@ import tim73.isa_2020.service.EmailService;
 import tim73.isa_2020.service.KorisnikService;
 import tim73.isa_2020.service.KorisnikServiceImpl;
 import tim73.isa_2020.service.LekService;
+import tim73.isa_2020.service.PregledService;
 import tim73.isa_2020.service.RezervacijaService;
-import tim73.isa_2020.service.SifrarnikLekovaService;
 
 @RestController
 @RequestMapping(value = "/rezervacije")
@@ -70,10 +70,7 @@ public class RezervacijaController {
 	private EmailService mailService;
 	
 	@Autowired
-	private LekService lekService;
-	
-	@Autowired
-	private SifrarnikLekovaService sifrarnikSevice;
+	private PregledService pregledService;
 	
 	
 	@GetMapping(value = "/setTime/{id}")
@@ -181,50 +178,37 @@ public class RezervacijaController {
 		
 		return new ResponseEntity<List<RezervacijaDTO>>(rezervacijeDTO, HttpStatus.OK);
 	}
-	
-	static class NovaRezervacija{
-		public String nazivLeka;
-		public Long apoteka;
-		public String vreme;
+	static class RezervacijaLeka {
+		public String naziv; //naziv leka
+		public String email; //email pacijenta
+		public String datumPreuzimanja;
+		public Long id; //id pregleda
 	}
-	
-	//pacijent bira lek i vreme do kog ce preuzeti lek
-	@PostMapping(value = "/novaRezervacija")
-	@PreAuthorize("hasRole('PACIJENT')")
-	public ResponseEntity<String> novaRezervacija(@RequestBody NovaRezervacija novaRezervacija, HttpServletRequest request)
-			throws MailException, InterruptedException {
-		String token = tokenUtils.getToken(request);
-		String username = this.tokenUtils.getUsernameFromToken(token);
-		Pacijent p = (Pacijent) this.korisnikDetails.loadUserByUsername(username);
-
-		SifrarnikLekova sl = sifrarnikSevice.findByNaziv(novaRezervacija.nazivLeka);
-
-		Lek lek = lekService.findBySifrarnikLekovaIdAndApotekaId(sl.getId(), novaRezervacija.apoteka);
-
-		Rezervacija rezervacija = new Rezervacija(novaRezervacija.vreme + ":00.000+01:00", "izdavanje", lek, p);
-		rezervacijaService.save(rezervacija);
-		mailService.sendSimpleMessage(p.getEmail(), "REZERVACIJA LEKA", "Uspesno ste rezervisali lek: "
-				+ novaRezervacija.nazivLeka + ". Vas jedinstveni broj rezervacije je: " + rezervacija.getId() + ".");
+	@PostMapping(value = "/rezervisi")
+	ResponseEntity <RezervacijaDTO> rezervacijaLeka(@RequestBody RezervacijaLeka rezervacija) {
 		
-		return new ResponseEntity<String>("ok", HttpStatus.OK);
-	}
-	
-	@GetMapping(value = "/pacijentoveRezervacije")
-	@PreAuthorize("hasRole('PACIJENT')")
-	public ResponseEntity<List<RezervacijaDTO>> pacijentoveRezervacije(HttpServletRequest request){
-		String token = tokenUtils.getToken(request);
-		String username = this.tokenUtils.getUsernameFromToken(token);
-		Pacijent p = (Pacijent) this.korisnikDetails.loadUserByUsername(username);
-		List<RezervacijaDTO> rezervacije=new ArrayList<RezervacijaDTO>();
+		Apoteka apoteka = pregledService.findOne(rezervacija.id).getApoteka();
+		Set<Lek> lekApoteka = apoteka.getLekovi();
 		
-		for(Rezervacija r:rezervacijaService.findByPacijentId(p.getId())) {
-			rezervacije.add(new RezervacijaDTO(r));
+		Korisnik pacijent = korisnikService.findByEmail(rezervacija.email);
+		Pacijent p = (Pacijent) pacijent;
+		
+		 Lek lek= null;
+		
+		for(Lek l: lekApoteka) {
+			if(l.getSifrarnikLekova().getNaziv().equals(rezervacija.naziv)) {
+				lek = l;
+			}
 		}
 		
 		
-		return new ResponseEntity<List<RezervacijaDTO>>(rezervacije, HttpStatus.OK);
+		Rezervacija rezervisi = new Rezervacija(rezervacija.datumPreuzimanja + ":00.000+01:00", "izdavanje" , lek, p);
+		rezervacijaService.save(rezervisi);
 		
+		RezervacijaDTO rezervacijaDTO = new RezervacijaDTO(rezervisi);
+		
+			
+		
+		return new ResponseEntity<RezervacijaDTO>(rezervacijaDTO, HttpStatus.OK);
 	}
-	
-
 }
