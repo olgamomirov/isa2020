@@ -30,7 +30,10 @@ public class Pacijent extends Korisnik{
 	
 	@OneToMany(mappedBy = "pacijent", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	private Set<ERecept> eRecept;
-
+	
+	@OneToMany(mappedBy = "pacijent", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	private Set<OcenaDermatolog> oceneDermatologa;
+	
 
 	public Pacijent() {
 		super();
@@ -84,4 +87,13 @@ public class Pacijent extends Korisnik{
 		this.penal = penal;
 	}
 
+	public Set<OcenaDermatolog> getOceneDermatologa() {
+		return oceneDermatologa;
+	}
+
+	public void setOceneDermatologa(Set<OcenaDermatolog> oceneDermatologa) {
+		this.oceneDermatologa = oceneDermatologa;
+	}
+
+	
 }
