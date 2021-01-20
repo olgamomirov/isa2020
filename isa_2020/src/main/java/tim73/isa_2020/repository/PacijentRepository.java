@@ -20,4 +20,7 @@ public interface PacijentRepository extends JpaRepository<Pacijent, Long>{
 	@Query("SELECT m FROM Pacijent m WHERE lower(m.ime) LIKE %:ime% and lower(m.prezime) LIKE %:prezime%")
 	List<Pacijent> searchByImeLikeAndPrezimeLikeIgnoreCase(@Param("ime") String ime, @Param("prezime") String prezime);
 	
+	@Query("SELECT p FROM Pacijent p WHERE p.penal>0")
+	List<Pacijent> saPenalima();
+
 }

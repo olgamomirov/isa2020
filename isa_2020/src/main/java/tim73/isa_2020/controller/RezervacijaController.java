@@ -207,6 +207,11 @@ public class RezervacijaController {
 		String username = this.tokenUtils.getUsernameFromToken(token);
 		Pacijent p = (Pacijent) this.korisnikDetails.loadUserByUsername(username);
 
+		if(p.getPenal()>=3) {
+			return ResponseEntity
+		            .badRequest().body("Imate 3 ili vise penala i ova funkcija Vam nije dostupna!");
+		}
+		
 		SifrarnikLekova sl = sifrarnikSevice.findByNaziv(novaRezervacija.nazivLeka);
 
 		Lek lek = lekService.findBySifrarnikLekovaIdAndApotekaId(sl.getId(), novaRezervacija.apoteka);
