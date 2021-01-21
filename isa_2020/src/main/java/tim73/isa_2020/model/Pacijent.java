@@ -35,6 +35,10 @@ public class Pacijent extends Korisnik{
 	private Set<OcenaDermatolog> oceneDermatologa;
 	
 
+	@OneToMany(mappedBy = "pacijent", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	private Set<OcenaFarmaceut> oceneFarmaceuta;
+	
+
 	public Pacijent() {
 		super();
 		// TODO Auto-generated constructor stub
@@ -93,6 +97,14 @@ public class Pacijent extends Korisnik{
 
 	public void setOceneDermatologa(Set<OcenaDermatolog> oceneDermatologa) {
 		this.oceneDermatologa = oceneDermatologa;
+	}
+
+	public Set<OcenaFarmaceut> getOceneFarmaceuta() {
+		return oceneFarmaceuta;
+	}
+
+	public void setOceneFarmaceuta(Set<OcenaFarmaceut> oceneFarmaceuta) {
+		this.oceneFarmaceuta = oceneFarmaceuta;
 	}
 
 	
