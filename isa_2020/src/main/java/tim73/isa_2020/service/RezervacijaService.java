@@ -13,4 +13,6 @@ public interface RezervacijaService {
 	List<Rezervacija> findByPacijentId(Long id);
 
 	void save(Rezervacija rezervacija);
+	
+	List<Rezervacija> izdavanjeRezervacije();
 }

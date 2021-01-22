@@ -37,4 +37,9 @@ public class PacijentServiceImpl implements PacijentService{
 		return u;
 	}
 
+	@Override
+	public List<Pacijent> saPenalima() {
+		return pacijentRepository.saPenalima();
+	}
+
 }

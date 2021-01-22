@@ -37,4 +37,9 @@ public class RezervacijaServiceImpl implements RezervacijaService{
 		rezervacijaRepository.save(rezervacija);
 	}
 
+	@Override
+	public List<Rezervacija> izdavanjeRezervacije() {
+		return rezervacijaRepository.izdavanjeRezervacije();
+	}
+
 }

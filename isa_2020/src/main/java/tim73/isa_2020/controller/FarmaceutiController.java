@@ -31,12 +31,17 @@ import tim73.isa_2020.model.Authority;
 import tim73.isa_2020.model.Dermatolog;
 import tim73.isa_2020.model.Farmaceut;
 import tim73.isa_2020.model.Korisnik;
+import tim73.isa_2020.model.OcenaDermatolog;
+import tim73.isa_2020.model.OcenaFarmaceut;
+import tim73.isa_2020.model.Pacijent;
 import tim73.isa_2020.model.Pregled;
 import tim73.isa_2020.model.RadnoVreme;
 import tim73.isa_2020.securityService.TokenUtils;
 import tim73.isa_2020.service.FarmaceutService;
 import tim73.isa_2020.service.KorisnikService;
 import tim73.isa_2020.service.KorisnikServiceImpl;
+import tim73.isa_2020.service.OcenaFarmaceutService;
+import tim73.isa_2020.service.PregledService;
 
 @RestController
 @RequestMapping(value = "/farmaceuti")
@@ -59,6 +64,12 @@ public class FarmaceutiController {
 
 	@Autowired
 	private PasswordEncoder passwordEncoder;
+
+	@Autowired
+	private PregledService pregledService;
+
+	@Autowired
+	private OcenaFarmaceutService ocenaFarmaceutService;
 
 	@RequestMapping(method = RequestMethod.POST, value = "/changeData", consumes = "application/json", produces = "application/json")
 	@PreAuthorize("hasRole('FARMACEUT')")
@@ -121,7 +132,7 @@ public class FarmaceutiController {
 		String username = this.tokenUtils.getUsernameFromToken(token);
 		Korisnik user = (Korisnik) this.userDetailsService.loadUserByUsername(username);
 		;
-        user.setStatus("ulogovan");
+		user.setStatus("ulogovan");
 		FarmaceutDTO farmaceutDTO = new FarmaceutDTO(user);
 
 		if (BCrypt.checkpw(passwordChanger.oldPassword, user.getLozinka())) {
@@ -141,7 +152,7 @@ public class FarmaceutiController {
 		public String oldPassword;
 		public String newPassword;
 	}
-	
+
 	@RequestMapping(value = "/change-status", method = RequestMethod.POST)
 	@PreAuthorize("hasRole('FARMACEUT')")
 	public ResponseEntity<FarmaceutDTO> changeStatus(@RequestBody StatusBody status, HttpServletRequest request) {
@@ -150,63 +161,97 @@ public class FarmaceutiController {
 		String username = this.tokenUtils.getUsernameFromToken(token);
 		Korisnik user = (Korisnik) this.userDetailsService.loadUserByUsername(username);
 		List<Authority> authority = (List<Authority>) user.getAuthorities();
-		
-		//new UserTokenState(token, tokenUtils.getExpiredIn(), authority.get(0).getName(), "ulogovan");
-	
-		System.out.println(status.statusNovi  + " sta cita?");
+
+		// new UserTokenState(token, tokenUtils.getExpiredIn(),
+		// authority.get(0).getName(), "ulogovan");
+
+		System.out.println(status.statusNovi + " sta cita?");
 		String status1 = status.statusNovi;
 		user.setStatus(status1);
 
 		korisnikService.save(user);
-	
+
 		System.out.println(user.getStatus() + " kakooo" + user.getIme() + " " + user.getTelefon());
-		
+
 		Farmaceut f = (Farmaceut) user;
-		
+
 		FarmaceutDTO dto = new FarmaceutDTO(f);
-		
-     return new ResponseEntity<FarmaceutDTO>(dto, HttpStatus.OK); 
+
+		return new ResponseEntity<FarmaceutDTO>(dto, HttpStatus.OK);
 	}
-	
+
 	@GetMapping(value = "/slobodni/{vreme}/{idApoteke}")
 	@PreAuthorize("hasRole('PACIJENT')")
-	public ResponseEntity<List<LekarDTO>> slobodniFarmaceuti(@PathVariable String vreme, @PathVariable Long idApoteke){
+	public ResponseEntity<List<LekarDTO>> slobodniFarmaceuti(@PathVariable String vreme, @PathVariable Long idApoteke) {
 		String datum = vreme.split("T")[0];
 		String vremeString = vreme.split("T")[1];
-System.out.println(datum);
-System.out.println(vremeString);
-		
-		DateTime vremePregleda = new DateTime(Integer.parseInt(datum.split("-")[0]), Integer.parseInt(datum.split("-")[1]),
-				Integer.parseInt(datum.split("-")[2]), Integer.parseInt(vremeString.split(":")[0]), Integer.parseInt(vremeString.split(":")[1]));
-		Interval noviPregled= new Interval(vremePregleda, new Period(1800000)); // pola sata za pregled
-		
-		ArrayList<Farmaceut> sviFarmaceutiIzApoteke = (ArrayList<Farmaceut>) farmaceutService.findByApotekaId(idApoteke);
-		ArrayList<LekarDTO> slobodniFarmaceuti=new ArrayList<LekarDTO>();
-		for(Farmaceut farmaceut:sviFarmaceutiIzApoteke) {
-			int slobodanPregled=0;
-			int slobodanUTokuRadnogVremena=0;
-			for(Pregled pregled:farmaceut.getPregledi()) {
-				Interval interval= new Interval(pregled.getInterval());
-				if(pregled!=null && pregled.getApoteka().getId().equals(idApoteke) && (interval.contains(noviPregled)) || interval.overlaps(noviPregled)){
+		System.out.println(datum);
+		System.out.println(vremeString);
+
+		DateTime vremePregleda = new DateTime(Integer.parseInt(datum.split("-")[0]),
+				Integer.parseInt(datum.split("-")[1]), Integer.parseInt(datum.split("-")[2]),
+				Integer.parseInt(vremeString.split(":")[0]), Integer.parseInt(vremeString.split(":")[1]));
+		Interval noviPregled = new Interval(vremePregleda, new Period(1800000)); // pola sata za pregled
+
+		ArrayList<Farmaceut> sviFarmaceutiIzApoteke = (ArrayList<Farmaceut>) farmaceutService
+				.findByApotekaId(idApoteke);
+		ArrayList<LekarDTO> slobodniFarmaceuti = new ArrayList<LekarDTO>();
+		for (Farmaceut farmaceut : sviFarmaceutiIzApoteke) {
+			int slobodanPregled = 0;
+			int slobodanUTokuRadnogVremena = 0;
+			for (Pregled pregled : farmaceut.getPregledi()) {
+				Interval interval = new Interval(pregled.getInterval());
+				if (pregled != null && pregled.getApoteka().getId().equals(idApoteke)
+						&& (interval.contains(noviPregled)) || interval.overlaps(noviPregled)) {
 					slobodanPregled++;
 				}
 			}
-			for(RadnoVreme rv:farmaceut.getRadnoVreme()) {
-				Interval interval=new Interval(rv.getInterval());
-				if(rv!=null && rv.getApoteka().getId().equals(idApoteke) && interval.contains(noviPregled)) {
+			for (RadnoVreme rv : farmaceut.getRadnoVreme()) {
+				Interval interval = new Interval(rv.getInterval());
+				if (rv != null && rv.getApoteka().getId().equals(idApoteke) && interval.contains(noviPregled)) {
 					slobodanUTokuRadnogVremena++;
 
 				}
 			}
-			
 
 			if (slobodanPregled == 0 && slobodanUTokuRadnogVremena != 0) {
-				
-				slobodniFarmaceuti.add(new LekarDTO(farmaceut.getId(),farmaceut.getIme()+" "+farmaceut.getPrezime(), "farmaceut",0));
+
+				slobodniFarmaceuti.add(new LekarDTO(farmaceut.getId(),
+						farmaceut.getIme() + " " + farmaceut.getPrezime(), "farmaceut", 0));
 			}
 		}
 		return new ResponseEntity<List<LekarDTO>>(slobodniFarmaceuti, HttpStatus.OK);
 	}
 
+	// pacijentu se nude farmaceuti kod kojih je bar jednom imao pregled
+	@RequestMapping(value = "/farmaceutiZaOcenjivanje", method = RequestMethod.GET)
+	@PreAuthorize("hasRole('PACIJENT')")
+	public ResponseEntity<List<LekarDTO>> farmaceutiKojiSemoguOceniti(HttpServletRequest request) {
+		String token = tokenUtils.getToken(request);
+		String username = this.tokenUtils.getUsernameFromToken(token);
+		Pacijent p = (Pacijent) this.userDetailsService.loadUserByUsername(username);
+
+		List<LekarDTO> farmaceuti = new ArrayList<LekarDTO>();
+
+		for (Pregled pregled : pregledService.findByPacijentId(p.getId())) {
+			if (pregled.getStatus().equals("odradjen") && pregled.getFarmaceut() != null) {
+				LekarDTO farmaceut;
+				OcenaFarmaceut ocena = ocenaFarmaceutService
+						.findByFarmaceutIdAndPacijentId(pregled.getFarmaceut().getId(), p.getId());
+				if (ocena != null) {
+					farmaceut = new LekarDTO(pregled.getFarmaceut().getId(),
+							pregled.getFarmaceut().getIme() + pregled.getFarmaceut().getPrezime(), "farmaceut",
+							ocena.getVrednost());
+				} else {
+					farmaceut = new LekarDTO(pregled.getFarmaceut().getId(),
+							pregled.getFarmaceut().getIme() + pregled.getFarmaceut().getPrezime(), "farmaceut", 0);
+				}
+				if (!farmaceuti.contains(farmaceut)) {
+					farmaceuti.add(farmaceut);
+				}
+			}
+		}
+		return new ResponseEntity<List<LekarDTO>>(farmaceuti, HttpStatus.OK);
+	}
 
 }

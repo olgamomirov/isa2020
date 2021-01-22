@@ -60,6 +60,10 @@ public class Apoteka {
 	@OneToMany(mappedBy = "apoteka", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	private Set<Pregled> pregledi = new HashSet<Pregled>();
 
+	@OneToMany(mappedBy = "apoteka", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	private Set<OcenaApoteka> oceneApoteke = new HashSet<OcenaApoteka>();
+
+	
 	public Apoteka() {
 		super();
 		// TODO Auto-generated constructor stub
@@ -166,6 +170,14 @@ public class Apoteka {
 
 	public void setPregledi(Set<Pregled> pregledi) {
 		this.pregledi = pregledi;
+	}
+
+	public Set<OcenaApoteka> getOceneApoteke() {
+		return oceneApoteke;
+	}
+
+	public void setOceneApoteke(Set<OcenaApoteka> oceneApoteke) {
+		this.oceneApoteke = oceneApoteke;
 	}
 	
 	

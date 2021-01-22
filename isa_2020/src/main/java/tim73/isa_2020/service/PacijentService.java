@@ -16,4 +16,6 @@ public interface PacijentService {
 	List<Pacijent> findByImeAndPrezime(String ime, String prezime);
 	
 	List<Pacijent> searchByImeLikeOrPrezimeLike(String ime, String prezime);
+	
+	List<Pacijent> saPenalima();
 }
