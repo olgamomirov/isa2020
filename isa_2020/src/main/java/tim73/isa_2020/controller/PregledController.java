@@ -191,7 +191,7 @@ public class PregledController {
         List<PregledDTO> preglediDTO= new ArrayList<>();
 		
 		for(Pregled p: pregledi) {
-			preglediDTO.add(new PregledDTO(p, p.getPacijent().getEmail()));
+			preglediDTO.add(new PregledDTO(p, p.getPacijent().getEmail(), p.getPacijent().getIme(), p.getPacijent().getPrezime()));
 		}	
 		
 		return new ResponseEntity<List<PregledDTO>>(preglediDTO, HttpStatus.OK);
@@ -231,7 +231,7 @@ public class PregledController {
 			
 		for(Pregled p: pregledi) {
 			if(p.getPacijent()!=null) {
-			preglediDTO.add(new PregledDTO(p, p.getPacijent().getEmail()));
+			preglediDTO.add(new PregledDTO(p, p.getPacijent().getEmail(), p.getPacijent().getIme(), p.getPacijent().getPrezime()));
 		}else {
 			preglediDTO.add(new PregledDTO(p));
 		}
@@ -272,7 +272,7 @@ public class PregledController {
 			
 		for(Pregled p: pregledi) {
 			
-			preglediDTO.add(new PregledDTO(p, pacijent.getEmail()));
+			preglediDTO.add(new PregledDTO(p, pacijent.getEmail(), pacijent.getIme(), pacijent.getPrezime()));
 		
 		}
 	 
@@ -299,7 +299,7 @@ public class PregledController {
 			
 		for(Pregled p: pregledi) {
 			if(p.getPacijent()!=null) {
-			preglediDTO.add(new PregledDTO(p, p.getPacijent().getEmail()));
+			preglediDTO.add(new PregledDTO(p, p.getPacijent().getEmail(), p.getPacijent().getIme(), p.getPacijent().getPrezime()));
 		}else {
 			preglediDTO.add(new PregledDTO(p));
 		}
