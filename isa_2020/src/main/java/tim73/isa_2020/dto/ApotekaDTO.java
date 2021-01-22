@@ -13,6 +13,10 @@ public class ApotekaDTO {
 		this(apoteka.getId(), apoteka.getNaziv(), apoteka.getGrad(), apoteka.getOcena());
 	}
 
+	public ApotekaDTO (Apoteka apoteka, double ocena) {
+		this(apoteka.getId(), apoteka.getNaziv(), apoteka.getGrad(), ocena);
+	}
+	
 	public ApotekaDTO(Long id, String naziv, String grad, double ocena) {
 		super();
 		this.id = id;
@@ -37,6 +41,48 @@ public class ApotekaDTO {
 	
 	public double getOcena() {
 		return ocena;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((grad == null) ? 0 : grad.hashCode());
+		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		result = prime * result + ((naziv == null) ? 0 : naziv.hashCode());
+		long temp;
+		temp = Double.doubleToLongBits(ocena);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ApotekaDTO other = (ApotekaDTO) obj;
+		if (grad == null) {
+			if (other.grad != null)
+				return false;
+		} else if (!grad.equals(other.grad))
+			return false;
+		if (id == null) {
+			if (other.id != null)
+				return false;
+		} else if (!id.equals(other.id))
+			return false;
+		if (naziv == null) {
+			if (other.naziv != null)
+				return false;
+		} else if (!naziv.equals(other.naziv))
+			return false;
+		if (Double.doubleToLongBits(ocena) != Double.doubleToLongBits(other.ocena))
+			return false;
+		return true;
 	}
 
 	

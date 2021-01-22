@@ -11,13 +11,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import tim73.isa_2020.model.OcenaApoteka;
 import tim73.isa_2020.model.OcenaDermatolog;
 import tim73.isa_2020.model.OcenaFarmaceut;
 import tim73.isa_2020.model.Pacijent;
 import tim73.isa_2020.securityService.TokenUtils;
+import tim73.isa_2020.service.ApotekaService;
 import tim73.isa_2020.service.DermatologService;
 import tim73.isa_2020.service.FarmaceutService;
 import tim73.isa_2020.service.KorisnikServiceImpl;
+import tim73.isa_2020.service.OcenaApotekaService;
 import tim73.isa_2020.service.OcenaDermatologService;
 import tim73.isa_2020.service.OcenaFarmaceutService;
 
@@ -32,6 +35,9 @@ public class OcenaController {
 	private OcenaFarmaceutService ocenaFarmaceutService;
 	
 	@Autowired
+	private OcenaApotekaService ocenaApotekaService;
+	
+	@Autowired
 	private KorisnikServiceImpl userDetailsService;
 
 	@Autowired
@@ -42,6 +48,9 @@ public class OcenaController {
 	
 	@Autowired
 	private FarmaceutService farmaceutService;
+	
+	@Autowired 
+	private ApotekaService apotekaService;
 
 	@RequestMapping(value = "/oceniDermatologa/{idDermatologa}/{ocena}", method = RequestMethod.POST)
 	@PreAuthorize("hasRole('PACIJENT')")
@@ -87,6 +96,30 @@ public class OcenaController {
 			ocenaFarmaceut.setPacijent(p);
 			ocenaFarmaceutService.save(ocenaFarmaceut);
 			return new ResponseEntity<String>("Uspesno ste ocenili farmaceuta", HttpStatus.OK);
+
+		}
+	}
+	
+	@RequestMapping(value = "/oceniApoteku/{idApoteke}/{ocena}", method = RequestMethod.POST)
+	@PreAuthorize("hasRole('PACIJENT')")
+	public ResponseEntity<String> oceniApoteku(@PathVariable Long idApoteke, @PathVariable int ocena,HttpServletRequest request) {
+		String token = tokenUtils.getToken(request);
+		String username = this.tokenUtils.getUsernameFromToken(token);
+		Pacijent p = (Pacijent) this.userDetailsService.loadUserByUsername(username);
+
+		System.out.println(ocena);
+		if (ocenaApotekaService.findByApotekaIdAndPacijentId(idApoteke, p.getId()) != null) {
+			OcenaApoteka ocenaApoteka = ocenaApotekaService.findByApotekaIdAndPacijentId(idApoteke,
+					p.getId());
+			ocenaApoteka.setVrednost(ocena);
+			ocenaApotekaService.save(ocenaApoteka);
+			return new ResponseEntity<String>("Uspesno ste promenili ocenu apoteci", HttpStatus.OK);
+		} else {
+			OcenaApoteka ocenaApoteka = new OcenaApoteka(ocena);
+			ocenaApoteka.setApoteka(apotekaService.findById(idApoteke));
+			ocenaApoteka.setPacijent(p);
+			ocenaApotekaService.save(ocenaApoteka);
+			return new ResponseEntity<String>("Uspesno ste ocenili apoteku", HttpStatus.OK);
 
 		}
 	}
