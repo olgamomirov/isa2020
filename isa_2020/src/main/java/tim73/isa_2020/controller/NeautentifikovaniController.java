@@ -18,9 +18,11 @@ import tim73.isa_2020.dto.LekDTO;
 import tim73.isa_2020.model.Apoteka;
 import tim73.isa_2020.model.Lek;
 import tim73.isa_2020.model.OcenaApoteka;
+import tim73.isa_2020.model.OcenaSifrarnikLekova;
 import tim73.isa_2020.service.ApotekaService;
 import tim73.isa_2020.service.LekService;
 import tim73.isa_2020.service.OcenaApotekaService;
+import tim73.isa_2020.service.OcenaSifrarnikLekovaService;
 
 @RestController
 @RequestMapping(value = "/svi")
@@ -34,8 +36,7 @@ public class NeautentifikovaniController {
 	private ApotekaService apotekaService;
 	
 	@Autowired
-	private OcenaApotekaService ocenaApotekaService;
-	
+	private OcenaSifrarnikLekovaService ocenaSifrarnikLekovaService;
 	
 	@GetMapping(value = "/lekovi/{id}")
 	public ResponseEntity<List<LekDTO>> lekoviApoteke(@PathVariable Long id) {
@@ -45,10 +46,18 @@ public class NeautentifikovaniController {
 		
         List<LekDTO> lekoviDTO= new ArrayList<>();
 		
+		
 		for(Lek l: lekovi) {
-			
-			lekoviDTO.add(new LekDTO(l));
+			double ocena=0;
+			double brojOcena=0;
+			for(OcenaSifrarnikLekova ocenaLeka :ocenaSifrarnikLekovaService.findBySifrarnikLekovaId(l.getSifrarnikLekova().getId())){
+				ocena+=ocenaLeka.getVrednost();
+				brojOcena++;
+			}
+			ocena=ocena/brojOcena;
+			lekoviDTO.add(new LekDTO(l,ocena));
 		}
+		
 		
 		return new ResponseEntity<List<LekDTO>>(lekoviDTO, HttpStatus.OK);
 	}

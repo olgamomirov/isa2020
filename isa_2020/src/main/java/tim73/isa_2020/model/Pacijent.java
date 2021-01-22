@@ -41,6 +41,9 @@ public class Pacijent extends Korisnik{
 	@OneToMany(mappedBy = "pacijent", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	private Set<OcenaApoteka> oceneApoteka;
 	
+	@OneToMany(mappedBy = "pacijent", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	private Set<OcenaSifrarnikLekova> oceneLekova;
+	
 
 	public Pacijent() {
 		super();
@@ -116,6 +119,14 @@ public class Pacijent extends Korisnik{
 
 	public void setOceneApoteka(Set<OcenaApoteka> oceneApoteka) {
 		this.oceneApoteka = oceneApoteka;
+	}
+
+	public Set<OcenaSifrarnikLekova> getOceneLekova() {
+		return oceneLekova;
+	}
+
+	public void setOceneLekova(Set<OcenaSifrarnikLekova> oceneLekova) {
+		this.oceneLekova = oceneLekova;
 	}
 
 	

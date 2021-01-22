@@ -53,6 +53,9 @@ public class SifrarnikLekova {
 	@ManyToMany(mappedBy = "sifrarnici")
 	private Set<ERecept> eRecepti;
 
+	@OneToMany(mappedBy = "sifrarnikLekova", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	private Set<OcenaSifrarnikLekova> oceneLekova;
+
 	
 	public SifrarnikLekova(String naziv, String vrstaLeka, String oblikLeka, String sastav, String proizvodjac,
 			boolean recept, String dodatneNapomene, List<Long> sifreZamenskih) {
@@ -163,6 +166,14 @@ public class SifrarnikLekova {
 
 	public void seteRecepti(Set<ERecept> eRecepti) {
 		this.eRecepti = eRecepti;
+	}
+
+	public Set<OcenaSifrarnikLekova> getOceneLekova() {
+		return oceneLekova;
+	}
+
+	public void setOceneLekova(Set<OcenaSifrarnikLekova> oceneLekova) {
+		this.oceneLekova = oceneLekova;
 	}
 	
 	

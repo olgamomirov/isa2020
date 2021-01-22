@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import tim73.isa_2020.model.OcenaApoteka;
 import tim73.isa_2020.model.OcenaDermatolog;
 import tim73.isa_2020.model.OcenaFarmaceut;
+import tim73.isa_2020.model.OcenaSifrarnikLekova;
 import tim73.isa_2020.model.Pacijent;
 import tim73.isa_2020.securityService.TokenUtils;
 import tim73.isa_2020.service.ApotekaService;
@@ -23,6 +24,8 @@ import tim73.isa_2020.service.KorisnikServiceImpl;
 import tim73.isa_2020.service.OcenaApotekaService;
 import tim73.isa_2020.service.OcenaDermatologService;
 import tim73.isa_2020.service.OcenaFarmaceutService;
+import tim73.isa_2020.service.OcenaSifrarnikLekovaService;
+import tim73.isa_2020.service.SifrarnikLekovaService;
 
 @RestController
 @RequestMapping(value = "/ocene")
@@ -38,6 +41,9 @@ public class OcenaController {
 	private OcenaApotekaService ocenaApotekaService;
 	
 	@Autowired
+	private OcenaSifrarnikLekovaService ocenaSifrarnikLekovaService;
+	
+	@Autowired
 	private KorisnikServiceImpl userDetailsService;
 
 	@Autowired
@@ -51,6 +57,9 @@ public class OcenaController {
 	
 	@Autowired 
 	private ApotekaService apotekaService;
+	
+	@Autowired 
+	private SifrarnikLekovaService sifrarnikLekovaService;
 
 	@RequestMapping(value = "/oceniDermatologa/{idDermatologa}/{ocena}", method = RequestMethod.POST)
 	@PreAuthorize("hasRole('PACIJENT')")
@@ -120,6 +129,29 @@ public class OcenaController {
 			ocenaApoteka.setPacijent(p);
 			ocenaApotekaService.save(ocenaApoteka);
 			return new ResponseEntity<String>("Uspesno ste ocenili apoteku", HttpStatus.OK);
+
+		}
+	}
+	
+	@RequestMapping(value = "/oceniLek/{sifraLeka}/{ocena}", method = RequestMethod.POST)
+	@PreAuthorize("hasRole('PACIJENT')")
+	public ResponseEntity<String> oceniLek(@PathVariable Long sifraLeka, @PathVariable int ocena,HttpServletRequest request) {
+		String token = tokenUtils.getToken(request);
+		String username = this.tokenUtils.getUsernameFromToken(token);
+		Pacijent p = (Pacijent) this.userDetailsService.loadUserByUsername(username);
+
+		System.out.println(ocena);
+		if (ocenaSifrarnikLekovaService.findBySifrarnikLekovaIdAndPacijentId(sifraLeka, p.getId()) != null) {
+			OcenaSifrarnikLekova ocenaSifrarnikLekova = ocenaSifrarnikLekovaService.findBySifrarnikLekovaIdAndPacijentId(sifraLeka,
+					p.getId());
+			ocenaSifrarnikLekova.setVrednost(ocena);
+			ocenaSifrarnikLekovaService.save(ocenaSifrarnikLekova);
+			return new ResponseEntity<String>("Uspesno ste promenili ocenu leku", HttpStatus.OK);
+		} else {
+			OcenaSifrarnikLekova ocenaSifrarnikLekova = new OcenaSifrarnikLekova(ocena, p, sifrarnikLekovaService.getById(sifraLeka));
+			
+			ocenaSifrarnikLekovaService.save(ocenaSifrarnikLekova);
+			return new ResponseEntity<String>("Uspesno ste ocenili lek", HttpStatus.OK);
 
 		}
 	}
