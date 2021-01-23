@@ -13,6 +13,9 @@ public class RezervacijaDTO {
 	
 	private DateTime datumPreuzimanja;
 	
+	private String datumPreuzimanjaString="";
+
+	
 	private String nazivLeka;
 	
 	private String nazivApoteke;
@@ -42,6 +45,9 @@ public class RezervacijaDTO {
 		this.nazivLeka = nazivLeka;
 		
 		this.nazivApoteke = nazivApoteke;
+		
+		this.datumPreuzimanjaString = this.datumPreuzimanja.toString("dd/MM/yyyy HH:mm");
+
 	}
 
 
@@ -67,6 +73,11 @@ public class RezervacijaDTO {
 
 	public String getStatus() {
 		return status;
+	}
+
+
+	public String getDatumPreuzimanjaString() {
+		return datumPreuzimanjaString;
 	}
 
 	

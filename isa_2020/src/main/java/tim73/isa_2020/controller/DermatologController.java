@@ -1,5 +1,6 @@
 package tim73.isa_2020.controller;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,15 +33,21 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import tim73.isa_2020.dto.DermatologDTO;
+import tim73.isa_2020.dto.LekarDTO;
 import tim73.isa_2020.model.Authority;
 import tim73.isa_2020.model.Dermatolog;
 import tim73.isa_2020.model.Korisnik;
+import tim73.isa_2020.model.OcenaDermatolog;
+import tim73.isa_2020.model.Pacijent;
+import tim73.isa_2020.model.Pregled;
 import tim73.isa_2020.model.UserTokenState;
 import tim73.isa_2020.repository.KorisnikRepository;
 import tim73.isa_2020.securityService.TokenUtils;
 import tim73.isa_2020.service.DermatologService;
 import tim73.isa_2020.service.KorisnikService;
 import tim73.isa_2020.service.KorisnikServiceImpl;
+import tim73.isa_2020.service.OcenaDermatologService;
+import tim73.isa_2020.service.PregledService;
 
 @RestController
 @RequestMapping(value = "/dermatolozi")
@@ -60,6 +67,12 @@ public class DermatologController {
 
 	@Autowired
 	private KorisnikService korisnikService;
+	
+	@Autowired 
+	private PregledService pregledService;
+	
+	@Autowired
+	private OcenaDermatologService ocenaDermatologService;
 
 	@Bean
 	public PasswordEncoder encoder() {
@@ -189,4 +202,31 @@ public class DermatologController {
      return new ResponseEntity<DermatologDTO>(dto, HttpStatus.OK); 
 	}
 
+	//pacijentu se nude dermatolozi kod kojih je bar jednom imao pregled 
+	@RequestMapping(value = "/dermatoloziZaOcenjivanje", method = RequestMethod.GET)
+	@PreAuthorize("hasRole('PACIJENT')")
+	public ResponseEntity<List<LekarDTO>> dermatoloziKojiSemoguOceniti(HttpServletRequest request){
+		String token = tokenUtils.getToken(request);
+		String username = this.tokenUtils.getUsernameFromToken(token);
+		Pacijent p = (Pacijent) this.userDetailsService.loadUserByUsername(username);
+		
+		List<LekarDTO> dermatolozi= new ArrayList<LekarDTO>();
+		
+		for(Pregled pregled:pregledService.findByPacijentId(p.getId())) {
+			if(pregled.getStatus().equals("odradjen")&&pregled.getDermatolog()!=null) {
+				LekarDTO dermatolog;
+				OcenaDermatolog ocena=ocenaDermatologService.findByDermatologIdAndPacijentId(pregled.getDermatolog().getId(), p.getId());
+				if(ocena!=null) {
+					dermatolog=new LekarDTO(pregled.getDermatolog().getId(),pregled.getDermatolog().getIme()+pregled.getDermatolog().getPrezime(), "dermatolog",ocena.getVrednost());
+				}
+				else{
+					dermatolog=new LekarDTO(pregled.getDermatolog().getId(),pregled.getDermatolog().getIme()+pregled.getDermatolog().getPrezime(), "dermatolog",0);
+				}
+				if(!dermatolozi.contains(dermatolog)) {
+					dermatolozi.add(dermatolog);
+				}
+			}
+		}
+		return new ResponseEntity<List<LekarDTO>>(dermatolozi, HttpStatus.OK);
+	}
 }

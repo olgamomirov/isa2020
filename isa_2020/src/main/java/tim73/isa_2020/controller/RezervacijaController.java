@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.websocket.server.PathParam;
 
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,9 +20,11 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.MailException;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -46,8 +49,10 @@ import tim73.isa_2020.service.KorisnikServiceImpl;
 import tim73.isa_2020.service.LekService;
 import tim73.isa_2020.service.PregledService;
 import tim73.isa_2020.service.RezervacijaService;
+import tim73.isa_2020.service.SifrarnikLekovaService;
 
 @RestController
+@CrossOrigin(origins = "http://localhost:3000")
 @RequestMapping(value = "/rezervacije")
 public class RezervacijaController {
 	
@@ -70,7 +75,14 @@ public class RezervacijaController {
 	private EmailService mailService;
 	
 	@Autowired
+	private LekService lekService;
+	
+	@Autowired
+	private SifrarnikLekovaService sifrarnikSevice;
+  
+  @Autowired
 	private PregledService pregledService;
+
 	
 	
 	@GetMapping(value = "/setTime/{id}")
@@ -178,6 +190,58 @@ public class RezervacijaController {
 		
 		return new ResponseEntity<List<RezervacijaDTO>>(rezervacijeDTO, HttpStatus.OK);
 	}
+
+	
+	static class NovaRezervacija{
+		public String nazivLeka;
+		public Long apoteka;
+		public String vreme;
+	}
+	
+	//pacijent bira lek i vreme do kog ce preuzeti lek
+	@PostMapping(value = "/novaRezervacija")
+	@PreAuthorize("hasRole('PACIJENT')")
+	public ResponseEntity<String> novaRezervacija(@RequestBody NovaRezervacija novaRezervacija, HttpServletRequest request)
+			throws MailException, InterruptedException {
+		String token = tokenUtils.getToken(request);
+		String username = this.tokenUtils.getUsernameFromToken(token);
+		Pacijent p = (Pacijent) this.korisnikDetails.loadUserByUsername(username);
+
+		if(p.getPenal()>=3) {
+			return ResponseEntity
+		            .badRequest().body("Imate 3 ili vise penala i ova funkcija Vam nije dostupna!");
+		}
+		
+		SifrarnikLekova sl = sifrarnikSevice.findByNaziv(novaRezervacija.nazivLeka);
+
+		Lek lek = lekService.findBySifrarnikLekovaIdAndApotekaId(sl.getId(), novaRezervacija.apoteka);
+
+		Rezervacija rezervacija = new Rezervacija(novaRezervacija.vreme + ":00.000+01:00", "izdavanje", lek, p);
+		rezervacijaService.save(rezervacija);
+		mailService.sendSimpleMessage(p.getEmail(), "REZERVACIJA LEKA", "Uspesno ste rezervisali lek: "
+				+ novaRezervacija.nazivLeka + ". Vas jedinstveni broj rezervacije je: " + rezervacija.getId() + ".");
+		
+		return new ResponseEntity<String>("ok", HttpStatus.OK);
+	}
+	
+	@GetMapping(value = "/pacijentoveRezervacije")
+	@PreAuthorize("hasRole('PACIJENT')")
+	public ResponseEntity<List<RezervacijaDTO>> pacijentoveRezervacije(HttpServletRequest request){
+		String token = tokenUtils.getToken(request);
+		String username = this.tokenUtils.getUsernameFromToken(token);
+		Pacijent p = (Pacijent) this.korisnikDetails.loadUserByUsername(username);
+		List<RezervacijaDTO> rezervacije=new ArrayList<RezervacijaDTO>();
+		
+		for(Rezervacija r:rezervacijaService.findByPacijentId(p.getId())) {
+			rezervacije.add(new RezervacijaDTO(r));
+		}
+		
+		
+		return new ResponseEntity<List<RezervacijaDTO>>(rezervacije, HttpStatus.OK);
+		
+	}
+	
+	
 	static class RezervacijaLeka {
 		public String naziv; //naziv leka
 		public String email; //email pacijenta
@@ -211,4 +275,31 @@ public class RezervacijaController {
 		
 		return new ResponseEntity<RezervacijaDTO>(rezervacijaDTO, HttpStatus.OK);
 	}
+	
+	@PutMapping(value ="/otkazivanjeRezervacije/{idRezervacije}")
+	@PreAuthorize("hasRole('PACIJENT')")
+	public ResponseEntity<String> otkazivanjeRezervacije(@PathVariable Long idRezervacije, HttpServletRequest request){
+		String token = tokenUtils.getToken(request);
+		String username = this.tokenUtils.getUsernameFromToken(token);
+		Pacijent p = (Pacijent) this.korisnikDetails.loadUserByUsername(username);
+		
+		Rezervacija rezervacija= rezervacijaService.findOne(idRezervacije);
+		//		if((interval.getStartMillis()-System.currentTimeMillis())/3600000>=24) {
+
+		DateTime datumPreuzimanja = new DateTime(rezervacija.getDatumPreuzimanja());
+		if((datumPreuzimanja.getMillis()-System.currentTimeMillis())/3600000>=24) {
+			System.out.println("otkazivanje");
+			rezervacija.setStatus("otkazan");
+			rezervacijaService.save(rezervacija);
+			return new ResponseEntity<String>("Rezervacija je uspesno otkazana", HttpStatus.OK);
+		}
+		else {
+			return  ResponseEntity.badRequest().body("Rezervaciju mozete otkazati najmanje 24h pre datuma preuzimanja");
+		}		
+	}
+
+
+
+
 }
+

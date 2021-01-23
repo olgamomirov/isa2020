@@ -24,9 +24,11 @@ import org.springframework.mail.MailException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -61,6 +63,7 @@ import tim73.isa_2020.service.TipPregledaService;
 
 @RestController
 @RequestMapping(value = "/pregledi")
+@CrossOrigin(origins = "http://localhost:3000")
 public class PregledController {
 	
 	@Autowired
@@ -494,25 +497,33 @@ public class PregledController {
 			
 		}
 	
-	@GetMapping(value="/rezervisi/{id}")
+		
+	@PutMapping(value="/rezervisi/{id}", produces = "application/json")
 	@PreAuthorize("hasRole('PACIJENT')")
-	public void rezervacija(@PathVariable long id, HttpServletRequest request) throws MailException, InterruptedException {
+	public ResponseEntity<String> rezervacija(@PathVariable long id, HttpServletRequest request) throws MailException, InterruptedException {
 
 		String token = tokenUtils.getToken(request);
 		String username = this.tokenUtils.getUsernameFromToken(token);
 		Pacijent p = (Pacijent) this.korisnikDetails.loadUserByUsername(username);
-		System.out.println(id);
+		
+		
+		
+		if(p.getPenal()>=3) {
+			return ResponseEntity
+		            .badRequest().body("Imate 3 ili vise penala i ova funkcija Vam nije dostupna!");
+		}
 		Pregled pregled = pregledService.findOne(id);
 		Interval interval = new Interval(pregled.getInterval());
 
 		if (pregled.getStatus().equals("default")) {
-			System.out.println("usao");
 			pregled.setStatus("rezervisan");
 			pregled.setPacijent(p);
 			pregledService.save(pregled);
 			mailService.sendSimpleMessage(p.getEmail(), "REZERVACIJA", "Uspesno ste rezervisali pregled kod dermatologa za "
 					+ interval.getStart().toString("dd/MM/yyyy HH:mm"));
 		}
+		
+		return new ResponseEntity<String>("Ok", HttpStatus.OK);
 	}
 	
 
@@ -522,6 +533,13 @@ public class PregledController {
 		String token = tokenUtils.getToken(request);
 		String username = this.tokenUtils.getUsernameFromToken(token);
 		Pacijent p = (Pacijent) this.korisnikDetails.loadUserByUsername(username);
+		
+		
+		if(p.getPenal()>=3) {
+			return ResponseEntity
+		            .badRequest().body("Imate 3 ili vise penala i ova funkcija Vam nije dostupna!");
+		}
+		
 		String datum = rezervacija.getDatum().split("T")[0];
 		String vremeString = rezervacija.getDatum().split("T")[1];
 		System.out.println(datum);

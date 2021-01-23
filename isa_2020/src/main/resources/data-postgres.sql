@@ -82,8 +82,6 @@ insert into "public"."rezervacija" ("datum_preuzimanja","status", "lek_id", "pac
 
 insert into "public"."rezervacija" ("datum_preuzimanja", "status", "lek_id", "pacijent_id") values('2021-01-13T14:00:00.000+01:00','preuzeto', 3, 3)
 
-
 insert into "public"."radno_vreme" ("interval", "apoteka_id", "dermatolog_id", "farmaceut_id") values('2021-01-13T08:00:00.000+01:00/2021-09-13T15:00:00.000+01:00',1,2,null)
 
 insert into "public"."radno_vreme" ("interval", "apoteka_id", "dermatolog_id", "farmaceut_id") values('2021-01-25T08:00:00.000+01:00/2021-09-25T15:00:00.000+01:00',2,null,4)
-

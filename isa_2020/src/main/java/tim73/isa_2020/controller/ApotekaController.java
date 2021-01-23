@@ -33,13 +33,23 @@ import tim73.isa_2020.model.Apoteka;
 import tim73.isa_2020.model.Dermatolog;
 import tim73.isa_2020.model.Farmaceut;
 import tim73.isa_2020.model.Korisnik;
+import tim73.isa_2020.model.Lek;
+import tim73.isa_2020.model.OcenaApoteka;
+import tim73.isa_2020.model.Pacijent;
 import tim73.isa_2020.model.Pregled;
 import tim73.isa_2020.model.RadnoVreme;
+import tim73.isa_2020.model.Rezervacija;
+import tim73.isa_2020.model.SifrarnikLekova;
 import tim73.isa_2020.securityService.TokenUtils;
 import tim73.isa_2020.service.ApotekaService;
 import tim73.isa_2020.service.DermatologService;
 import tim73.isa_2020.service.KorisnikService;
 import tim73.isa_2020.service.KorisnikServiceImpl;
+import tim73.isa_2020.service.LekService;
+import tim73.isa_2020.service.OcenaApotekaService;
+import tim73.isa_2020.service.PregledService;
+import tim73.isa_2020.service.RezervacijaService;
+import tim73.isa_2020.service.SifrarnikLekovaService;
 
 //@CrossOrigin(origins = "http://localhost:3000")
 @RestController
@@ -57,6 +67,21 @@ public class ApotekaController {
 
 	@Autowired
 	private KorisnikServiceImpl userDetailsService;
+	
+	@Autowired
+	private SifrarnikLekovaService sifrarnikService;
+	
+	@Autowired
+	private LekService lekService;
+	
+	@Autowired 
+	private PregledService pregledService;
+	
+	@Autowired
+	private RezervacijaService rezervacijaService;
+	
+	@Autowired
+	private OcenaApotekaService ocenaApotekaService;
 
 	
 	@GetMapping(value = "/{id}")
@@ -72,9 +97,15 @@ public class ApotekaController {
 		List<Apoteka> apoteke= apotekaService.findAll();
 		
 		List<ApotekaDTO> apotekeDTO= new ArrayList<>();
-		
 		for(Apoteka a:apoteke) {
-			apotekeDTO.add(new ApotekaDTO(a));
+			double ocena=0;
+			double brojOcena=0;
+			for (OcenaApoteka oa:ocenaApotekaService.findByApotekaId(a.getId())) {
+				ocena+=oa.getVrednost();
+				brojOcena++;
+			}
+			ocena=ocena/brojOcena;
+			apotekeDTO.add(new ApotekaDTO(a,ocena));
 		}
 		
 		return new ResponseEntity<List<ApotekaDTO>>(apotekeDTO, HttpStatus.OK);
@@ -212,4 +243,72 @@ public class ApotekaController {
 
 		return new ResponseEntity<Set<ApotekaDTO>>(apotekeSaSlobodnimFarmaceutom, HttpStatus.OK);
 	}
+	
+	//za apoteke koje imaju na stanju lek koji zeli da se rezervise
+	@GetMapping(value = "/rezervacijaLeka/{nazivLeka}")
+	@PreAuthorize("hasRole('PACIJENT')")
+	public ResponseEntity<List<ApotekaDTO>> apotekeSaLekovimaNaStanju(@PathVariable String nazivLeka){
+		
+		List<ApotekaDTO> apotekeSaLekovimaNaStanju = new ArrayList<ApotekaDTO>();
+		SifrarnikLekova sl = sifrarnikService.findByNaziv(nazivLeka);
+
+		for (Lek lek : lekService.findBySifrarnikLekova(sl.getId())) {
+			if (lek.getKolicina() > 0) {
+				double ocena=0;
+				double brojOcena=0;
+				for (OcenaApoteka oa:lek.getApoteka().getOceneApoteke()) {
+					ocena+=oa.getVrednost();
+					brojOcena++; 
+				}
+				ocena=ocena/brojOcena;
+				apotekeSaLekovimaNaStanju.add(new ApotekaDTO(lek.getApoteka(),ocena));
+			}
+		}
+
+		return new ResponseEntity<List<ApotekaDTO>>(apotekeSaLekovimaNaStanju, HttpStatus.OK);
+	}
+	
+	//za apoteke koje pacijent moze da oceni
+		@GetMapping(value = "/apotekeZaOcenjivanje")
+		@PreAuthorize("hasRole('PACIJENT')")
+		public ResponseEntity<List<ApotekaDTO>> apotekeZaOcenjivanje(HttpServletRequest request){
+			String token = tokenUtils.getToken(request);
+			String username = this.tokenUtils.getUsernameFromToken(token);
+			Pacijent p = (Pacijent) this.userDetailsService.loadUserByUsername(username);
+			
+			List<ApotekaDTO> apoteke= new ArrayList<ApotekaDTO>();
+			
+			for(Pregled pregled:pregledService.findByPacijentId(p.getId())) {
+				Apoteka a=pregled.getApoteka();
+				if(pregled.getStatus().equals("odradjen")&& !apoteke.contains(new ApotekaDTO(a))) {
+					double ocena=0;
+					double brojOcena=0;
+					for (OcenaApoteka oa:a.getOceneApoteke()) {
+						ocena+=oa.getVrednost();
+						brojOcena++; 
+					}
+					ocena=ocena/brojOcena;
+					apoteke.add(new ApotekaDTO(a,ocena));
+				}
+			}
+			for(Rezervacija rezervacija:rezervacijaService.findByPacijentId(p.getId())) {
+				Apoteka a= rezervacija.getLek().getApoteka();
+				if(rezervacija.getStatus().equals("preuzeto")&& !apoteke.contains(new ApotekaDTO(a))) {
+					double ocena=0;
+					double brojOcena=0;
+					for (OcenaApoteka oa:a.getOceneApoteke()) {
+						ocena+=oa.getVrednost();
+						brojOcena++; 
+					}
+					ocena=ocena/brojOcena;
+					apoteke.add(new ApotekaDTO(a,ocena));
+				}
+			}
+			
+			return new ResponseEntity<List<ApotekaDTO>>(apoteke, HttpStatus.OK);
+		}
+
+	
+			
+	
 }

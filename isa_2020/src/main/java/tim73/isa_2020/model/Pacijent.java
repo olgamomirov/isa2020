@@ -30,7 +30,20 @@ public class Pacijent extends Korisnik{
 	
 	@OneToMany(mappedBy = "pacijent", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	private Set<ERecept> eRecept;
+	
+	@OneToMany(mappedBy = "pacijent", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	private Set<OcenaDermatolog> oceneDermatologa;
+	
 
+	@OneToMany(mappedBy = "pacijent", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	private Set<OcenaFarmaceut> oceneFarmaceuta;
+	
+	@OneToMany(mappedBy = "pacijent", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	private Set<OcenaApoteka> oceneApoteka;
+	
+	@OneToMany(mappedBy = "pacijent", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	private Set<OcenaSifrarnikLekova> oceneLekova;
+	
 
 	public Pacijent() {
 		super();
@@ -84,4 +97,37 @@ public class Pacijent extends Korisnik{
 		this.penal = penal;
 	}
 
+	public Set<OcenaDermatolog> getOceneDermatologa() {
+		return oceneDermatologa;
+	}
+
+	public void setOceneDermatologa(Set<OcenaDermatolog> oceneDermatologa) {
+		this.oceneDermatologa = oceneDermatologa;
+	}
+
+	public Set<OcenaFarmaceut> getOceneFarmaceuta() {
+		return oceneFarmaceuta;
+	}
+
+	public void setOceneFarmaceuta(Set<OcenaFarmaceut> oceneFarmaceuta) {
+		this.oceneFarmaceuta = oceneFarmaceuta;
+	}
+
+	public Set<OcenaApoteka> getOceneApoteka() {
+		return oceneApoteka;
+	}
+
+	public void setOceneApoteka(Set<OcenaApoteka> oceneApoteka) {
+		this.oceneApoteka = oceneApoteka;
+	}
+
+	public Set<OcenaSifrarnikLekova> getOceneLekova() {
+		return oceneLekova;
+	}
+
+	public void setOceneLekova(Set<OcenaSifrarnikLekova> oceneLekova) {
+		this.oceneLekova = oceneLekova;
+	}
+
+	
 }

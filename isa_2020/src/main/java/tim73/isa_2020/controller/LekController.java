@@ -37,6 +37,7 @@ import tim73.isa_2020.model.Apoteka;
 import tim73.isa_2020.model.Dermatolog;
 import tim73.isa_2020.model.Korisnik;
 import tim73.isa_2020.model.Lek;
+import tim73.isa_2020.model.OcenaSifrarnikLekova;
 import tim73.isa_2020.model.Pacijent;
 import tim73.isa_2020.model.Pregled;
 import tim73.isa_2020.model.Rezervacija;
@@ -45,8 +46,10 @@ import tim73.isa_2020.securityService.TokenUtils;
 import tim73.isa_2020.service.EmailService;
 import tim73.isa_2020.service.KorisnikServiceImpl;
 import tim73.isa_2020.service.LekService;
+import tim73.isa_2020.service.OcenaSifrarnikLekovaService;
 import tim73.isa_2020.service.PacijentService;
 import tim73.isa_2020.service.PregledService;
+import tim73.isa_2020.service.RezervacijaService;
 import tim73.isa_2020.service.SifrarnikLekovaService;
 
 @RestController
@@ -74,6 +77,10 @@ public class LekController {
 	@Autowired
 	private EmailService mailService;
 	
+	
+	@Autowired
+	private OcenaSifrarnikLekovaService ocenaSifrarnikLekovaService;
+	
 	@GetMapping(value = "/sviLekovi")
 	public ResponseEntity<List<LekDTO>> findAll() {
 		
@@ -82,7 +89,14 @@ public class LekController {
 		List<LekDTO> lekoviDTO= new ArrayList<>();
 		
 		for(Lek l: lekovi) {
-			lekoviDTO.add(new LekDTO(l));
+			double ocena=0;
+			double brojOcena=0;
+			for(OcenaSifrarnikLekova ocenaLeka :ocenaSifrarnikLekovaService.findBySifrarnikLekovaId(l.getSifrarnikLekova().getId())){
+				ocena+=ocenaLeka.getVrednost();
+				brojOcena++;
+			}
+			ocena=ocena/brojOcena;
+			lekoviDTO.add(new LekDTO(l,ocena));
 		}
 		
 		return new ResponseEntity<List<LekDTO>>(lekoviDTO, HttpStatus.OK);
@@ -356,6 +370,42 @@ public class LekController {
 		}
 		
 		return new ResponseEntity<ArrayList<LekDTO>>(lekoviDTO, HttpStatus.OK);
+	}
+
+	@GetMapping(value = "/lekoviZaOcenjivanje")
+	@PreAuthorize("hasRole('PACIJENT')")
+	public ResponseEntity<List<LekDTO>> lekoviZaOcenjivanje(HttpServletRequest request){
+		
+		String token = tokenUtils.getToken(request);
+		String username = this.tokenUtils.getUsernameFromToken(token);
+		Pacijent p = (Pacijent) this.userDetailsService.loadUserByUsername(username);
+		
+		List<LekDTO> lekovi = new ArrayList<LekDTO>();
+		
+		for (Rezervacija rezervacija : p.getRezervacije()) {
+			if (rezervacija.getStatus().equals("preuzeto")) {
+				OcenaSifrarnikLekova ocena = ocenaSifrarnikLekovaService.findBySifrarnikLekovaIdAndPacijentId(
+						rezervacija.getLek().getSifrarnikLekova().getId(), p.getId());
+
+				LekDTO lek;
+				if(ocena!=null) {
+					lek= new LekDTO(rezervacija.getLek(), ocena.getVrednost());
+					System.out.println(ocena.getVrednost());
+
+				}
+				else {
+					System.out.println("usao u else?");
+
+					lek= new LekDTO(rezervacija.getLek(), 0);
+
+				}
+				if(!lekovi.contains(lek)) {
+					lekovi.add(lek);
+				}
+			}
+		}
+
+		return new ResponseEntity<List<LekDTO>>(lekovi, HttpStatus.OK);
 	}
 
 }
