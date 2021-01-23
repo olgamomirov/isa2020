@@ -754,8 +754,8 @@ public class PregledController {
 	     dto = new PregledDTO(noviPregled);
 	     
 	     //POSLATI MEJL PACIJENTU
-	    /* mailService.sendSimpleMessage(pacijent.getEmail(), "ZAKAZIVANJE PREGLEDA", "Zakazan Vam je pregled kod dermatologa u "
-					+ interval.getStart().toString("dd/MM/yyyy HH:mm"));*/
+	     mailService.sendSimpleMessage(pacijent.getEmail(), "ZAKAZIVANJE PREGLEDA", "Zakazan Vam je pregled kod dermatologa u "
+					+ interval.getStart().toString("dd/MM/yyyy HH:mm"));
 			
 			}
 			if(!flag2) {
@@ -768,7 +768,7 @@ public class PregledController {
 	}
 	@PostMapping(value = "/zakaziNoviFarmaceut")
 	@PreAuthorize("hasRole('FARMACEUT')")
-	public ResponseEntity<PregledDTO> zakaziNoviKodFarmaceuta(@RequestBody NoviPregled p, HttpServletRequest request){
+	public ResponseEntity<PregledDTO> zakaziNoviKodFarmaceuta(@RequestBody NoviPregled p, HttpServletRequest request) throws MailException, InterruptedException{
      
 		String token = tokenUtils.getToken(request);
 		String username = this.tokenUtils.getUsernameFromToken(token);
@@ -839,10 +839,11 @@ public class PregledController {
 		
 			
 	     dto = new PregledDTO(noviPregled);
+	    
 	     
 	     //POSLATI MEJL PACIJENTU
-	    /* mailService.sendSimpleMessage(pacijent.getEmail(), "ZAKAZIVANJE PREGLEDA", "Zakazan Vam je pregled kod farmaceuta u "
-					+ interval.getStart().toString("dd/MM/yyyy HH:mm"));*/
+	     mailService.sendSimpleMessage(pacijent.getEmail(), "ZAKAZIVANJE PREGLEDA", "Zakazan Vam je pregled kod farmaceuta u "
+					+ interval.getStart().toString("dd/MM/yyyy HH:mm"));
 			}
 			if(!flag2) {
 				System.out.println("nije u radnom vremenu");
