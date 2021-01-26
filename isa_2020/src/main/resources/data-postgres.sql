@@ -78,7 +78,7 @@ insert into "public"."lek" ( "kolicina", "apoteka_id", "sifra_leka_id") values( 
 insert into "public"."lek" ( "kolicina", "apoteka_id", "sifra_leka_id") values( 5, 2, 3)
 insert into "public"."lek" ( "kolicina", "apoteka_id", "sifra_leka_id") values( 7, 3, 3)
 
-insert into "public"."rezervacija" ("datum_preuzimanja","status", "lek_id", "pacijent_id") values('2021-01-25T14:00:00.000+01:00','izdavanje', 1, 3)
+insert into "public"."rezervacija" ("datum_preuzimanja","status", "lek_id", "pacijent_id") values('2021-01-29T14:00:00.000+01:00','izdavanje', 1, 3)
 
 insert into "public"."rezervacija" ("datum_preuzimanja", "status", "lek_id", "pacijent_id") values('2021-01-13T14:00:00.000+01:00','preuzeto', 3, 3)
 
