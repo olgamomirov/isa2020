@@ -134,9 +134,10 @@ public class KorisnikController {
 		
 		String token = tokenUtils.getToken(request);
 		String username = this.tokenUtils.getUsernameFromToken(token);
-		Korisnik korisnik = (Korisnik) this.userDetailsService.loadUserByUsername(username);
-
-		PacijentPodaciDTO pacijentdto= new PacijentPodaciDTO(korisnik);
+		Pacijent korisnik = (Pacijent) this.userDetailsService.loadUserByUsername(username);
+		
+		System.out.println(korisnik.getPenal());
+		PacijentPodaciDTO pacijentdto= new PacijentPodaciDTO(korisnik, korisnik.getPenal() );
 
 		
 		return ResponseEntity.ok(pacijentdto);

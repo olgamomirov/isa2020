@@ -329,12 +329,8 @@ public class PregledController {
 		
 		for (Pregled pregled:pregledi) {
 			if(pregled.getDermatolog()!=null && pregled.getStatus().equals("odradjen")) {
-				/*
-				double cena=0;
-				for (TipPregleda tip : pregled.getTipovi()) {
-					cena += tip.getCena();
-				}
-				*/
+				
+				
 				Interval interval=new Interval(pregled.getInterval());
 				System.out.println(interval.getStart().toString("dd/MM/yyyy HH:mm"));
 				double trajanje= (interval.getEndMillis()-interval.getStartMillis())/60000; //pretvaranje u minute
@@ -424,19 +420,18 @@ public class PregledController {
 		
 		for (Pregled pregled:pregledi) {
 			if(pregled.getStatus().equals("rezervisan")) {
-				double cena=2000;
 				Interval interval = new Interval(pregled.getInterval());
 
-				double trajanje = interval.getEndMillis() - interval.getStartMillis()/ 60000; // pretvaranje u minute
+				double trajanje = (interval.getEndMillis() - interval.getStartMillis())/ 60000; // pretvaranje u minute
 				if (pregled.getFarmaceut() != null) {
 					preglediDTO.add(new PregledZaPacijentaDTO(pregled,
 							(pregled.getFarmaceut().getIme() + " " + pregled.getFarmaceut().getPrezime()),
-							interval.getStart().toString("dd/MM/yyyy HH:mm"), cena, trajanje));
+							interval.getStart().toString("dd/MM/yyyy HH:mm"), pregled.getTip().getCena(), trajanje));
 				}
 				else {
 					preglediDTO.add(new PregledZaPacijentaDTO(pregled,
 							(pregled.getDermatolog().getIme() + " " + pregled.getDermatolog().getPrezime()),
-							interval.getStart().toString("dd/MM/yyyy HH:mm"), cena, trajanje));
+							interval.getStart().toString("dd/MM/yyyy HH:mm"), pregled.getTip().getCena(), trajanje));
 				}
 			}
 		}
@@ -475,7 +470,7 @@ public class PregledController {
 			if(p.getDermatolog()!=null) {
 				double trajanje= (interval.getEndMillis()-interval.getStartMillis())/60000; //pretvaranje u minute
 
-				preglediDTO.add(new PregledZaPacijentaDTO(p, p.getDermatolog().getIme()+" "+p.getDermatolog().getPrezime(), interval.getStart().toString("dd/MM/yyyy HH:mm"), 2000, trajanje));
+				preglediDTO.add(new PregledZaPacijentaDTO(p, p.getDermatolog().getIme()+" "+p.getDermatolog().getPrezime(), interval.getStart().toString("dd/MM/yyyy HH:mm"), p.getTip().getCena(), trajanje));
 			}
 		}
 		return new ResponseEntity<List<PregledZaPacijentaDTO>>(preglediDTO,HttpStatus.OK);

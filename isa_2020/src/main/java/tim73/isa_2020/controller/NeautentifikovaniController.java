@@ -71,18 +71,25 @@ public class NeautentifikovaniController {
 		
 		for(Apoteka a:apoteke) {
 			double ocena=0;
-			double brojOcena=0;
-			for (OcenaApoteka oa:a.getOceneApoteke()) {
-				ocena+=oa.getVrednost();
-				brojOcena++; 
+
+			double brojOcena = 0;
+
+			if (!a.getOceneApoteke().isEmpty()) {
+				for (OcenaApoteka oa : a.getOceneApoteke()) {
+
+					if (oa != null) {
+						ocena += oa.getVrednost();
+						brojOcena++;
+					}
+				}
+				ocena = ocena / brojOcena;
 			}
-			ocena=ocena/brojOcena;
 			apotekeDTO.add(new ApotekaDTO(a,ocena));
 		}
 		
 		return new ResponseEntity<List<ApotekaDTO>>(apotekeDTO, HttpStatus.OK);
 	}
-	/*
+	
 	@GetMapping(value = "/lekovi/{id}/{pretraga}")
 	public ResponseEntity<List<LekDTO>> lekoviPretraga(@PathVariable String pretraga, @PathVariable Long id) {
 		
@@ -93,12 +100,32 @@ public class NeautentifikovaniController {
         List<LekDTO> lekoviDTO= new ArrayList<>();
 		
 		for(Lek l: lekovi) {
-			if(l.getNaziv().contains(pretraga)) {
-				lekoviDTO.add(new LekDTO(l));
+			
+			if(l.getSifrarnikLekova().getNaziv().contains(pretraga)) {
+				double ocena=0;
+				double brojOcena=0;
+				for(OcenaSifrarnikLekova ocenaLeka :ocenaSifrarnikLekovaService.findBySifrarnikLekovaId(l.getSifrarnikLekova().getId())){
+					ocena+=ocenaLeka.getVrednost();
+					brojOcena++;
+				}
+				ocena=ocena/brojOcena;
+				lekoviDTO.add(new LekDTO(l,ocena));			
 			}
+			
 		}
 		
 		return new ResponseEntity<List<LekDTO>>(lekoviDTO, HttpStatus.OK);
 	}
-	*/
+	
+	@GetMapping(value = "/gradovi")
+	public ResponseEntity<List<String>> gradoviZaFilter(){
+		ArrayList<String> gradovi= new ArrayList<String>();
+		for(Apoteka a: apotekaService.findAll()) {
+			if(!gradovi.contains(a.getGrad())) {
+				gradovi.add(a.getGrad());
+			}
+		}
+		return new ResponseEntity<List<String>>(gradovi, HttpStatus.OK);
+	}
+	
 }
