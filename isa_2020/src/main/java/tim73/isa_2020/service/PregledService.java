@@ -21,4 +21,5 @@ public interface PregledService {
 	
 	List<Pregled> findByPacijentId (Long id);
 
+	List<Pregled> proveraPregleda();
 }

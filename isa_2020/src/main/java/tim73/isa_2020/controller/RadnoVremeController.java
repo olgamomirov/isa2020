@@ -55,7 +55,6 @@ public class RadnoVremeController {
 	private KorisnikServiceImpl korisnikDetails;
 
 	/*
->>>>>>> refs/remotes/origin/main
 	
 	@GetMapping(value = "/add")
 	ResponseEntity<String> add(){
@@ -101,6 +100,36 @@ public class RadnoVremeController {
 		return new ResponseEntity<>(rv.toString(), HttpStatus.OK);
 	}
 	*/
+	@GetMapping(value = "/add")
+	ResponseEntity<String> add(){
+		Dermatolog dermatolog= dermatologService.findById(2);
+		Apoteka apoteka= apotekaService.findById(1);
+		RadnoVreme rv = null;
+		
+		for(int j=1; j<=12; j++) {
+		
+	      for(int i=1; i<28; i++) {
+	    	  if(i<=10) {
+		  rv=new RadnoVreme("2021-" + "0" + j + "-" + i + "T08:00:00.000+01:00/2021-" + "0" +j + "-" + i + "T15:00:00.000+01:00");
+		  rv.setDermatolog(dermatolog);
+		  rv.setApoteka(apoteka);
+		  radnoVremeService.save(rv);
+		  }else {
+			  rv=new RadnoVreme("2021-" + j + "-" + i + "T08:00:00.000+01:00/2021-" +j + "-" + i + "T15:00:00.000+01:00");
+			  rv.setDermatolog(dermatolog);
+			  rv.setApoteka(apoteka);
+			  radnoVremeService.save(rv);
+			  
+		  }
+	    	  
+	}
+		}
+		
+		
+		
+		
+		return new ResponseEntity<>(rv.toString(), HttpStatus.OK);
+	}
 	@GetMapping(value = "/getRadnoVreme")
 	ResponseEntity<List<RadnoVremeDTO>> get(HttpServletRequest request){
 		String token = tokenUtils.getToken(request);
