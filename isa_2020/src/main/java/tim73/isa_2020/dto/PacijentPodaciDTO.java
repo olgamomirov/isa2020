@@ -12,12 +12,15 @@ public class PacijentPodaciDTO {
 	private String grad;
 	private String drzava;
 	private String telefon;
+	private int penali;
 	
 	public PacijentPodaciDTO (Korisnik korisnik) {
 		this(korisnik.getEmail(), korisnik.getIme(), korisnik.getPrezime(), korisnik.getUlica(), korisnik.getGrad(), korisnik.getDrzava(), korisnik.getTelefon());
 	}
 	
-	
+	public PacijentPodaciDTO (Korisnik korisnik, int penali) {
+		this(korisnik.getEmail(), korisnik.getIme(), korisnik.getPrezime(), korisnik.getUlica(), korisnik.getGrad(), korisnik.getDrzava(), korisnik.getTelefon(), penali);
+	}
 	
 
 	public PacijentPodaciDTO() {
@@ -25,7 +28,18 @@ public class PacijentPodaciDTO {
 	}
 
 
-
+	public PacijentPodaciDTO(String email, String ime, String prezime, String ulica, String grad, String drzava,
+			String telefon, int penali) {
+		super();
+		this.email = email;
+		this.ime = ime;
+		this.prezime = prezime;
+		this.ulica = ulica;
+		this.grad = grad;
+		this.drzava = drzava;
+		this.telefon = telefon;
+		this.penali=penali;
+	}
 
 	public PacijentPodaciDTO(String email, String ime, String prezime, String ulica, String grad, String drzava,
 			String telefon) {
@@ -94,6 +108,10 @@ public class PacijentPodaciDTO {
 
 	public void setTelefon(String telefon) {
 		this.telefon = telefon;
+	}
+
+	public int getPenali() {
+		return penali;
 	}
 	
 	
