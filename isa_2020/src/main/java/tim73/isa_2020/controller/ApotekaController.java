@@ -173,7 +173,21 @@ public class ApotekaController {
 	@PreAuthorize("hasRole('PACIJENT')")
 	public ResponseEntity<ApotekaDTO> detaljiApoteke(@PathVariable long id){
 		Apoteka apoteka=apotekaService.findById(id);
-		ApotekaDTO apotekaDTO=new ApotekaDTO(apoteka);
+		double ocena=0;
+
+		double brojOcena = 0;
+		if (!apoteka.getOceneApoteke().isEmpty()) {
+			for (OcenaApoteka oa : apoteka.getOceneApoteke()) {
+
+				if (oa != null) {
+					ocena += oa.getVrednost();
+					brojOcena++;
+				}
+			}
+			ocena = ocena / brojOcena;
+		}
+		
+		ApotekaDTO apotekaDTO=new ApotekaDTO(apoteka,ocena);
 		return new ResponseEntity<ApotekaDTO>(apotekaDTO, HttpStatus.OK);
 		
 	}
