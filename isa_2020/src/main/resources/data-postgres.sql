@@ -57,7 +57,8 @@ insert into "public"."korisnik_authority"  ("korisnik_id", "authority_id") value
 insert into "public"."tip_pregleda" ( "cena", "tip") values( 1000.0, 'pregled mladeza')
 insert into "public"."tip_pregleda" ( "cena", "tip") values( 500.0, 'kontrola')
 insert into "public"."pregled" ( "dijagnoza", "interval", "status", "terapija", "apoteka_id", "dermatolog_id", "farmaceut_id", "pacijent_id", "tip_id") values( 'zdravo', '2021-11-07T08:00:00.000+01:00/2021-11-07T15:00:00.000+01:00', 'rezervisan', 'nema', 2, 2, null, 3, 1)
-insert into "public"."pregled" ( "dijagnoza", "interval", "status", "terapija", "apoteka_id", "dermatolog_id", "farmaceut_id", "pacijent_id", "tip_id") values( 'kontrola', '2021-01-27T08:00:00.000+01:00/2021-01-27T15:00:00.000+01:00', 'rezervisan', 'nema', 2, 2, null, 3, 1)
+insert into "public"."pregled" ( "dijagnoza", "interval", "status", "terapija", "apoteka_id", "dermatolog_id", "farmaceut_id", "pacijent_id", "tip_id") values( 'kontrola', '2021-01-28T13:30:00.000+01:00/2021-01-28T13:50:00.000+01:00', 'rezervisan', 'nema', 2, 2, null, 3, 1)
+insert into "public"."pregled" ( "dijagnoza", "interval", "status", "terapija", "apoteka_id", "dermatolog_id", "farmaceut_id", "pacijent_id", "tip_id") values( null, '2021-01-28T13:35:00.000+01:00/2021-01-28T13:45:00.000+01:00', 'rezervisan', 'nema', 2, 2, null, 3, 1)
 insert into "public"."pregled" ( "dijagnoza", "interval", "status", "terapija", "apoteka_id", "dermatolog_id", "farmaceut_id", "pacijent_id", "tip_id") values( 'strasno', '2021-01-17T08:00:00.000+01:00/2021-01-17T15:00:00.000+01:00', 'rezervisan', 'cccc', 1, null, 4, 3, 2)
 insert into "public"."pregled" ( "dijagnoza", "interval", "status", "terapija", "apoteka_id", "dermatolog_id", "farmaceut_id", "pacijent_id", "tip_id") values( null, '2021-02-23T08:00:00.000+01:00/2021-02-23T15:00:00.000+01:00', 'default', 'null', 2, 2, null, null, 2)
 insert into "public"."pregled" ( "dijagnoza", "interval", "status", "terapija", "apoteka_id", "dermatolog_id", "farmaceut_id", "pacijent_id", "tip_id") values( null, '2021-03-28T08:00:00.000+01:00/2021-03-28T15:00:00.000+01:00', 'rezervisan', 'null', 2, null, 4, 5, 2)
@@ -87,6 +88,6 @@ insert into "public"."rezervacija" ("datum_preuzimanja","status", "lek_id", "pac
 
 insert into "public"."rezervacija" ("datum_preuzimanja", "status", "lek_id", "pacijent_id") values('2021-01-13T14:00:00.000+01:00','preuzeto', 3, 3)
 
-insert into "public"."radno_vreme" ("interval", "apoteka_id", "dermatolog_id", "farmaceut_id") values('2021-01-13T08:00:00.000+01:00/2021-09-13T15:00:00.000+01:00',1,2,null)
+insert into "public"."radno_vreme" ("interval", "apoteka_id", "dermatolog_id", "farmaceut_id") values('2021-01-13T08:00:00.000+01:00/2021-09-13T15:00:00.000+01:00',1,null,4)
 
 insert into "public"."radno_vreme" ("interval", "apoteka_id", "dermatolog_id", "farmaceut_id") values('2021-01-25T08:00:00.000+01:00/2021-09-25T15:00:00.000+01:00',2,null,4)

@@ -19,6 +19,7 @@ import tim73.isa_2020.model.RadnoVreme;
 import tim73.isa_2020.model.Rezervacija;
 import tim73.isa_2020.service.ApotekaService;
 import tim73.isa_2020.service.DermatologService;
+import tim73.isa_2020.service.FarmaceutService;
 import tim73.isa_2020.service.PacijentService;
 import tim73.isa_2020.service.PregledService;
 import tim73.isa_2020.service.RadnoVremeService;
@@ -45,6 +46,9 @@ public class ScheduledTasks {
 	
 	@Autowired
 	private DermatologService dermatologService;
+	
+	@Autowired
+	private FarmaceutService farmaceutService;
 
 	//@Scheduled(cron = "00 00 1 * ?") //u ponoc svakog prvog u mesecu
 	@Scheduled(fixedRate = 120000) // update na 2 min
@@ -76,7 +80,7 @@ public class ScheduledTasks {
 		for(Pregled p: pregledService.proveraPregleda()) {
 			DateTime vremePregleda= new DateTime(p.getInterval().split("/")[0]);
 			
-				if(((vremePregleda.getMillis()-System.currentTimeMillis())<0)) {
+				if((((vremePregleda.getMillis()+600000)-System.currentTimeMillis())<0)) { //moze najkasnije 10 miinuta da zakasni sa zapocinjanjem pregleda
 
 
 					p.setStatus("neodradjen");
@@ -117,17 +121,30 @@ public class ScheduledTasks {
 		for(int j=1; j<=12; j++) {
 		
 	      for(int i=1; i<28; i++) {
-	    	  if(i<=10) {
-		  rv=new RadnoVreme("2021-" + "0" + j + "-" + i + "T08:00:00.000+01:00/2021-" + "0" +j + "-" + i + "T15:00:00.000+01:00");
+	    	  if(j<10) {
+	    		  if(i<10) {
+		  rv=new RadnoVreme("2021-" + "0" + j + "-" + "0" +  i + "T08:00:00.000+01:00/2021-" + "0" +j + "-" + "0" + i + "T15:00:00.000+01:00");
 		  rv.setDermatolog(dermatolog);
 		  rv.setApoteka(apoteka);
 		  radnoVremeService.save(rv);
+	    		  }else {
+	    			  rv=new RadnoVreme("2021-" + "0" + j + "-" + i + "T08:00:00.000+01:00/2021-" + "0" +j + "-" + i + "T15:00:00.000+01:00");
+	    			  rv.setDermatolog(dermatolog);
+	    			  rv.setApoteka(apoteka);
+	    			  radnoVremeService.save(rv);
+	    		  }
 		  }else {
-			  rv=new RadnoVreme("2021-" + j + "-" + i + "T08:00:00.000+01:00/2021-" +j + "-" + i + "T15:00:00.000+01:00");
+			  if(i<10) {
+			  rv=new RadnoVreme("2021-" + j + "-"+ "0" + i + "T08:00:00.000+01:00/2021-" +j + "-" + "0" + i + "T15:00:00.000+01:00");
 			  rv.setDermatolog(dermatolog);
 			  rv.setApoteka(apoteka);
 			  radnoVremeService.save(rv);
-			  
+			  }else {
+				  rv=new RadnoVreme("2021-" + j + "-" + i + "T08:00:00.000+01:00/2021-" +j + "-" + i + "T15:00:00.000+01:00");
+				  rv.setDermatolog(dermatolog);
+				  rv.setApoteka(apoteka);
+				  radnoVremeService.save(rv);
+			  }
 		  }
 	    	  
 	}

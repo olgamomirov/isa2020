@@ -729,8 +729,10 @@ public class PregledController {
         boolean flag2 = false;
         for(RadnoVreme radnoVreme: d.getRadnoVreme()) {
         	Interval i = new Interval(radnoVreme.getInterval());
+        	System.out.println("ne " + i.getStart());
         	if(i.overlaps(interval2)){
         	flag2 = true;
+        	System.out.println("da " + i.getStart());
         	break;
         	}
         }
@@ -754,9 +756,9 @@ public class PregledController {
 	     dto = new PregledDTO(noviPregled);
 	     
 	     //POSLATI MEJL PACIJENTU
-	     mailService.sendSimpleMessage(pacijent.getEmail(), "ZAKAZIVANJE PREGLEDA", "Zakazan Vam je pregled kod dermatologa u "
+	  /*   mailService.sendSimpleMessage(pacijent.getEmail(), "ZAKAZIVANJE PREGLEDA", "Zakazan Vam je pregled kod dermatologa u "
 					+ interval.getStart().toString("dd/MM/yyyy HH:mm"));
-			
+			*/
 			}
 			if(!flag2) {
 				System.out.println("nije u radnom vremenu");
