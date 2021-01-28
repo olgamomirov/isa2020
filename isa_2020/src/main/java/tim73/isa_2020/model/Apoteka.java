@@ -62,7 +62,15 @@ public class Apoteka {
 
 	@OneToMany(mappedBy = "apoteka", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	private Set<OcenaApoteka> oceneApoteke = new HashSet<OcenaApoteka>();
+	
+	@OneToMany(mappedBy = "apoteka", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	private Set<AkcijaPromocija> akcijePromocije =new HashSet<AkcijaPromocija>();
 
+	
+	@ManyToMany
+	@JoinTable(name ="akcije_promocije_pretplate", joinColumns = @JoinColumn(name="apoteka_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name="pacijent_id", referencedColumnName = "id"))
+	private Set<Pacijent> pacijenti = new HashSet<Pacijent>();
+	
 	
 	public Apoteka() {
 		super();
@@ -178,6 +186,22 @@ public class Apoteka {
 
 	public void setOceneApoteke(Set<OcenaApoteka> oceneApoteke) {
 		this.oceneApoteke = oceneApoteke;
+	}
+
+	public Set<AkcijaPromocija> getAkcijePromocije() {
+		return akcijePromocije;
+	}
+
+	public void setAkcijePromocije(Set<AkcijaPromocija> akcijePromocije) {
+		this.akcijePromocije = akcijePromocije;
+	}
+
+	public Set<Pacijent> getPacijenti() {
+		return pacijenti;
+	}
+
+	public void setPacijenti(Set<Pacijent> pacijenti) {
+		this.pacijenti = pacijenti;
 	}
 	
 	
