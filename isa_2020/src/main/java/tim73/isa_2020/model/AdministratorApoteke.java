@@ -11,4 +11,12 @@ public class AdministratorApoteke extends Korisnik{
 	@ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	private Apoteka apoteka ;
 
+	public Apoteka getApoteka() {
+		return apoteka;
+	}
+
+	public void setApoteka(Apoteka apoteka) {
+		this.apoteka = apoteka;
+	}
+
 }

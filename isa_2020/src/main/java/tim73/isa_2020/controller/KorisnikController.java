@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.joda.time.DateTime;
+import org.joda.time.Interval;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -48,6 +49,7 @@ import tim73.isa_2020.model.Korisnik;
 import tim73.isa_2020.model.Pacijent;
 import tim73.isa_2020.model.Pregled;
 import tim73.isa_2020.model.UserTokenState;
+import tim73.isa_2020.model.ZahtevZaGodisnji;
 import tim73.isa_2020.repository.PacijentRepository;
 import tim73.isa_2020.securityService.TokenUtils;
 import tim73.isa_2020.service.ApotekaService;
@@ -56,6 +58,7 @@ import tim73.isa_2020.service.KorisnikService;
 import tim73.isa_2020.service.KorisnikServiceImpl;
 import tim73.isa_2020.service.PacijentService;
 import tim73.isa_2020.service.PregledService;
+import tim73.isa_2020.service.ZahtevZaGodisnjiService;
 import tim73.isa_2020.token.JwtAuthenticationRequest;
 
 @RestController
@@ -83,6 +86,10 @@ public class KorisnikController {
 	
 	@Autowired
 	private EmailService mailService;
+	
+	@Autowired
+	private ZahtevZaGodisnjiService zahtevGodisnjiService;
+	
 	/*
 	@PostMapping(value = "/login", consumes=MediaType.APPLICATION_JSON_VALUE)
 	public void login(@RequestBody Korisnik korisnik) {
@@ -346,7 +353,20 @@ static class PenalBody{
 	     String token = tokenUtils.getToken(request);
 		 String username = this.tokenUtils.getUsernameFromToken(token);
 		 Korisnik k = (Korisnik) this.userDetailsService.loadUserByUsername(username);
-		
+		 List<Authority> authority = (List<Authority>) k.getAuthorities();
+			String role = authority.get(0).getName();
+			
+		 String interval = godisnji.pocetak + ":00.000+01:00" + "/" + godisnji.kraj + ":00.000+01:00";
+		 if(role.equals("DERMATOLOG")) {
+			 Dermatolog d = (Dermatolog) k;
+			// ZahtevZaGodisnji zahtev = new ZahtevZaGodisnji(interval, d, null, );
+		 }else {
+			 Farmaceut f = (Farmaceut) k;
+			 ZahtevZaGodisnji zahtev = new ZahtevZaGodisnji(interval, "neodobren","", null, f, f.getApoteka());
+			 zahtevGodisnjiService.save(zahtev);
+		 }
+		 
+		 
 		/* Set<AdministratorApoteke> admini = a.getAdministratorApoteke();
 			if(!flag) {
 				String email = null;
