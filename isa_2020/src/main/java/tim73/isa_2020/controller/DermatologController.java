@@ -101,25 +101,25 @@ public class DermatologController {
 		Korisnik ulogovan = (Korisnik) this.userDetailsService.loadUserByUsername(username);
 
 		Korisnik userEdited = ulogovan;
-		if (korisnik.getIme() != null) {
+		if (korisnik.getIme() != "") {
 			userEdited.setIme(korisnik.getIme());
 		}
-		if (korisnik.getPrezime() != null) {
+		if (korisnik.getPrezime() != "") {
 			userEdited.setPrezime(korisnik.getPrezime());
 		}
-		if (korisnik.getEmail() != null) {
+		if (korisnik.getEmail() != "") {
 			userEdited.setEmail(korisnik.getEmail());
 		}
-		if (korisnik.getUlica() != null) {
+		if (korisnik.getUlica() != "") {
 			userEdited.setUlica(korisnik.getUlica());
 		}
-		if (korisnik.getGrad() != null) {
+		if (korisnik.getGrad() != "") {
 			userEdited.setGrad(korisnik.getGrad());
 		}
-		if (korisnik.getDrzava() != null) {
+		if (korisnik.getDrzava() != "") {
 			userEdited.setDrzava(korisnik.getDrzava());
 		}
-		if (korisnik.getTelefon() != null) {
+		if (korisnik.getTelefon() != "") {
 			userEdited.setTelefon(korisnik.getTelefon());
 		}
 		korisnikService.save(userEdited);

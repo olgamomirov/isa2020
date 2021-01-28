@@ -55,7 +55,6 @@ public class RadnoVremeController {
 	private KorisnikServiceImpl korisnikDetails;
 
 	/*
->>>>>>> refs/remotes/origin/main
 	
 	@GetMapping(value = "/add")
 	ResponseEntity<String> add(){
@@ -101,6 +100,9 @@ public class RadnoVremeController {
 		return new ResponseEntity<>(rv.toString(), HttpStatus.OK);
 	}
 	*/
+	
+		
+	
 	@GetMapping(value = "/getRadnoVreme")
 	ResponseEntity<List<RadnoVremeDTO>> get(HttpServletRequest request){
 		String token = tokenUtils.getToken(request);

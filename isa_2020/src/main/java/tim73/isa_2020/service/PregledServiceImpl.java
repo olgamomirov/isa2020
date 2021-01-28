@@ -55,4 +55,11 @@ public class PregledServiceImpl implements PregledService{
 		return pregledRepository.findByPacijentId(id);
 	}
 
+
+	@Override
+	public List<Pregled> proveraPregleda() {
+		// TODO Auto-generated method stub
+		return pregledRepository.proveraDatumaPregleda();
+	}
+
 }
