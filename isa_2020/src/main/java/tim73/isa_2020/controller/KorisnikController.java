@@ -90,6 +90,9 @@ public class KorisnikController {
 	@Autowired
 	private ZahtevZaGodisnjiService zahtevGodisnjiService;
 	
+	@Autowired
+	private ApotekaService apotekaService;
+	
 	/*
 	@PostMapping(value = "/login", consumes=MediaType.APPLICATION_JSON_VALUE)
 	public void login(@RequestBody Korisnik korisnik) {
@@ -345,7 +348,7 @@ static class PenalBody{
 		public String kraj;
 	}
 		@RequestMapping(value = "/godisnji/add", method = RequestMethod.POST, consumes = "application/json", produces = "application/json")
-		@PreAuthorize("hasRole('DERMATOLOG') or hasRole('FARMACEUT')")
+		@PreAuthorize("hasRole('FARMACEUT')")
 		public String setGodisnji(@RequestBody Godisnji godisnji, HttpServletRequest request) throws MailException, InterruptedException {
 			
 	     
@@ -353,18 +356,13 @@ static class PenalBody{
 	     String token = tokenUtils.getToken(request);
 		 String username = this.tokenUtils.getUsernameFromToken(token);
 		 Korisnik k = (Korisnik) this.userDetailsService.loadUserByUsername(username);
-		 List<Authority> authority = (List<Authority>) k.getAuthorities();
-			String role = authority.get(0).getName();
-			
+		 
 		 String interval = godisnji.pocetak + ":00.000+01:00" + "/" + godisnji.kraj + ":00.000+01:00";
-		 if(role.equals("DERMATOLOG")) {
-			 Dermatolog d = (Dermatolog) k;
-			// ZahtevZaGodisnji zahtev = new ZahtevZaGodisnji(interval, d, null, );
-		 }else {
+		
 			 Farmaceut f = (Farmaceut) k;
 			 ZahtevZaGodisnji zahtev = new ZahtevZaGodisnji(interval, "neodobren","", null, f, f.getApoteka());
 			 zahtevGodisnjiService.save(zahtev);
-		 }
+		 
 		 
 		 
 		/* Set<AdministratorApoteke> admini = a.getAdministratorApoteke();
@@ -380,5 +378,45 @@ static class PenalBody{
 			
 			return k.getIme();
 		}
+		static class GodisnjiDermatolog{
+			public String pocetak;
+			public String kraj;
+			public Long apotekaId;
+		}
+			@RequestMapping(value = "/godisnji/addDermatolog", method = RequestMethod.POST, consumes = "application/json", produces = "application/json")
+			@PreAuthorize("hasRole('DERMATOLOG')")
+			public String setGodisnjiDermatolog(@RequestBody GodisnjiDermatolog godisnji, HttpServletRequest request) throws MailException, InterruptedException {
+				
+		     
+		     
+		     String token = tokenUtils.getToken(request);
+			 String username = this.tokenUtils.getUsernameFromToken(token);
+			 Korisnik k = (Korisnik) this.userDetailsService.loadUserByUsername(username);
+			 
+			 Apoteka a = apotekaService.findById(godisnji.apotekaId);
+			 
+			 String interval = godisnji.pocetak + ":00.000+01:00" + "/" + godisnji.kraj + ":00.000+01:00";
+			 
+				 Dermatolog d = (Dermatolog) k;
+				// ZahtevZaGodisnji zahtev = new ZahtevZaGodisnji(interval, d, null, );
+			
+				 ZahtevZaGodisnji zahtev = new ZahtevZaGodisnji(interval, "neodobren","", d, null, a);
+				 zahtevGodisnjiService.save(zahtev);
+			 
+			 
+			 
+			/* Set<AdministratorApoteke> admini = a.getAdministratorApoteke();
+				if(!flag) {
+					String email = null;
+				for(AdministratorApoteke admin: admini) {
+					 email = admin.getEmail();  //salje prvom adminu kog nadje
+					break;
+				}*/
+				mailService.sendSimpleMessage("violetamarceta1995@gmail.com", "Zahtev za godisnji odmor od lekara: " + k.getIme() + " " + k.getPrezime(), "Od: "
+						+ godisnji.pocetak.toString() + "do: " + godisnji.kraj.toString());
+				//}
+				
+				return k.getIme();
+			}
 	
 }

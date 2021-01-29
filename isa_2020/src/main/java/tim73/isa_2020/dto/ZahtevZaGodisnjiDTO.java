@@ -16,8 +16,8 @@ public class ZahtevZaGodisnjiDTO {
 
 	private String email;
 	
-	public ZahtevZaGodisnjiDTO(ZahtevZaGodisnji zahtev) {
-		this(zahtev.getId(), zahtev.getInterval(), zahtev.getStatus(), zahtev.getFarmaceut().getEmail());
+	public ZahtevZaGodisnjiDTO(ZahtevZaGodisnji zahtev, String email) {
+		this(zahtev.getId(), zahtev.getInterval(), zahtev.getStatus(), email);
 	}
 	
 	public ZahtevZaGodisnjiDTO(Long id, String interval2, String status, String email) {
