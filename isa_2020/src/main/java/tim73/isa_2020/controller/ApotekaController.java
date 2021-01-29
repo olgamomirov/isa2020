@@ -322,7 +322,21 @@ public class ApotekaController {
 			return new ResponseEntity<List<ApotekaDTO>>(apoteke, HttpStatus.OK);
 		}
 
-	
-			
+		@GetMapping(value = "/nazivi")
+		@PreAuthorize("hasRole('ADMINISTRATOR')")
+		public ResponseEntity<List<String>> sviGradovi(){
+			List<String> nazivi= new ArrayList<String>();
+			for(Apoteka a:apotekaService.findAll()) {
+				if(!nazivi.contains(a.getNaziv())) {
+					nazivi.add(a.getNaziv());
+					System.out.println(a.getNaziv());
+				}
+			}
+			System.out.println("usao");
+
+			return new ResponseEntity<List<String>>(nazivi, HttpStatus.OK);
+		}
+
+		
 	
 }

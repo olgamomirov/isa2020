@@ -6,6 +6,9 @@ insert into "public"."korisnik" ("id", "drzava", "email", "grad", "ime", "lozink
 
 insert into "public"."korisnik" ("id", "drzava", "email", "grad", "ime", "lozinka", "prezime", "telefon", "ulica", "enabled", "status") values(6, 'Srbija', 'violetamarceta1995@gmail.com', 'Novi Sad', 'Violeta', '$2a$04$Vbug2lwwJGrvUXTj6z7ff.97IzVBkrJ1XfApfGNl.Z695zqcnPYra', 'Marceta', '555222', 'Slobodana Bajica 2', true, 'registrovan')
 
+insert into "public"."korisnik" ("id", "drzava", "email", "grad", "ime", "lozinka", "prezime", "telefon", "ulica", "enabled", "status") values(7, 'Srbija', 'jovanka@gmail.com', 'Novi Sad', 'Jovanka', '$2a$04$Vbug2lwwJGrvUXTj6z7ff.97IzVBkrJ1XfApfGNl.Z695zqcnPYra', 'Jovic', '555222', 'Sklj', true, 'registrovan')
+insert into "public"."dermatolog" ("id") values(7)
+
 
 insert into "public"."apoteka" ("drzava", "grad", "naziv", "ocena", "ulica") values(null, 'Ruma', 'Neka', 5, null)
 insert into "public"."apoteka" ("drzava", "grad", "naziv", "ocena", "ulica") values(null, 'Beograd', 'Nova', 4, null)
@@ -15,6 +18,9 @@ insert into "public"."farmaceut" ("id", "apoteka_id") values(4, 2)
 insert into "public"."zaposleni_dermatolozi" ("apoteka_id", "dermatolog_id") values(2, 2)
 
 insert into "public"."zaposleni_dermatolozi" ("apoteka_id", "dermatolog_id") values(3, 2)
+insert into "public"."zaposleni_dermatolozi" ("apoteka_id", "dermatolog_id") values(1, 7)
+insert into "public"."zaposleni_dermatolozi" ("apoteka_id", "dermatolog_id") values(2, 7)
+
 
 --insert into "public"."lek" ("id", "kolicina", "naziv", "sifra", "apoteka_id") values(1, 2, 'bromazepam', '123', 1)
 

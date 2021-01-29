@@ -34,6 +34,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import tim73.isa_2020.dto.DermatologDTO;
 import tim73.isa_2020.dto.LekarDTO;
+import tim73.isa_2020.model.AdministratorApoteke;
+import tim73.isa_2020.model.Apoteka;
 import tim73.isa_2020.model.Authority;
 import tim73.isa_2020.model.Dermatolog;
 import tim73.isa_2020.model.Korisnik;
@@ -43,6 +45,7 @@ import tim73.isa_2020.model.Pregled;
 import tim73.isa_2020.model.UserTokenState;
 import tim73.isa_2020.repository.KorisnikRepository;
 import tim73.isa_2020.securityService.TokenUtils;
+import tim73.isa_2020.service.ApotekaService;
 import tim73.isa_2020.service.DermatologService;
 import tim73.isa_2020.service.KorisnikService;
 import tim73.isa_2020.service.KorisnikServiceImpl;
@@ -73,6 +76,9 @@ public class DermatologController {
 	
 	@Autowired
 	private OcenaDermatologService ocenaDermatologService;
+	
+	@Autowired
+	private ApotekaService apotekaService;
 
 	@Bean
 	public PasswordEncoder encoder() {
@@ -229,4 +235,62 @@ public class DermatologController {
 		}
 		return new ResponseEntity<List<LekarDTO>>(dermatolozi, HttpStatus.OK);
 	}
+	
+	@RequestMapping(value = "/search", method = RequestMethod.GET)
+	@PreAuthorize("hasRole('ADMINISTRATOR')")
+	public ResponseEntity<List<LekarDTO>> pretragaDermatologa(@RequestParam("ime") String ime, @RequestParam("prezime") String prezime,HttpServletRequest request){
+		
+
+		List<Dermatolog> dermatolozi=dermatologService.findByImeIPrezime(ime, prezime);
+		List<LekarDTO> dermatoloziDTO= new ArrayList<LekarDTO>();
+		for(Dermatolog dermatolog:dermatolozi) {
+			String apoteke="";
+			for(Apoteka apoteka:dermatolog.getApoteke()) {
+				apoteke+=apoteka.getNaziv()+",";
+			}
+			apoteke=apoteke.substring(0, apoteke.length()-1); //da bih uklonila poslednji zarez
+			double ocena=0;
+			double brOcena=0;
+			if(!dermatolog.getOceneDermatologa().isEmpty()) {
+				for(OcenaDermatolog od:dermatolog.getOceneDermatologa()) {
+					ocena+=od.getVrednost();
+					brOcena++;
+				}
+				ocena=ocena/brOcena;
+			}
+			dermatoloziDTO.add(new LekarDTO(dermatolog.getId(), dermatolog.getIme()+" "+dermatolog.getPrezime(), "dermatolog", ocena, apoteke));
+		}
+		return new ResponseEntity<List<LekarDTO>>(dermatoloziDTO, HttpStatus.OK);
+	}
+	@RequestMapping(value = "/dermatolozi", method = RequestMethod.GET)
+	@PreAuthorize("hasRole('ADMINISTRATOR')")
+	public ResponseEntity<List<LekarDTO>> dermatolozi(HttpServletRequest request){
+		String token = tokenUtils.getToken(request);
+		String username = this.tokenUtils.getUsernameFromToken(token);
+		AdministratorApoteke admin = (AdministratorApoteke) this.userDetailsService.loadUserByUsername(username);
+		
+		List<LekarDTO> dermatoloziDTO= new ArrayList<LekarDTO>();
+		
+		Apoteka a=admin.getApoteka();
+		
+		for(Dermatolog dermatolog:a.getDermatolozi()) {
+			String apoteke="";
+			for(Apoteka apoteka:dermatolog.getApoteke()) {
+				apoteke+=apoteka.getNaziv()+",";
+			}
+			apoteke=apoteke.substring(0, apoteke.length()-1); //da bih uklonila poslednji zarez
+			double ocena=0;
+			double brOcena=0;
+			if(!dermatolog.getOceneDermatologa().isEmpty()) {
+				for(OcenaDermatolog od:dermatolog.getOceneDermatologa()) {
+					ocena+=od.getVrednost();
+					brOcena++;
+				}
+				ocena=ocena/brOcena;
+			}
+			dermatoloziDTO.add(new LekarDTO(dermatolog.getId(), dermatolog.getIme()+" "+dermatolog.getPrezime(), "dermatolog", ocena, apoteke));
+		}
+		return new ResponseEntity<List<LekarDTO>>(dermatoloziDTO, HttpStatus.OK);
+	}
 }
+	
