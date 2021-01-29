@@ -38,6 +38,9 @@ public class Lek {
 	@JoinColumn(name = "sifra_leka_id", referencedColumnName = "id")
 	private SifrarnikLekova sifrarnikLekova;
 	
+	@OneToMany(mappedBy = "lek", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	private Set<Cenovnik> cenovnici = new HashSet<Cenovnik>();
+	
 
 	public Lek() {
 		super();
@@ -49,8 +52,15 @@ public class Lek {
 		this.kolicina = kolicina;
 		this.apoteka = apoteka;
 	}
+    //konstruktor sa cenovnikom
 
-	
+	public Set<Cenovnik> getCenovnici() {
+		return cenovnici;
+	}
+
+	public void setCenovnici(Set<Cenovnik> cenovnici) {
+		this.cenovnici = cenovnici;
+	}
 
 	public int getKolicina() {
 		return kolicina;

@@ -115,6 +115,24 @@ public class LekController {
 		
 		return new ResponseEntity<List<LekDTO>>(lekoviDTO, HttpStatus.OK);
 	}
+	@GetMapping(value = "/sviIzAdministratoveApoteke") //svi lekovi iz apoteke u kojoj radi administrator
+	@PreAuthorize("hasRole('ADMINISTRATOR')")
+	public ResponseEntity<List<LekDTO>> findAllFrom(HttpServletRequest request) {
+		
+		String token = tokenUtils.getToken(request);
+		String username = this.tokenUtils.getUsernameFromToken(token);
+		AdministratorApoteke korisnik = (AdministratorApoteke) this.userDetailsService.loadUserByUsername(username);
+		
+		List<Lek> lekovi= lekService.findByApotekaId(korisnik.getApoteka().getId());
+		
+        List<LekDTO> lekoviDTO= new ArrayList<>();
+		
+		for(Lek l: lekovi) {
+			lekoviDTO.add(new LekDTO(l));
+		}	
+		
+		return new ResponseEntity<List<LekDTO>>(lekoviDTO, HttpStatus.OK);
+	}
 	/*
 	@GetMapping(value = "/pacijent/{id}")
 	public ResponseEntity<List<LekDTO>> findAlergije(@PathVariable Long id) {
