@@ -42,6 +42,10 @@ public class Lek {
 	private Set<Cenovnik> cenovnici = new HashSet<Cenovnik>();
 	
 
+	@OneToMany(mappedBy = "lek", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	private Set<UpitZaLek> upitiZaLek = new HashSet<UpitZaLek>();
+	
+	
 	public Lek() {
 		super();
 		// TODO Auto-generated constructor stub
@@ -90,14 +94,20 @@ public class Lek {
 		this.rezervacije = rezervacije;
 	}
 
-	
-
 	public SifrarnikLekova getSifrarnikLekova() {
 		return sifrarnikLekova;
 	}
 
 	public void setSifrarnikLekova(SifrarnikLekova sifrarnikLekova) {
 		this.sifrarnikLekova = sifrarnikLekova;
+	}
+
+	public Set<UpitZaLek> getUpitiZaLek() {
+		return upitiZaLek;
+	}
+
+	public void setUpitiZaLek(Set<UpitZaLek> upitiZaLek) {
+		this.upitiZaLek = upitiZaLek;
 	}
 	
 }
