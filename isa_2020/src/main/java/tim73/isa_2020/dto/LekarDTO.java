@@ -18,12 +18,12 @@ public class LekarDTO {
 		
 	}
 	
-	public LekarDTO(Long id, String imeIPrezime, String specijalizacija, int ocena) {
+	public LekarDTO(Long id, String imeIPrezime, String specijalizacija, double ocena2) {
 		super();
 		this.id=id;
 		this.imeIPrezime = imeIPrezime;
 		this.specijalizacija = specijalizacija;
-		this.ocena=ocena;
+		this.ocena=ocena2;
 		
 	}
 	

@@ -223,10 +223,10 @@ public class DermatologController {
 				LekarDTO dermatolog;
 				OcenaDermatolog ocena=ocenaDermatologService.findByDermatologIdAndPacijentId(pregled.getDermatolog().getId(), p.getId());
 				if(ocena!=null) {
-					dermatolog=new LekarDTO(pregled.getDermatolog().getId(),pregled.getDermatolog().getIme()+pregled.getDermatolog().getPrezime(), "dermatolog",ocena.getVrednost());
+					dermatolog=new LekarDTO(pregled.getDermatolog().getId(),pregled.getDermatolog().getIme()+" "+pregled.getDermatolog().getPrezime(), "dermatolog",ocena.getVrednost());
 				}
 				else{
-					dermatolog=new LekarDTO(pregled.getDermatolog().getId(),pregled.getDermatolog().getIme()+pregled.getDermatolog().getPrezime(), "dermatolog",0);
+					dermatolog=new LekarDTO(pregled.getDermatolog().getId(),pregled.getDermatolog().getIme()+" "+pregled.getDermatolog().getPrezime(), "dermatolog",0);
 				}
 				if(!dermatolozi.contains(dermatolog)) {
 					dermatolozi.add(dermatolog);
