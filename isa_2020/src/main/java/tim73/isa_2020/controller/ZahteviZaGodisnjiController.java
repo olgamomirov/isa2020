@@ -73,7 +73,11 @@ public class ZahteviZaGodisnjiController {
 		List<ZahtevZaGodisnjiDTO> zahteviDTO = new ArrayList<ZahtevZaGodisnjiDTO>();
 		
 		for(ZahtevZaGodisnji z: neodobreni) {
-			zahteviDTO.add(new ZahtevZaGodisnjiDTO(z));
+			if(z.getDermatolog()==null) {
+				zahteviDTO.add(new ZahtevZaGodisnjiDTO(z, z.getFarmaceut().getEmail()));
+			}else {
+				zahteviDTO.add(new ZahtevZaGodisnjiDTO(z, z.getDermatolog().getEmail()));
+		}
 		}
 		return new ResponseEntity<List<ZahtevZaGodisnjiDTO>>(zahteviDTO, HttpStatus.OK);
 	}
@@ -93,7 +97,7 @@ public class ZahteviZaGodisnjiController {
 		   mailService.sendSimpleMessage(zahtev.email, "Vas zahtev za godisnji odmor je odobren. ", "Od: "
 					+ zahtev1.getInterval() + "do: ");
 		   
-		   ZahtevZaGodisnjiDTO zahtevDTO = new ZahtevZaGodisnjiDTO(zahtev1);
+		   ZahtevZaGodisnjiDTO zahtevDTO = new ZahtevZaGodisnjiDTO(zahtev1, zahtev.email);
 			
 			return new ResponseEntity<ZahtevZaGodisnjiDTO>(zahtevDTO, HttpStatus.OK);
 		}
@@ -110,11 +114,16 @@ public class ZahteviZaGodisnjiController {
 	           zahtev1.setStatus("odbijen");
 	           zahtev1.setRazlogOdbijanja(zahtev.razlog);
 			   zahtevService.save(zahtev1);
-			   
+			   ZahtevZaGodisnjiDTO zahtevDTO = null;
+			   if(zahtev1.getDermatolog()==null) {
 			   mailService.sendSimpleMessage(zahtev1.getFarmaceut().getEmail(), "Vas zahtev za godisnji odmor je odbijen zbog ", zahtev.razlog);
 			   
-			   ZahtevZaGodisnjiDTO zahtevDTO = new ZahtevZaGodisnjiDTO(zahtev1);
-				
+			               zahtevDTO = new ZahtevZaGodisnjiDTO(zahtev1, zahtev1.getFarmaceut().getEmail());
+			   }else {
+				   mailService.sendSimpleMessage(zahtev1.getDermatolog().getEmail(), "Vas zahtev za godisnji odmor je odbijen zbog ", zahtev.razlog);
+				   
+				           zahtevDTO = new ZahtevZaGodisnjiDTO(zahtev1, zahtev1.getDermatolog().getEmail());
+			   }
 				return new ResponseEntity<ZahtevZaGodisnjiDTO>(zahtevDTO, HttpStatus.OK);
 			}
 }
