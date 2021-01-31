@@ -30,6 +30,9 @@ public class Lek {
 	@ManyToOne
 	private Apoteka apoteka;
 	
+	@OneToMany(mappedBy = "lek")
+	private Set<StavkaNarudzbenice> stavkeNarudzbenice= new HashSet<StavkaNarudzbenice>();
+	
 	@OneToMany(mappedBy = "lek", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	private Set<Rezervacija> rezervacije = new HashSet<Rezervacija>();
 	
