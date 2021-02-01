@@ -8,27 +8,18 @@ public class CenovnikDTO {
 
 	private Long id;
 	
-	private double cena;
 	
 	private Interval interval;
 
 	
 	public CenovnikDTO(Cenovnik cenovnik) {
-		this(cenovnik.getCena(), cenovnik.getInterval());
+		this( cenovnik.getInterval());
 	}
 	
-	public CenovnikDTO(double cena, String interval) {
+	public CenovnikDTO( String interval) {
 		super();
-		this.cena = cena;
+		
 		this.interval = new Interval(interval);
-	}
-
-	public double getCena() {
-		return cena;
-	}
-
-	public void setCena(double cena) {
-		this.cena = cena;
 	}
 
 	public Interval getInterval() {
