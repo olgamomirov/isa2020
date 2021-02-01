@@ -2,6 +2,7 @@ package tim73.isa_2020.controller;
 
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -31,6 +32,7 @@ import tim73.isa_2020.dto.ApotekaDTO;
 import tim73.isa_2020.dto.LekDTO;
 import tim73.isa_2020.dto.LekZaAlergijeDTO;
 import tim73.isa_2020.dto.RezervacijaDTO;
+import tim73.isa_2020.dto.SifrarnikLekovaDTO;
 import tim73.isa_2020.model.AdministratorApoteke;
 import tim73.isa_2020.model.Alergije;
 import tim73.isa_2020.model.Apoteka;
@@ -42,6 +44,7 @@ import tim73.isa_2020.model.Pacijent;
 import tim73.isa_2020.model.Pregled;
 import tim73.isa_2020.model.Rezervacija;
 import tim73.isa_2020.model.SifrarnikLekova;
+import tim73.isa_2020.model.UpitZaLek;
 import tim73.isa_2020.securityService.TokenUtils;
 import tim73.isa_2020.service.EmailService;
 import tim73.isa_2020.service.KorisnikServiceImpl;
@@ -51,6 +54,7 @@ import tim73.isa_2020.service.PacijentService;
 import tim73.isa_2020.service.PregledService;
 import tim73.isa_2020.service.RezervacijaService;
 import tim73.isa_2020.service.SifrarnikLekovaService;
+import tim73.isa_2020.service.UpitZaLekService;
 
 @RestController
 @RequestMapping(value = "/lekovi")
@@ -76,6 +80,9 @@ public class LekController {
 	
 	@Autowired
 	private EmailService mailService;
+	
+	@Autowired
+	private UpitZaLekService upitService;
 	
 	
 	@Autowired
@@ -106,6 +113,25 @@ public class LekController {
 	public ResponseEntity<List<LekDTO>> findOne(@PathVariable Long id) {
 		
 		List<Lek> lekovi= lekService.findByApotekaId(id);
+		
+        List<LekDTO> lekoviDTO= new ArrayList<>();
+		
+		for(Lek l: lekovi) {
+			lekoviDTO.add(new LekDTO(l));
+		}	
+		
+		return new ResponseEntity<List<LekDTO>>(lekoviDTO, HttpStatus.OK);
+	}
+	@GetMapping(value = "/sviIzAdministratoveApoteke") //svi lekovi iz apoteke u kojoj radi administrator
+	@PreAuthorize("hasRole('ADMINISTRATOR')")
+	public ResponseEntity<List<LekDTO>> findAllFrom(HttpServletRequest request) {
+	
+		
+		String token = tokenUtils.getToken(request);
+		String username = this.tokenUtils.getUsernameFromToken(token);
+		AdministratorApoteke korisnik = (AdministratorApoteke) this.userDetailsService.loadUserByUsername(username);
+		
+		List<Lek> lekovi= lekService.findByApotekaId(korisnik.getApoteka().getId());
 		
         List<LekDTO> lekoviDTO= new ArrayList<>();
 		
@@ -264,17 +290,33 @@ public class LekController {
 			}
 			
 		}
-	/*	Set<AdministratorApoteke> admini = a.getAdministratorApoteke();
+		Set<AdministratorApoteke> admini = a.getAdministratorApoteke();
 		if(!flag) {
 			String email = null;
 		for(AdministratorApoteke admin: admini) {
-			 email = admin.getEmail();  //salje prvom adminu kog nadje
-			break;
+			 email = admin.getEmail();  //salje svim administratorima apoteke (ukoliko ih ima vise)
+			 mailService.sendSimpleMessage(email, "NEDOSTUPAN LEK", "Lek  "
+						+ naziv + " nije dostupan.");
 		}
-		mailService.sendSimpleMessage(email, "NEDOSTUPAN LEK", "Lek  "
-				+ naziv + " nije dostupan.");
-		}*/
+		
+		}
+		
+		Lek lek = null;
 	
+		if(!flag) {
+			for(Lek l: lekovi) {
+				
+				if(l.getSifrarnikLekova().getNaziv().equals(naziv)) { 
+					 
+					lek = l;
+					
+					
+				}
+				
+			}
+			UpitZaLek upitZaSlanje = new UpitZaLek(lek, "nepregledan" , new Date());
+			upitService.save(upitZaSlanje);
+		}
 			
 			return flag;
 		
@@ -407,5 +449,6 @@ public class LekController {
 
 		return new ResponseEntity<List<LekDTO>>(lekovi, HttpStatus.OK);
 	}
+	
 
 }
