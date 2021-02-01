@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import tim73.isa_2020.controller.DermatologController.PasswordChanger;
@@ -27,6 +28,8 @@ import tim73.isa_2020.controller.DermatologController.StatusBody;
 import tim73.isa_2020.dto.DermatologDTO;
 import tim73.isa_2020.dto.FarmaceutDTO;
 import tim73.isa_2020.dto.LekarDTO;
+import tim73.isa_2020.model.AdministratorApoteke;
+import tim73.isa_2020.model.Apoteka;
 import tim73.isa_2020.model.Authority;
 import tim73.isa_2020.model.Dermatolog;
 import tim73.isa_2020.model.Farmaceut;
@@ -240,11 +243,11 @@ public class FarmaceutiController {
 						.findByFarmaceutIdAndPacijentId(pregled.getFarmaceut().getId(), p.getId());
 				if (ocena != null) {
 					farmaceut = new LekarDTO(pregled.getFarmaceut().getId(),
-							pregled.getFarmaceut().getIme() + pregled.getFarmaceut().getPrezime(), "farmaceut",
+							pregled.getFarmaceut().getIme()+" " + pregled.getFarmaceut().getPrezime(), "farmaceut",
 							ocena.getVrednost());
 				} else {
 					farmaceut = new LekarDTO(pregled.getFarmaceut().getId(),
-							pregled.getFarmaceut().getIme() + pregled.getFarmaceut().getPrezime(), "farmaceut", 0);
+							pregled.getFarmaceut().getIme() +" "+ pregled.getFarmaceut().getPrezime(), "farmaceut", 0);
 				}
 				if (!farmaceuti.contains(farmaceut)) {
 					farmaceuti.add(farmaceut);
@@ -254,4 +257,51 @@ public class FarmaceutiController {
 		return new ResponseEntity<List<LekarDTO>>(farmaceuti, HttpStatus.OK);
 	}
 
+	@RequestMapping(value = "/search", method = RequestMethod.GET)
+	@PreAuthorize("hasRole('ADMINISTRATOR')")
+	public ResponseEntity<List<LekarDTO>> pretragaFarmaceuta(@RequestParam("ime") String ime, @RequestParam("prezime") String prezime,HttpServletRequest request){
+		
+
+		List<Farmaceut> farmaceuti=farmaceutService.findByImeIPrezime(ime, prezime);
+		List<LekarDTO> farmaceutiDTO= new ArrayList<LekarDTO>();
+		for(Farmaceut farmaceut:farmaceuti) {
+			double ocena=0;
+			double brOcena=0;
+			if(!farmaceut.getOceneFarmaceuta().isEmpty()) {
+				for(OcenaFarmaceut of:farmaceut.getOceneFarmaceuta()) {
+					ocena+=of.getVrednost();
+					brOcena++;
+				}
+				ocena=ocena/brOcena;
+			}
+			farmaceutiDTO.add(new LekarDTO(farmaceut.getId(), farmaceut.getIme()+" "+farmaceut.getPrezime(), "farmaceut", ocena, farmaceut.getApoteka().getNaziv()));
+		}
+		return new ResponseEntity<List<LekarDTO>>(farmaceutiDTO, HttpStatus.OK);
+	}
+	@RequestMapping(value = "/farmaceuti", method = RequestMethod.GET)
+	@PreAuthorize("hasRole('ADMINISTRATOR')")
+	public ResponseEntity<List<LekarDTO>> farmaceuti(HttpServletRequest request){
+		String token = tokenUtils.getToken(request);
+		String username = this.tokenUtils.getUsernameFromToken(token);
+		AdministratorApoteke admin = (AdministratorApoteke) this.userDetailsService.loadUserByUsername(username);
+		
+		List<LekarDTO> farmaceutiDTO= new ArrayList<LekarDTO>();
+		
+		Apoteka a=admin.getApoteka();
+		
+		for(Farmaceut farmaceut:a.getFarmaceuti()) {
+			
+			double ocena=0;
+			double brOcena=0;
+			if(!farmaceut.getOceneFarmaceuta().isEmpty()) {
+				for(OcenaFarmaceut of:farmaceut.getOceneFarmaceuta()) {
+					ocena+=of.getVrednost();
+					brOcena++;
+				}
+				ocena=ocena/brOcena;
+			}
+			farmaceutiDTO.add(new LekarDTO(farmaceut.getId(), farmaceut.getIme()+" "+farmaceut.getPrezime(), "farmaceut", ocena, farmaceut.getApoteka().getNaziv()));
+		}
+		return new ResponseEntity<List<LekarDTO>>(farmaceutiDTO, HttpStatus.OK);
+	}
 }

@@ -38,6 +38,11 @@ public class Apoteka {
 	@Column(nullable=true)
 	private double ocena;
 	
+	//za mape
+	private double lat;
+	
+	private double lng;
+	
 	
 	@ManyToMany
 	@JoinTable(name ="zaposleni_dermatolozi", joinColumns = @JoinColumn(name="apoteka_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name="dermatolog_id", referencedColumnName = "id"))
@@ -64,21 +69,32 @@ public class Apoteka {
 	private Set<OcenaApoteka> oceneApoteke = new HashSet<OcenaApoteka>();
 	
 	@OneToMany(mappedBy = "apoteka", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	private Set<AkcijaPromocija> akcijePromocije =new HashSet<AkcijaPromocija>();
+  
+  @OneToMany(mappedBy = "apoteka", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	private Set<Narudzbenica> narudzbenice = new HashSet<Narudzbenica>();
 
+
+	
+	@ManyToMany
+	@JoinTable(name ="akcije_promocije_pretplate", joinColumns = @JoinColumn(name="apoteka_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name="pacijent_id", referencedColumnName = "id"))
+	private Set<Pacijent> pacijenti = new HashSet<Pacijent>();
+	
 	
 	public Apoteka() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
 
-	public Apoteka(String naziv, String ulica, String grad, String drzava, double ocena) {
+	public Apoteka(String naziv, String ulica, String grad, String drzava, double ocena, double lat, double lng) {
 		super();
 		this.naziv = naziv;
 		this.ulica = ulica;
 		this.grad = grad;
 		this.drzava = drzava;
 		this.ocena = ocena;
+		this.lat=lat;
+		this.lng=lng;
 	}
 
 	public String getNaziv() {
@@ -183,6 +199,41 @@ public class Apoteka {
 		this.oceneApoteke = oceneApoteke;
 	}
 
+
+	public Set<AkcijaPromocija> getAkcijePromocije() {
+		return akcijePromocije;
+	}
+
+	public void setAkcijePromocije(Set<AkcijaPromocija> akcijePromocije) {
+		this.akcijePromocije = akcijePromocije;
+	}
+
+	public Set<Pacijent> getPacijenti() {
+		return pacijenti;
+	}
+
+	public void setPacijenti(Set<Pacijent> pacijenti) {
+		this.pacijenti = pacijenti;
+	}
+
+	public double getLat() {
+		return lat;
+	}
+
+	public void setLat(double lat) {
+		this.lat = lat;
+	}
+
+	public double getLng() {
+		return lng;
+	}
+
+	public void setLng(double lng) {
+		this.lng = lng;
+	}
+	
+	
+
 	public Set<Narudzbenica> getNarudzbenice() {
 		return narudzbenice;
 	}
@@ -190,5 +241,6 @@ public class Apoteka {
 	public void setNarudzbenice(Set<Narudzbenica> narudzbenice) {
 		this.narudzbenice = narudzbenice;
 	}
+
 	
 }
