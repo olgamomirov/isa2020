@@ -59,7 +59,14 @@ public class Lek {
 		this.kolicina = kolicina;
 		this.apoteka = apoteka;
 	}
-    //konstruktor sa cenovnikom
+	
+	
+	public Lek(int kolicina, Apoteka apoteka, SifrarnikLekova sifrarnikLekova) {
+		super();
+		this.kolicina = kolicina;
+		this.apoteka = apoteka;
+		this.sifrarnikLekova = sifrarnikLekova;
+	}
 
 	public Set<Cenovnik> getCenovnici() {
 		return cenovnici;

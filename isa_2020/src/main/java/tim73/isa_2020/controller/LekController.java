@@ -32,6 +32,7 @@ import tim73.isa_2020.dto.ApotekaDTO;
 import tim73.isa_2020.dto.LekDTO;
 import tim73.isa_2020.dto.LekZaAlergijeDTO;
 import tim73.isa_2020.dto.RezervacijaDTO;
+import tim73.isa_2020.dto.SifrarnikLekovaDTO;
 import tim73.isa_2020.model.AdministratorApoteke;
 import tim73.isa_2020.model.Alergije;
 import tim73.isa_2020.model.Apoteka;
@@ -124,6 +125,7 @@ public class LekController {
 	@GetMapping(value = "/sviIzAdministratoveApoteke") //svi lekovi iz apoteke u kojoj radi administrator
 	@PreAuthorize("hasRole('ADMINISTRATOR')")
 	public ResponseEntity<List<LekDTO>> findAllFrom(HttpServletRequest request) {
+	
 		
 		String token = tokenUtils.getToken(request);
 		String username = this.tokenUtils.getUsernameFromToken(token);
@@ -447,5 +449,6 @@ public class LekController {
 
 		return new ResponseEntity<List<LekDTO>>(lekovi, HttpStatus.OK);
 	}
+	
 
 }

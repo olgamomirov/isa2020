@@ -51,6 +51,7 @@ public class CenovnikController {
 
 	@Autowired
 	private KorisnikServiceImpl userDetailsService;
+	
 	static class CenovnikNovi{
 		public double cena;
 		public Long idLek;

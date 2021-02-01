@@ -28,12 +28,15 @@ import tim73.isa_2020.model.Dermatolog;
 import tim73.isa_2020.model.Korisnik;
 import tim73.isa_2020.model.Lek;
 import tim73.isa_2020.model.Narudzbenica;
+import tim73.isa_2020.model.SifrarnikLekova;
 import tim73.isa_2020.model.StavkaNarudzbenice;
 import tim73.isa_2020.model.ZahtevZaGodisnji;
 import tim73.isa_2020.securityService.TokenUtils;
 import tim73.isa_2020.service.ApotekaService;
 import tim73.isa_2020.service.KorisnikServiceImpl;
+import tim73.isa_2020.service.LekService;
 import tim73.isa_2020.service.NarudzbenicaService;
+import tim73.isa_2020.service.SifrarnikLekovaService;
 import tim73.isa_2020.service.StavkaNarudzbeniceService;
 
 @RestController
@@ -59,7 +62,11 @@ public class NarudzbenicaController {
 	@Autowired
 	private ApotekaService apotekaService;
 	
+	@Autowired
+	private LekService lekService;
 	
+	@Autowired
+	private SifrarnikLekovaService sifrarnikService;
 	
 	static class parovi{
 		
@@ -88,16 +95,29 @@ public class NarudzbenicaController {
 			 Narudzbenica narudzbenica  = new Narudzbenica(rok, a);
 			 
 			 
-		for(int i=0; i<parovi.size(); i++) {
+		
 	     for(Lek l: lekoviApoteke) {
+	    	 for(int i=0; i<parovi.size(); i++) {
 			if(l.getSifrarnikLekova().getNaziv().equals(parovi.get(i).key)) {
-	    
+	     
 	     StavkaNarudzbenice stavka = new StavkaNarudzbenice(l, parovi.get(i).value, narudzbenica);
 	     stavkeNarudzbenice.add(stavka);
-	    
+	     parovi.remove(i);
+	     }}
 	     }
-		}
-		}
+	     //narucuje lek koji do sad nije bio na stanju
+	    	 for(SifrarnikLekova sifra: sifrarnikService.findAll()) {
+	    		 for(int i=0; i<parovi.size(); i++) {
+	    		 if(sifra.getNaziv().equals(parovi.get(i).key)) {
+	    	 Lek noviLek = new Lek(0, a, sifra);
+	    	 lekService.save(noviLek);
+	    	 StavkaNarudzbenice stavka = new StavkaNarudzbenice(noviLek, parovi.get(i).value, narudzbenica);
+		     stavkeNarudzbenice.add(stavka);
+	    	 }
+	    	 }
+	    	 }
+		
+		
 	    narudzbenica.setStavkeNarudzbenice(stavkeNarudzbenice);
 		 
 		narudzbenicaService.save(narudzbenica);
