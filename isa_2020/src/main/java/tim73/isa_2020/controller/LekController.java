@@ -407,5 +407,24 @@ public class LekController {
 
 		return new ResponseEntity<List<LekDTO>>(lekovi, HttpStatus.OK);
 	}
+	
+	@GetMapping(value = "/lekoviApoteke")
+	@PreAuthorize("hasRole('ADMINISTRATOR')")
+	public ResponseEntity<List<String>> lekoviApoteke (HttpServletRequest request){
+		String token = tokenUtils.getToken(request);
+		String username = this.tokenUtils.getUsernameFromToken(token);
+		AdministratorApoteke admin = (AdministratorApoteke) this.userDetailsService.loadUserByUsername(username);
+		
+		List<String> lekovi = new ArrayList<String>();
+		Apoteka apoteka= admin.getApoteka();
+		
+		for(Lek l:apoteka.getLekovi()) {
+			if(!lekovi.contains(l.getSifrarnikLekova().getNaziv())) {
+				lekovi.add(l.getSifrarnikLekova().getNaziv());
+			}
+		}
+		
+		return new ResponseEntity<List<String>>(lekovi,HttpStatus.OK);
+	}
 
 }

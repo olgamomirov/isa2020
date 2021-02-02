@@ -33,6 +33,9 @@ public class Lek {
 	@OneToMany(mappedBy = "lek", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	private Set<Rezervacija> rezervacije = new HashSet<Rezervacija>();
 	
+	@OneToMany(mappedBy = "lek", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	private Set<StavkeAkcijePromocije> stavke =new HashSet<StavkeAkcijePromocije>();
+	
 	
 	@OneToOne(cascade = CascadeType.ALL)
 	@JoinColumn(name = "sifra_leka_id", referencedColumnName = "id")
@@ -88,6 +91,14 @@ public class Lek {
 
 	public void setSifrarnikLekova(SifrarnikLekova sifrarnikLekova) {
 		this.sifrarnikLekova = sifrarnikLekova;
+	}
+
+	public Set<StavkeAkcijePromocije> getStavke() {
+		return stavke;
+	}
+
+	public void setStavke(Set<StavkeAkcijePromocije> stavke) {
+		this.stavke = stavke;
 	}
 	
 }
