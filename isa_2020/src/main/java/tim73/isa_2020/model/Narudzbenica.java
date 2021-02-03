@@ -27,24 +27,30 @@ public class Narudzbenica {
 	
 	private String rokPonude;
 	
+	private String status;
+	
 	@ManyToOne
 	private Apoteka apoteka;
 	
 	@OneToMany(mappedBy = "narudzbenica", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	private Set<StavkaNarudzbenice> stavkeNarudzbenice = new HashSet<StavkaNarudzbenice>();
+	
+	@OneToMany(mappedBy = "narudzbenica", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+	private Set<Ponuda> ponude = new HashSet<Ponuda>();
 
 	public Narudzbenica() {
 		super();
 		
 	}
 
-	public Narudzbenica(String rokPonude, Apoteka apoteka) {
+	public Narudzbenica(String rokPonude, String status, Apoteka apoteka) {
 		super();
 		this.rokPonude = rokPonude;
+		this.status = status;
 		this.apoteka = apoteka;
 	}
 
-	public Narudzbenica(String rokPonude, Apoteka apoteka, Set<StavkaNarudzbenice> stavkeNarudzbenice) {
+	public Narudzbenica(String rokPonude, String status, Apoteka apoteka, Set<StavkaNarudzbenice> stavkeNarudzbenice) {
 		super();
 		this.rokPonude = rokPonude;
 		this.apoteka = apoteka;
@@ -79,4 +85,20 @@ public class Narudzbenica {
 		return id;
 	}
 
+	public Set<Ponuda> getPonude() {
+		return ponude;
+	}
+
+	public void setPonude(Set<Ponuda> ponude) {
+		this.ponude = ponude;
+	}
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
+	
 }

@@ -11,4 +11,8 @@ public interface NarudzbenicaService {
 	
 	List<Narudzbenica> findAll();
 	
+	Narudzbenica findOne(Long id);
+	
+	List<Narudzbenica> proveraNarudzbenice();
+	
 }

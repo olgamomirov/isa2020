@@ -2,12 +2,16 @@ package tim73.isa_2020.controller;
 
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -133,6 +137,33 @@ static class parovi{
 		}	
 		return null;
 		//return new ResponseEntity<List<CenovnikDTO>>(lekoviDTO, HttpStatus.OK);
+	}
+	@GetMapping(value = "/najbliziDatum")
+	public ResponseEntity<DateTime> najbliziDatum() {
+		
+	    
+	   List<Cenovnik> sviCenovnici = cenovnikService.findAll();
+	   List<DateTime> datumi = new ArrayList<DateTime>();
+	   
+	   for(Cenovnik cenovnik: sviCenovnici) {
+		   datumi.add(new DateTime(cenovnik.getInterval().split("/")[1])); //kupi krajnji datum
+	   }
+	   final long now = System.currentTimeMillis();
+
+	// Get date closest to "now"
+	DateTime closest = Collections.min(datumi, new Comparator<DateTime>() {
+		@Override
+		public int compare(DateTime d1, DateTime d2) {
+	        long diff1 = Math.abs(d1.getMillis() - now);
+	        long diff2 = Math.abs(d2.getMillis() - now);
+	        return Long.compare(diff1, diff2);
+	    }
+
+		
+	});
+			   
+		
+		return new ResponseEntity<DateTime>(closest, HttpStatus.OK);
 	}
 
 }
