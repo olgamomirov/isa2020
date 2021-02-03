@@ -4,6 +4,7 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
@@ -12,6 +13,7 @@ import java.util.Set;
 import javax.servlet.http.HttpServletRequest;
 
 import org.joda.time.DateTime;
+import org.joda.time.Interval;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,9 +25,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import tim73.isa_2020.dto.CenovnikDTO;
+import tim73.isa_2020.dto.CenovnikStavkaDTO;
 import tim73.isa_2020.dto.FarmaceutDTO;
 import tim73.isa_2020.dto.LekDTO;
 import tim73.isa_2020.model.AdministratorApoteke;
@@ -33,6 +37,8 @@ import tim73.isa_2020.model.Apoteka;
 import tim73.isa_2020.model.Cenovnik;
 import tim73.isa_2020.model.CenovnikStavka;
 import tim73.isa_2020.model.Lek;
+import tim73.isa_2020.model.Pregled;
+import tim73.isa_2020.model.UpitZaLek;
 import tim73.isa_2020.securityService.TokenUtils;
 import tim73.isa_2020.service.CenovnikService;
 import tim73.isa_2020.service.CenovnikStavkaService;
@@ -165,5 +171,146 @@ static class parovi{
 		
 		return new ResponseEntity<DateTime>(closest, HttpStatus.OK);
 	}
+	@GetMapping(value = "/proveraDatuma") //provera da li je za ovaj period vec definisan cenovnik, ako jeste- ne moze se definisati novi cenovnik za taj datum, samo menjati
+	@PreAuthorize("hasRole('ADMINISTRATOR')")
+	public boolean proveriCenovnik(@RequestParam("pocetak") String pocetak, @RequestParam("kraj") String kraj, HttpServletRequest request) throws MailException, InterruptedException {
+		
+		boolean flag = false;
+		
+		String token = tokenUtils.getToken(request);
+		String username = this.tokenUtils.getUsernameFromToken(token);
+		AdministratorApoteke korisnik = (AdministratorApoteke) this.userDetailsService.loadUserByUsername(username);
+		
+		Apoteka a = korisnik.getApoteka();
+		
+		Set<Cenovnik> cenovnici = a.getCenovnici();
+	    
+		String intervalS = pocetak + ":00.000+01:00" + "/" + kraj + ":00.000+01:00";
+		Interval interval = new Interval(intervalS);
+		
+		for(Cenovnik c: cenovnici) {
+			Interval i = new Interval(c.getInterval());
+			if(i.overlaps(interval)) {
+				
+				flag = true;
+				break;
+			}
+		}
+			
+			return flag;
+		
+	}
+	@GetMapping(value = "/cenovniciOdDanasNadalje") //ne moze da menja prosle cenovnike zbog izvestaja
+	@PreAuthorize("hasRole('ADMINISTRATOR')")
+	public ResponseEntity<List<CenovnikDTO>> getCenovnici(HttpServletRequest request) throws MailException, InterruptedException {
+		
+		boolean flag = false;
+		
+		String token = tokenUtils.getToken(request);
+		String username = this.tokenUtils.getUsernameFromToken(token);
+		AdministratorApoteke korisnik = (AdministratorApoteke) this.userDetailsService.loadUserByUsername(username);
+		
+		Apoteka a = korisnik.getApoteka();
+		
+		Set<Cenovnik> cenovnici = a.getCenovnici();
+	    
+		List<CenovnikDTO> cenovniciDTO = new ArrayList<CenovnikDTO>();
+		
+		DateTime danas = new DateTime();
+		Interval danasI = new Interval(danas, danas);
+		
+		for(Cenovnik c: cenovnici) {
+			Interval interval = new Interval(c.getInterval());
+			if(interval.overlaps(danasI)) {
+				cenovniciDTO.add(new CenovnikDTO(c));
+			}
+		}
+			
+			return new ResponseEntity<List<CenovnikDTO>>(cenovniciDTO, HttpStatus.OK);
+		
+	}
+	@GetMapping(value = "/getOne") //cenovnik za izmenu
+	@PreAuthorize("hasRole('ADMINISTRATOR')")
+	public ResponseEntity<CenovnikDTO> findOneCenovnik(@RequestParam("id") Long id) {
+		
+		Cenovnik c = cenovnikService.findOne(id);
+		
+		Set<CenovnikStavka> stavke = c.getStavkeCenovnika();
+		
+		List<CenovnikStavkaDTO> stavkeDTO = new ArrayList<CenovnikStavkaDTO>();
+		
+		CenovnikDTO cDTO = new CenovnikDTO(c);
+		for(CenovnikStavka stavka: stavke) {
+			
+			stavkeDTO.add(new CenovnikStavkaDTO(stavka));
+		}
+		
+		cDTO.setStavke(stavkeDTO);
+		
 
+        return new ResponseEntity<CenovnikDTO>(cDTO, HttpStatus.OK);
+	}
+static class paroviIzmena{
+		public Long id;//id cenovnika koji se menja
+		public String key; //naziv leka
+		public int value; //cena leka
+		public String periodVazenjaOd; 
+		public String periodVazenjaDo;
+		
+	}
+	@RequestMapping(value = "/izmeniCenovnik", method = RequestMethod.POST, produces = "application/json" ,  consumes = "application/json")
+	@PreAuthorize("hasRole('ADMINISTRATOR')")
+	public ResponseEntity<CenovnikDTO> izmenaCenovnika(@RequestBody List<paroviIzmena> listaLekovaICena, HttpServletRequest request) throws ParseException, MailException, InterruptedException {
+		
+		String token = tokenUtils.getToken(request);
+		String username = this.tokenUtils.getUsernameFromToken(token);
+		AdministratorApoteke korisnik = (AdministratorApoteke) this.userDetailsService.loadUserByUsername(username);
+		
+		Cenovnik cenovnikStari = cenovnikService.findOne(listaLekovaICena.get(0).id);
+		
+		DateTime kraj = new DateTime(listaLekovaICena.get(0).periodVazenjaOd);
+		DateTime kraj2 = kraj.minusDays(1);
+		System.out.println(kraj2.toString() + " datum podesen");
+		 String intervalNovi = listaLekovaICena.get(0).periodVazenjaOd + ":00.000+01:00" + "/" + listaLekovaICena.get(0).periodVazenjaDo + ":00.000+01:00";
+		 
+		 String intervalStari = cenovnikStari.getInterval().split("/")[0] + "/" + kraj2;
+		
+		 cenovnikStari.setInterval(intervalStari);
+		 cenovnikService.save(cenovnikStari);
+		
+		 Cenovnik cenovnikNovi = new Cenovnik(intervalNovi, korisnik.getApoteka());
+		 cenovnikService.save(cenovnikNovi);
+		 Set<CenovnikStavka> stavkeListaStare = cenovnikStari.getStavkeCenovnika();
+		 Set<CenovnikStavka> stavkeeee = new HashSet<CenovnikStavka>();
+		 
+		 for(CenovnikStavka stavka: stavkeListaStare) {
+			 if(listaLekovaICena.size()!=0) {
+				 for(int i=0; i<listaLekovaICena.size(); i++) {
+			 if(stavka.getLek().getSifrarnikLekova().getNaziv().equals(listaLekovaICena.get(i).key)) {
+				 CenovnikStavka s = new CenovnikStavka(listaLekovaICena.get(i).value, stavka.getLek(), cenovnikNovi);
+				 stavkeeee.add(s);
+			 }else {
+				 CenovnikStavka s = new CenovnikStavka(stavka.getCena(), stavka.getLek(), cenovnikNovi);
+				 stavkeeee.add(s);
+			 }
+		 }
+			 }else {
+				 CenovnikStavka s = new CenovnikStavka(stavka.getCena(), stavka.getLek(), cenovnikNovi);
+				 stavkeeee.add(s);
+				 
+			 }
+		 }
+		 
+		
+		 
+		 cenovnikNovi.setStavkeCenovnika(stavkeeee);
+		 
+		 cenovnikService.save(cenovnikNovi);
+		 
+	   
+		 CenovnikDTO cenovnikDTO = new CenovnikDTO(cenovnikNovi);
+		
+		 return new ResponseEntity<CenovnikDTO>(cenovnikDTO, HttpStatus.OK);
+		
+	}
 }
