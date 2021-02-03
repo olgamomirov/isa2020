@@ -25,4 +25,9 @@ public class FarmaceutServiceImpl implements FarmaceutService{
 		return farmaceutRepository.findByApotekaId(id);
 	}
 
+	@Override
+	public List<Farmaceut> findByImeIPrezime(String ime, String prezime) {
+		return farmaceutRepository.searchByImeLikeAndPrezimeLikeIgnoreCase(ime, prezime);
+	}
+
 }

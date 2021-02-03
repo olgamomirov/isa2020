@@ -7,6 +7,7 @@ import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
@@ -43,6 +44,9 @@ public class Pacijent extends Korisnik{
 	
 	@OneToMany(mappedBy = "pacijent", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	private Set<OcenaSifrarnikLekova> oceneLekova;
+	
+	@ManyToMany(mappedBy = "pacijenti")
+	private Set<Apoteka> apoteke= new HashSet<Apoteka>();
 	
 
 	public Pacijent() {
@@ -127,6 +131,14 @@ public class Pacijent extends Korisnik{
 
 	public void setOceneLekova(Set<OcenaSifrarnikLekova> oceneLekova) {
 		this.oceneLekova = oceneLekova;
+	}
+
+	public Set<Apoteka> getApoteke() {
+		return apoteke;
+	}
+
+	public void setApoteke(Set<Apoteka> apoteke) {
+		this.apoteke = apoteke;
 	}
 
 	

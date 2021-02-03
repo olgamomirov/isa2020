@@ -1,5 +1,7 @@
 package tim73.isa_2020.service;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +29,13 @@ public class DermatologServiceImpl implements DermatologService {
 	public void save(Dermatolog dermatolog) {
 		dermatologRepository.save(dermatolog);
 		
+	}
+
+
+
+	@Override
+	public List<Dermatolog> findByImeIPrezime(String ime, String prezime) {
+		return dermatologRepository.searchByImeLikeAndPrezimeLikeIgnoreCase(ime, prezime);
 	}
 
 }

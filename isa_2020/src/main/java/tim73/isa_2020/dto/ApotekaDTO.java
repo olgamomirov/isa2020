@@ -8,6 +8,9 @@ public class ApotekaDTO {
 	private String naziv;
 	private String grad;
 	private double ocena;
+	//za mape
+	private double lat;
+	private double lng;
 	
 	public ApotekaDTO (Apoteka apoteka) {
 		this(apoteka.getId(), apoteka.getNaziv(), apoteka.getGrad(), apoteka.getOcena());
@@ -17,12 +20,23 @@ public class ApotekaDTO {
 		this(apoteka.getId(), apoteka.getNaziv(), apoteka.getGrad(), ocena);
 	}
 	
+	
 	public ApotekaDTO(Long id, String naziv, String grad, double ocena) {
 		super();
 		this.id = id;
 		this.naziv = naziv;
 		this.grad = grad;
 		this.ocena=ocena;
+	}
+	
+	public ApotekaDTO(Long id, String naziv, String grad, double ocena,double lat, double lng) {
+		super();
+		this.id = id;
+		this.naziv = naziv;
+		this.grad = grad;
+		this.ocena=ocena;
+		this.lat=lat;
+		this.lng=lng;
 	}
 
 	public Long getId() {
@@ -83,6 +97,14 @@ public class ApotekaDTO {
 		if (Double.doubleToLongBits(ocena) != Double.doubleToLongBits(other.ocena))
 			return false;
 		return true;
+	}
+
+	public double getLat() {
+		return lat;
+	}
+
+	public double getLng() {
+		return lng;
 	}
 
 	
