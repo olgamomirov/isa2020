@@ -1,5 +1,6 @@
 package tim73.isa_2020.controller;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -10,10 +11,14 @@ import javax.mail.Multipart;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.mail.MailException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -22,12 +27,15 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import tim73.isa_2020.controller.KorisnikController.GodisnjiDermatolog;
+import tim73.isa_2020.dto.NarudzbenicaDTO;
+import tim73.isa_2020.dto.PonudaDTO;
 import tim73.isa_2020.model.AdministratorApoteke;
 import tim73.isa_2020.model.Apoteka;
 import tim73.isa_2020.model.Dermatolog;
 import tim73.isa_2020.model.Korisnik;
 import tim73.isa_2020.model.Lek;
 import tim73.isa_2020.model.Narudzbenica;
+import tim73.isa_2020.model.Ponuda;
 import tim73.isa_2020.model.SifrarnikLekova;
 import tim73.isa_2020.model.StavkaNarudzbenice;
 import tim73.isa_2020.model.ZahtevZaGodisnji;
@@ -68,6 +76,35 @@ public class NarudzbenicaController {
 	@Autowired
 	private SifrarnikLekovaService sifrarnikService;
 	
+	@GetMapping(value = "/sve") //narudzbenice iz apoteke u kojoj adminsitrator radi
+	@PreAuthorize("hasRole('ADMINISTRATOR')")
+	public ResponseEntity<List<NarudzbenicaDTO>> findAll(HttpServletRequest request) {
+		
+		 String token = tokenUtils.getToken(request);
+		 String username = this.tokenUtils.getUsernameFromToken(token);
+		 AdministratorApoteke admin = (AdministratorApoteke) this.userDetailsService.loadUserByUsername(username);
+		
+		List<Narudzbenica> narudzbenice= narudzbenicaService.findAll();
+		
+		List<Narudzbenica> narudzbeniceApoteke = new ArrayList<Narudzbenica>();
+		
+		for(Narudzbenica n: narudzbenice) {
+			if(n.getApoteka().getId().equals(admin.getApoteka().getId())) {
+				
+				narudzbeniceApoteke.add(n);
+			}
+			
+		}
+		
+        List<NarudzbenicaDTO> narudzbeniceDTO= new ArrayList<>();
+		
+		for(Narudzbenica n: narudzbeniceApoteke) {
+			narudzbeniceDTO.add(new NarudzbenicaDTO(n));
+		}	
+		
+		return new ResponseEntity<List<NarudzbenicaDTO>>(narudzbeniceDTO, HttpStatus.OK);
+	}
+	
 	static class parovi{
 		
 		public String key;
@@ -92,7 +129,7 @@ public class NarudzbenicaController {
 			
 			 String rok = parovi.get(0).rok + ":00.000+01:00";
 			 
-			 Narudzbenica narudzbenica  = new Narudzbenica(rok, a);
+			 Narudzbenica narudzbenica  = new Narudzbenica(rok,"ceka ponude", a);
 			 
 			 
 		

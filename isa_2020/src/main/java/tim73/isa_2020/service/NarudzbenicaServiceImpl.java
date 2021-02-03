@@ -27,4 +27,16 @@ public class NarudzbenicaServiceImpl implements NarudzbenicaService{
 		return narudzbenicaRepository.findAll();
 	}
 
+	@Override
+	public Narudzbenica findOne(Long id) {
+		// TODO Auto-generated method stub
+		return narudzbenicaRepository.findById(id).orElse(null);
+	}
+
+	@Override
+	public List<Narudzbenica> proveraNarudzbenice() {
+		// TODO Auto-generated method stub
+		return narudzbenicaRepository.proveraDatumaDavanjaPonuda();
+	}
+
 }
