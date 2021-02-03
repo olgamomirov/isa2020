@@ -33,6 +33,9 @@ public class Lek {
 	@OneToMany(mappedBy = "lek")
 	private Set<StavkaNarudzbenice> stavkeNarudzbenice= new HashSet<StavkaNarudzbenice>();
 	
+	@OneToMany(mappedBy = "lek")
+	private Set<CenovnikStavka> cenovnikStavke= new HashSet<CenovnikStavka>();
+	
 	@OneToMany(mappedBy = "lek", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	private Set<Rezervacija> rezervacije = new HashSet<Rezervacija>();
 	
@@ -44,10 +47,7 @@ public class Lek {
 	@JoinColumn(name = "sifra_leka_id", referencedColumnName = "id")
 	private SifrarnikLekova sifrarnikLekova;
 	
-	@OneToMany(mappedBy = "lek", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-	private Set<Cenovnik> cenovnici = new HashSet<Cenovnik>();
 	
-
 	@OneToMany(mappedBy = "lek", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	private Set<UpitZaLek> upitiZaLek = new HashSet<UpitZaLek>();
 	
@@ -71,13 +71,6 @@ public class Lek {
 		this.sifrarnikLekova = sifrarnikLekova;
 	}
 
-	public Set<Cenovnik> getCenovnici() {
-		return cenovnici;
-	}
-
-	public void setCenovnici(Set<Cenovnik> cenovnici) {
-		this.cenovnici = cenovnici;
-	}
 
 	public int getKolicina() {
 		return kolicina;

@@ -1,7 +1,9 @@
 package tim73.isa_2020;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,14 +15,18 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 import tim73.isa_2020.model.Apoteka;
 import tim73.isa_2020.model.Dermatolog;
+import tim73.isa_2020.model.Narudzbenica;
 import tim73.isa_2020.model.Pacijent;
+import tim73.isa_2020.model.Ponuda;
 import tim73.isa_2020.model.Pregled;
 import tim73.isa_2020.model.RadnoVreme;
 import tim73.isa_2020.model.Rezervacija;
 import tim73.isa_2020.service.ApotekaService;
 import tim73.isa_2020.service.DermatologService;
 import tim73.isa_2020.service.FarmaceutService;
+import tim73.isa_2020.service.NarudzbenicaService;
 import tim73.isa_2020.service.PacijentService;
+import tim73.isa_2020.service.PonudaService;
 import tim73.isa_2020.service.PregledService;
 import tim73.isa_2020.service.RadnoVremeService;
 import tim73.isa_2020.service.RezervacijaService;
@@ -48,7 +54,10 @@ public class ScheduledTasks {
 	private DermatologService dermatologService;
 	
 	@Autowired
-	private FarmaceutService farmaceutService;
+	private NarudzbenicaService narudzbenicaService;
+	
+	@Autowired
+	private PonudaService ponudaService;
 
 	//@Scheduled(cron = "00 00 1 * ?") //u ponoc svakog prvog u mesecu
 	@Scheduled(fixedRate = 120000) // update na 2 min
@@ -153,5 +162,26 @@ public class ScheduledTasks {
 		
 		
 	
+	}
+	@Scheduled(fixedRate = 60000)
+	public void proberaNarudzbenice() {
+		Set<Ponuda> ponude = new HashSet<Ponuda>();
+		
+		for(Narudzbenica n: narudzbenicaService.proveraNarudzbenice()) { //lista narudzbenica sa statusom 'ceka ponude'
+			DateTime rok= new DateTime(n.getRokPonude());
+			
+				if((((rok.getMillis())-System.currentTimeMillis())<0)) {
+                   System.out.println(n.getPonude());
+					for(Ponuda p: n.getPonude()) {
+						p.setRokIstekao(true);
+						ponudaService.save(p);
+					}
+
+					
+				}		
+			
+		}
+		
+		
 	}
 }
