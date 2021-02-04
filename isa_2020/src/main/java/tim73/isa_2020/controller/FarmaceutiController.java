@@ -1,7 +1,9 @@
 package tim73.isa_2020.controller;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -39,6 +41,7 @@ import tim73.isa_2020.model.OcenaFarmaceut;
 import tim73.isa_2020.model.Pacijent;
 import tim73.isa_2020.model.Pregled;
 import tim73.isa_2020.model.RadnoVreme;
+import tim73.isa_2020.securityService.AuthorityService;
 import tim73.isa_2020.securityService.TokenUtils;
 import tim73.isa_2020.service.FarmaceutService;
 import tim73.isa_2020.service.KorisnikService;
@@ -73,6 +76,9 @@ public class FarmaceutiController {
 
 	@Autowired
 	private OcenaFarmaceutService ocenaFarmaceutService;
+	
+	@Autowired
+	private AuthorityService authorityService;
 
 	@RequestMapping(method = RequestMethod.POST, value = "/changeData", consumes = "application/json", produces = "application/json")
 	@PreAuthorize("hasRole('FARMACEUT')")
@@ -304,4 +310,43 @@ public class FarmaceutiController {
 		}
 		return new ResponseEntity<List<LekarDTO>>(farmaceutiDTO, HttpStatus.OK);
 	}
+	
+	//administrator apoteke zaposljava novog farmaceuta
+		@RequestMapping(value = "/registruj", method = RequestMethod.POST, consumes = "application/json")
+		@PreAuthorize("hasRole('ADMINISTRATOR')")
+		public void registruj(@RequestBody FarmaceutDTO korisnik, HttpServletRequest request) {
+			
+			String token = tokenUtils.getToken(request);
+			String username = this.tokenUtils.getUsernameFromToken(token);
+			AdministratorApoteke admin = (AdministratorApoteke) this.userDetailsService.loadUserByUsername(username);
+			
+			List<Authority> a=authorityService.findByname("ROLE_FARMACEUT");
+			Set<RadnoVreme> radnoVreme= new HashSet<RadnoVreme>();
+			
+			Farmaceut farmaceut= new Farmaceut();
+			farmaceut.setEmail(korisnik.getEmail());
+			farmaceut.setIme(korisnik.getIme());
+			farmaceut.setPrezime(korisnik.getPrezime());
+			farmaceut.setDrzava(korisnik.getDrzava());
+			farmaceut.setGrad(korisnik.getGrad());
+			farmaceut.setUlica(korisnik.getUlica());
+			farmaceut.setTelefon(korisnik.getTelefon());
+			farmaceut.setStatus("registrovan");
+			farmaceut.setEnabled(true);
+			farmaceut.setLozinka(passwordEncoder.encode("123"));
+			farmaceut.setAuthorities(a);
+			farmaceut.setApoteka(admin.getApoteka());
+			
+			for(String s:korisnik.getRadnoVreme()) {
+				String interval = s.split(",")[0] + ":00.000+01:00" + "/" +s.split(",")[1] + ":00.000+01:00";
+				RadnoVreme rv=new RadnoVreme(interval);
+				rv.setFarmaceut(farmaceut);
+				rv.setApoteka(admin.getApoteka());
+				radnoVreme.add(rv);
+			}
+			
+			farmaceut.setRadnoVreme(radnoVreme);
+			
+			korisnikService.save(farmaceut);
+		}
 }

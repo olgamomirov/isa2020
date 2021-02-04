@@ -160,6 +160,8 @@ public class KorisnikController {
 			} else if (a.getAuthority().equals("ROLE_ADMINISTRATOR")) {
 				AdministratorApoteke korisnik = (AdministratorApoteke) this.userDetailsService
 						.loadUserByUsername(username);
+				System.out.println("ispis iz getPodaci: "+korisnik.getDrzava()+" "+korisnik.getStatus());
+
 				korisnikDTO = new PacijentPodaciDTO(korisnik);
 				return ResponseEntity.ok(korisnikDTO);
 			}
@@ -426,7 +428,18 @@ public class KorisnikController {
 
 		return k.getIme();
 	}
+	@PutMapping(value = "/promenaStatusa")
+	@PreAuthorize("hasRole('ADMINISTRATOR')")
+	public ResponseEntity<String> promenaStatusa(@RequestBody String status, HttpServletRequest request) {
+		
+		String token = tokenUtils.getToken(request);
+		String username = this.tokenUtils.getUsernameFromToken(token);
+		Korisnik korisnik = (Korisnik) this.userDetailsService.loadUserByUsername(username);
+		korisnik.setStatus(status);
+		korisnikService.save(korisnik);
+		return new ResponseEntity<String>(korisnik.getStatus(), HttpStatus.OK);
 
+	}
 	@PutMapping(value = "/promenaLozinke", consumes = MediaType.APPLICATION_JSON_VALUE)
 	@PreAuthorize("hasRole('ADMINISTRATOR')")
 	public ResponseEntity<String> promenaLozinke(@RequestBody LozinkaDTO lozinka, HttpServletRequest request) {
@@ -444,24 +457,8 @@ public class KorisnikController {
 		}
 	}
 
-	static class Status {
-		public String statusNovi;
-		
-	}
-	@RequestMapping(value = "/change-status", method = RequestMethod.PUT, consumes = "application/json")
-	@PreAuthorize("hasRole('ADMINISTRATOR')")
-	public void changeStatus(@RequestBody Status status, HttpServletRequest request) {
-		// Ocitavamo trenutno ulogovanog korisnika
-		String token = tokenUtils.getToken(request);
-		String username = this.tokenUtils.getUsernameFromToken(token);
-		Korisnik user = (Korisnik) this.userDetailsService.loadUserByUsername(username);
-		
-		System.out.println(status.statusNovi + " sta cita?");
-		String status1 = status.statusNovi;
-		user.setStatus(status1);
-		korisnikService.save(user);
+	
+	
 
-		System.out.println(user.getStatus() + " kakooo" + user.getIme() + " " + user.getTelefon());
-	}
-
+	
 }

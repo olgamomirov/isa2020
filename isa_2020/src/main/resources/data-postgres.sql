@@ -9,7 +9,7 @@ insert into "public"."korisnik" ("id", "drzava", "email", "grad", "ime", "lozink
 insert into "public"."korisnik" ("id", "drzava", "email", "grad", "ime", "lozinka", "prezime", "telefon", "ulica", "enabled", "status") values(7, 'Srbija', 'jovanka@gmail.com', 'Novi Sad', 'Jovanka', '$2a$04$Vbug2lwwJGrvUXTj6z7ff.97IzVBkrJ1XfApfGNl.Z695zqcnPYra', 'Jovic', '555222', 'Sklj', true, 'registrovan')
 insert into "public"."dermatolog" ("id") values(7)
 
-
+  
 insert into "public"."apoteka" ("drzava", "grad", "naziv", "ocena", "ulica", "lat", "lng") values(null, 'Ruma', 'Neka', 5, null,45.006236, 19.831878)
 insert into "public"."apoteka" ("drzava", "grad", "naziv", "ocena", "ulica", "lat", "lng") values(null, 'Beograd', 'Nova', 4, null,44.773457, 20.489661)
 insert into "public"."administrator_apoteke" ("id", "apoteka_id") values(6, 2)
