@@ -459,7 +459,6 @@ public class KorisnikController {
 		System.out.println(status.statusNovi + " sta cita?");
 		String status1 = status.statusNovi;
 		user.setStatus(status1);
-		user.setIme("Olga");
 		korisnikService.save(user);
 
 		System.out.println(user.getStatus() + " kakooo" + user.getIme() + " " + user.getTelefon());
