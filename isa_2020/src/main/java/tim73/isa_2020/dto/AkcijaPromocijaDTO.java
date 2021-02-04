@@ -6,7 +6,7 @@ public class AkcijaPromocijaDTO {
 	private String akcijePromocije;
 	
 	private String odKadVazi;
-	
+	 
 	private String doKadVazi;
 	
 	private double procenat;
@@ -80,6 +80,6 @@ public class AkcijaPromocijaDTO {
 	public void setLekoviNaAkciji(List<String> lekoviNaAkciji) {
 		this.lekoviNaAkciji = lekoviNaAkciji;
 	}
-	
+	 
 	
 }
