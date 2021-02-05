@@ -71,9 +71,11 @@ public class Apoteka {
 	@OneToMany(mappedBy = "apoteka", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	private Set<AkcijaPromocija> akcijePromocije =new HashSet<AkcijaPromocija>();
   
-  @OneToMany(mappedBy = "apoteka", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "apoteka", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	private Set<Narudzbenica> narudzbenice = new HashSet<Narudzbenica>();
 
+    @OneToMany(mappedBy = "apoteka", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	private Set<Cenovnik> cenovnici = new HashSet<Cenovnik>();
 
 	
 	@ManyToMany
@@ -230,9 +232,7 @@ public class Apoteka {
 
 	public void setLng(double lng) {
 		this.lng = lng;
-	}
-	
-	
+	}	
 
 	public Set<Narudzbenica> getNarudzbenice() {
 		return narudzbenice;
@@ -240,6 +240,14 @@ public class Apoteka {
 
 	public void setNarudzbenice(Set<Narudzbenica> narudzbenice) {
 		this.narudzbenice = narudzbenice;
+	}
+
+  public Set<Cenovnik> getCenovnici() {
+		return cenovnici;
+	}
+
+	public void setCenovnici(Set<Cenovnik> cenovnici) {
+		this.cenovnici = cenovnici;
 	}
 
 	@Override
@@ -299,6 +307,9 @@ public class Apoteka {
 			return false;
 		return true;
 	}
+
+
+	
 
 	
 }

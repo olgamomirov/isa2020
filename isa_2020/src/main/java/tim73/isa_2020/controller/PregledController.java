@@ -23,6 +23,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.mail.MailException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,11 +36,13 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import net.bytebuddy.dynamic.DynamicType.Builder.FieldDefinition.Optional.Valuable;
+import tim73.isa_2020.controller.KorisnikController.Godisnji;
 import tim73.isa_2020.dto.ApotekaDTO;
 import tim73.isa_2020.dto.LekDTO;
 import tim73.isa_2020.dto.PregledDTO;
 import tim73.isa_2020.dto.PregledZaPacijentaDTO;
 import tim73.isa_2020.dto.RezervacijaPregledaKodFarmaceutaDTO;
+import tim73.isa_2020.model.AdministratorApoteke;
 import tim73.isa_2020.model.Apoteka;
 import tim73.isa_2020.model.Authority;
 import tim73.isa_2020.model.Dermatolog;
@@ -50,6 +53,7 @@ import tim73.isa_2020.model.Pacijent;
 import tim73.isa_2020.model.Pregled;
 import tim73.isa_2020.model.RadnoVreme;
 import tim73.isa_2020.model.TipPregleda;
+import tim73.isa_2020.model.ZahtevZaGodisnji;
 import tim73.isa_2020.securityService.TokenUtils;
 import tim73.isa_2020.service.ApotekaService;
 import tim73.isa_2020.service.DermatologService;
@@ -60,6 +64,7 @@ import tim73.isa_2020.service.KorisnikServiceImpl;
 import tim73.isa_2020.service.PacijentService;
 import tim73.isa_2020.service.PregledService;
 import tim73.isa_2020.service.TipPregledaService;
+import tim73.isa_2020.service.ZahtevZaGodisnjiService;
 
 @RestController
 @RequestMapping(value = "/pregledi")
@@ -95,6 +100,9 @@ public class PregledController {
 	
 	@Autowired
 	private TipPregledaService tipService;
+	
+	@Autowired
+	private ZahtevZaGodisnjiService godisnjiService;
 	
 	/*
 	@GetMapping(value = "/addPregled")
@@ -847,6 +855,91 @@ public class PregledController {
 			}
 			
 		return new ResponseEntity<PregledDTO>(dto,HttpStatus.OK);
+		
+
+	}
+	static class UnapredDefinisanPregled{
+		public Long id; //id lekara za kog se pregled definise
+		public String datumStart; //pocetak
+		public double cena;
+		public String tip;
+	}
+	
+	@PostMapping(value = "/definisiSlobodanTermin")
+	@PreAuthorize("hasRole('ADMINISTRATOR')")
+	public ResponseEntity<PregledDTO> definisiSlobodanTermin(@RequestBody UnapredDefinisanPregled p, HttpServletRequest request) throws MailException, InterruptedException{
+     
+		String token = tokenUtils.getToken(request);
+		String username = this.tokenUtils.getUsernameFromToken(token);
+		AdministratorApoteke k = (AdministratorApoteke) this.korisnikDetails.loadUserByUsername(username);
+		
+		
+		
+		Apoteka a = k.getApoteka();
+		
+		Interval interval = new Interval(p.datumStart + ":00.000+01:00" + "/" + p.datumStart + ":00.000+01:00");
+		DateTime end = interval.getEnd();
+		DateTime endNovi = end.plusMinutes(30); //pregledi traju pola sata
+		
+		Interval interval2 = new Interval(p.datumStart + "/" + endNovi);
+
+		boolean flag1 = false;
+		
+		boolean flag2 = false;
+		
+	    Pregled noviPregled = new Pregled(interval2.toString(), "default" , null, null);
+
+        Korisnik lekar = korisnikService.findById(p.id);
+        PregledDTO dto = null;
+		
+        			Dermatolog d = (Dermatolog) lekar;
+        			noviPregled.setDermatolog(d);
+       
+        			for(Pregled provera: d.getPregledi()) {
+        				Interval i = new Interval(provera.getInterval());
+        				if(i.overlaps(interval2)) {
+        					flag1=true;
+        					break;
+        				}
+        				}
+        			List<ZahtevZaGodisnji> godisnji = godisnjiService.findAll();
+        			
+        			for(ZahtevZaGodisnji g: godisnji) {
+        				Interval i = new Interval(g.getInterval());
+        				if(g.getDermatolog().equals(d)) {
+        					if(g.getStatus().equals("odobren")) {
+        						if(i.overlaps(interval2)) {
+        							flag2=true;
+        							break;
+        						}
+        					}
+        				}
+        				
+        			}
+        			 boolean flag3 = false;
+        		        for(RadnoVreme radnoVreme: d.getRadnoVreme()) {
+        		        	Interval i = new Interval(radnoVreme.getInterval());
+        		        	if(i.overlaps(interval2)){
+        		        	flag3 = true;
+        		        	break;
+        		        	}
+        		        }
+        			if((flag1==true)||(flag2==true)||(flag3==false)) {
+        				
+        				System.out.println("ne moze " + flag1 + " " + flag2 + " " + flag3);
+        				
+        			}if(flag3&&(flag1==false)&&(flag2==false)){
+        	TipPregleda t = new TipPregleda(p.tip, p.cena);
+        	tipService.save(t);
+        	noviPregled.setTip(t);
+        	noviPregled.setApoteka(a);
+        	pregledService.save(noviPregled);
+        
+            dto = new PregledDTO(noviPregled);
+            
+            
+        			}
+        			return new ResponseEntity<PregledDTO>(dto,HttpStatus.OK);
 		
 
 	}
