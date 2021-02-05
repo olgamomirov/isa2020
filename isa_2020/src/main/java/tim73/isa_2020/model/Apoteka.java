@@ -242,5 +242,63 @@ public class Apoteka {
 		this.narudzbenice = narudzbenice;
 	}
 
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((drzava == null) ? 0 : drzava.hashCode());
+		result = prime * result + ((grad == null) ? 0 : grad.hashCode());
+		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		long temp;
+		temp = Double.doubleToLongBits(lat);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(lng);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		result = prime * result + ((naziv == null) ? 0 : naziv.hashCode());
+		result = prime * result + ((ulica == null) ? 0 : ulica.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Apoteka other = (Apoteka) obj;
+		if (drzava == null) {
+			if (other.drzava != null)
+				return false;
+		} else if (!drzava.equals(other.drzava))
+			return false;
+		if (grad == null) {
+			if (other.grad != null)
+				return false;
+		} else if (!grad.equals(other.grad))
+			return false;
+		if (id == null) {
+			if (other.id != null)
+				return false;
+		} else if (!id.equals(other.id))
+			return false;
+		if (Double.doubleToLongBits(lat) != Double.doubleToLongBits(other.lat))
+			return false;
+		if (Double.doubleToLongBits(lng) != Double.doubleToLongBits(other.lng))
+			return false;
+		if (naziv == null) {
+			if (other.naziv != null)
+				return false;
+		} else if (!naziv.equals(other.naziv))
+			return false;
+		if (ulica == null) {
+			if (other.ulica != null)
+				return false;
+		} else if (!ulica.equals(other.ulica))
+			return false;
+		return true;
+	}
+
 	
 }

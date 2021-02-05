@@ -62,4 +62,16 @@ public class PregledServiceImpl implements PregledService{
 		return pregledRepository.proveraDatumaPregleda();
 	}
 
+
+	@Override
+	public List<Pregled> findByFarmaceutIdAndApotekaId(Long farmaceutId, Long apotekaId) {
+		return pregledRepository.findByFarmaceutIdAndApotekaId(farmaceutId, apotekaId);
+	}
+
+
+	@Override
+	public List<Pregled> findByDermatologIdAndApotekaId(Long dermatologId, Long apotekaId) {
+		return pregledRepository.findByDermatologIdAndApotekaId(dermatologId, apotekaId);
+	}
+
 }

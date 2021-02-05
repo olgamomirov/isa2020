@@ -52,6 +52,7 @@ import tim73.isa_2020.service.KorisnikService;
 import tim73.isa_2020.service.KorisnikServiceImpl;
 import tim73.isa_2020.service.OcenaFarmaceutService;
 import tim73.isa_2020.service.PregledService;
+import tim73.isa_2020.service.RadnoVremeService;
 
 @RestController
 @RequestMapping(value = "/farmaceuti")
@@ -85,6 +86,10 @@ public class FarmaceutiController {
 	
 	@Autowired
 	private AuthorityService authorityService;
+	
+	@Autowired
+	private RadnoVremeService radnoVremeService;
+
 
 	@RequestMapping(method = RequestMethod.POST, value = "/changeData", consumes = "application/json", produces = "application/json")
 	@PreAuthorize("hasRole('FARMACEUT')")
@@ -360,17 +365,26 @@ public class FarmaceutiController {
 		@PreAuthorize("hasRole('ADMINISTRATOR')")
 		public ResponseEntity<String> otpusti(@PathVariable Long id, HttpServletRequest request) {
 			System.out.println(id);
-			
-		
+			String token = tokenUtils.getToken(request);
+			String username = this.tokenUtils.getUsernameFromToken(token);
+			AdministratorApoteke admin = (AdministratorApoteke) this.userDetailsService.loadUserByUsername(username);
+		Apoteka apoteka=admin.getApoteka();
 		  Farmaceut f=farmaceutService.findOne(id); 
-		  if(!f.getPregledi().isEmpty()) {
-			  for (Pregled pregled: f.getPregledi()) {
+		  if(!pregledService.findByFarmaceutIdAndApotekaId(id, apoteka.getId()).isEmpty()) {
+			  for (Pregled pregled: pregledService.findByFarmaceutIdAndApotekaId(id, apoteka.getId())) {
 				  if(pregled.getStatus().equals("rezervisan")) {
 					  return ResponseEntity.badRequest().body("Farmaceut ima zakazane preglede");
 				  }
 			  }
 		  }
 		 f.setApoteka(null);
+		 
+		 for(RadnoVreme rv: radnoVremeService.findByFarmaceutIdAndApotekaId(id, apoteka.getId())) {
+			 f.getRadnoVreme().remove(rv);
+			 radnoVremeService.remove(rv);
+			 
+		 }
+		 
 		 korisnikService.save(f);
 		 return new ResponseEntity<String>("Farmaceut je otpusten!", HttpStatus.OK);
 			

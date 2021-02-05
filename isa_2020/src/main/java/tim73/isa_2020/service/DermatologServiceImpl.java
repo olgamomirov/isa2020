@@ -38,4 +38,11 @@ public class DermatologServiceImpl implements DermatologService {
 		return dermatologRepository.searchByImeLikeAndPrezimeLikeIgnoreCase(ime, prezime);
 	}
 
+
+
+	@Override
+	public List<Dermatolog> findAll() {
+		return dermatologRepository.findAll();
+	}
+
 }

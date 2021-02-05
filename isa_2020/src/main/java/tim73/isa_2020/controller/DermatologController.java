@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.joda.time.Interval;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
@@ -23,8 +24,11 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,10 +42,12 @@ import tim73.isa_2020.model.AdministratorApoteke;
 import tim73.isa_2020.model.Apoteka;
 import tim73.isa_2020.model.Authority;
 import tim73.isa_2020.model.Dermatolog;
+import tim73.isa_2020.model.Farmaceut;
 import tim73.isa_2020.model.Korisnik;
 import tim73.isa_2020.model.OcenaDermatolog;
 import tim73.isa_2020.model.Pacijent;
 import tim73.isa_2020.model.Pregled;
+import tim73.isa_2020.model.RadnoVreme;
 import tim73.isa_2020.model.UserTokenState;
 import tim73.isa_2020.repository.KorisnikRepository;
 import tim73.isa_2020.securityService.TokenUtils;
@@ -51,9 +57,12 @@ import tim73.isa_2020.service.KorisnikService;
 import tim73.isa_2020.service.KorisnikServiceImpl;
 import tim73.isa_2020.service.OcenaDermatologService;
 import tim73.isa_2020.service.PregledService;
+import tim73.isa_2020.service.RadnoVremeService;
 
 @RestController
 @RequestMapping(value = "/dermatolozi")
+@CrossOrigin(origins = "http://localhost:3000")
+
 public class DermatologController {
 
 	@Autowired
@@ -79,6 +88,9 @@ public class DermatologController {
 	
 	@Autowired
 	private ApotekaService apotekaService;
+	
+	@Autowired
+	private RadnoVremeService radnoVremeService;
 
 	@Bean
 	public PasswordEncoder encoder() {
@@ -292,5 +304,110 @@ public class DermatologController {
 		}
 		return new ResponseEntity<List<LekarDTO>>(dermatoloziDTO, HttpStatus.OK);
 	}
+	
+	@GetMapping(value = "/zaZaposlenje")
+	@PreAuthorize("hasRole('ADMINISTRATOR')")
+	public ResponseEntity<List<LekarDTO>> zaZaposlenje(HttpServletRequest request){
+		String token = tokenUtils.getToken(request);
+		String username = this.tokenUtils.getUsernameFromToken(token);
+		AdministratorApoteke admin = (AdministratorApoteke) this.userDetailsService.loadUserByUsername(username);
+		
+		List<LekarDTO>  dermatolozi = new ArrayList<LekarDTO>();
+		
+		for(Dermatolog dermatolog:dermatologService.findAll()) {
+			int brojApoteka=0;
+			String apotekeUKojimaRadi="";
+			double ocena=0;
+			double ocenaBroj = 0;
+			for (Apoteka a : dermatolog.getApoteke()) {
+				if (!a.equals(admin.getApoteka())) {
+					brojApoteka++;
+					apotekeUKojimaRadi += a.getNaziv() + ",";
+
+					if (!dermatolog.getOceneDermatologa().isEmpty()) {
+						for (OcenaDermatolog o : dermatolog.getOceneDermatologa()) {
+							ocena = +o.getVrednost();
+							ocenaBroj++;
+						}
+						ocena = ocena / ocenaBroj;
+					}
+				}
+
+			}
+			if (brojApoteka == dermatolog.getApoteke().size()) {
+				apotekeUKojimaRadi=apotekeUKojimaRadi.substring(0, apotekeUKojimaRadi.length()-1);
+				dermatolozi.add(new LekarDTO(dermatolog.getId(), dermatolog.getIme()+" "+dermatolog.getPrezime(), "dermatolog", ocena,apotekeUKojimaRadi));
+			
+			}
+		}
+		return new ResponseEntity<List<LekarDTO>>(dermatolozi, HttpStatus.OK);
+	}
+	
+	@PostMapping(value="/noviDermatolog/radnoVreme")
+	@PreAuthorize("hasRole('ADMINISTRATOR')")
+	public ResponseEntity<String> zaposli(@RequestParam("lekar") Long id,@RequestBody List<String> radnoVreme, HttpServletRequest request){
+		String token = tokenUtils.getToken(request);
+		String username = this.tokenUtils.getUsernameFromToken(token);
+		AdministratorApoteke admin = (AdministratorApoteke) this.userDetailsService.loadUserByUsername(username);
+		Apoteka apoteka=admin.getApoteka();
+		
+		System.out.println(id);
+		Dermatolog dermatolog=dermatologService.findById(id);
+		if(!dermatolog.getRadnoVreme().isEmpty()) {
+			for(RadnoVreme rv:dermatolog.getRadnoVreme()) {
+				for(String novoRV: radnoVreme) {
+					Interval rvI=new Interval(rv.getInterval());
+					Interval novoRVI=new Interval(novoRV.split(",")[0]+ ":00.000+01:00" + "/" +novoRV.split(",")[1] + ":00.000+01:00");
+					if(novoRVI.overlaps(rvI)) {
+						return new ResponseEntity<String>("radno vreme "+novoRVI.toString()+" se preklapa sa "+rvI.toString(), HttpStatus.BAD_REQUEST);
+					}
+				}
+			}
+		}
+		for(String rv:radnoVreme) {
+			RadnoVreme novoRV=new RadnoVreme(rv.split(",")[0]+ ":00.000+01:00" + "/" +rv.split(",")[1] + ":00.000+01:00");
+			novoRV.setApoteka(apoteka);
+			novoRV.setDermatolog(dermatolog);
+			dermatolog.getRadnoVreme().add(novoRV);
+		}
+		dermatolog.getApoteke().add(apoteka);
+		apoteka.getDermatolozi().add(dermatolog);
+		korisnikService.save(dermatolog);
+		return new ResponseEntity<String>("Uspesno ste zaposlili dermatologa", HttpStatus.OK);
+	}
+	
+	@PutMapping(value = "/otpusti/{id}")
+	@PreAuthorize("hasRole('ADMINISTRATOR')")
+	public ResponseEntity<String> otpusti(@PathVariable Long id, HttpServletRequest request) {
+		System.out.println(id);
+		String token = tokenUtils.getToken(request);
+		String username = this.tokenUtils.getUsernameFromToken(token);
+		AdministratorApoteke admin = (AdministratorApoteke) this.userDetailsService.loadUserByUsername(username);
+		Apoteka apoteka=admin.getApoteka();
+	
+	  Dermatolog d=dermatologService.findById(id); 
+	  if(!pregledService.findByDermatologIdAndApotekaId(d.getId(), apoteka.getId()).isEmpty()) {
+		  for (Pregled pregled:pregledService.findByDermatologIdAndApotekaId(d.getId(), apoteka.getId())) {
+			  if(pregled.getStatus().equals("rezervisan")) {
+				  return ResponseEntity.badRequest().body("Farmaceut ima zakazane preglede");
+			  }
+		  }
+	  }
+	 for(Apoteka a:d.getApoteke()) {
+		 if(a.equals(apoteka)) {
+			 d.getApoteke().remove(a);
+			 a.getDermatolozi().remove(d);
+		 }
+	 }
+	 for(RadnoVreme rv: radnoVremeService.findByDermatologIdAndApotekaId(id, apoteka.getId())) {
+		 d.getRadnoVreme().remove(rv);
+		 radnoVremeService.remove(rv);
+		 
+	 }
+	 korisnikService.save(d);
+	 return new ResponseEntity<String>("Farmaceut je otpusten!", HttpStatus.OK);
+		
+	}
+	
 }
 	
