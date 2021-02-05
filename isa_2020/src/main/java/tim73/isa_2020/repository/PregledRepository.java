@@ -22,4 +22,8 @@ public interface PregledRepository extends JpaRepository<Pregled, Long>{
 	
 	@Query("SELECT p FROM Pregled p WHERE p.status='rezervisan' or p.status='default'")
 	List<Pregled> proveraDatumaPregleda();
+	
+	List<Pregled> findByFarmaceutIdAndApotekaId(Long farmaceutId, Long apotekaId);
+	List<Pregled> findByDermatologIdAndApotekaId(Long dermatologId, Long apotekaId);
+
 }

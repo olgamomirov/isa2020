@@ -40,6 +40,8 @@ public class PacijentPodaciDTO {
 		this.telefon = telefon;
 		this.penali=penali;
 	}
+	
+	
 
 	public PacijentPodaciDTO(String email, String ime, String prezime, String ulica, String grad, String drzava,
 			String telefon) {
@@ -113,6 +115,8 @@ public class PacijentPodaciDTO {
 	public int getPenali() {
 		return penali;
 	}
+
+	
 	
 	
 	

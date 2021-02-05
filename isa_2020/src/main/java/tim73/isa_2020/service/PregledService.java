@@ -22,4 +22,8 @@ public interface PregledService {
 	List<Pregled> findByPacijentId (Long id);
 
 	List<Pregled> proveraPregleda();
+	
+	List<Pregled> findByFarmaceutIdAndApotekaId(Long farmaceutId, Long apotekaId);
+	
+	List<Pregled> findByDermatologIdAndApotekaId(Long dermatologId, Long apotekaId);
 }

@@ -275,8 +275,21 @@ System.out.println(apoteka.getLat());
 					slobodanFarmaceut++;
 				}
 			}
+			double ocena=0;
+			double brojOcena=0;
+			if (!apoteka.getOceneApoteke().isEmpty()) {
+				for (OcenaApoteka oa : apoteka.getOceneApoteke()) {
+
+					if (oa != null) {
+						ocena += oa.getVrednost();
+						brojOcena++;
+					}
+				}
+				ocena = ocena / brojOcena;
+			}
+			
 			if (slobodanFarmaceut > 0) {
-				apotekeSaSlobodnimFarmaceutom.add(new ApotekaDTO(apoteka));
+				apotekeSaSlobodnimFarmaceutom.add(new ApotekaDTO(apoteka,ocena));
 			}
 		}
 

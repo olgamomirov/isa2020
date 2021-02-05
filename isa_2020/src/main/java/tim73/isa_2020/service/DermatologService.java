@@ -12,4 +12,6 @@ public interface DermatologService {
 	void save(Dermatolog dermatolog);
 	
 	List<Dermatolog> findByImeIPrezime(String ime, String prezime);
+	
+	List<Dermatolog> findAll();
 }
