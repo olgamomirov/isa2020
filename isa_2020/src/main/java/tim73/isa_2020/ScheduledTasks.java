@@ -164,7 +164,7 @@ public class ScheduledTasks {
 	
 	}
 	@Scheduled(fixedRate = 60000)
-	public void proberaNarudzbenice() {
+	public void proveraNarudzbenice() {
 		Set<Ponuda> ponude = new HashSet<Ponuda>();
 		
 		for(Narudzbenica n: narudzbenicaService.proveraNarudzbenice()) { //lista narudzbenica sa statusom 'ceka ponude'

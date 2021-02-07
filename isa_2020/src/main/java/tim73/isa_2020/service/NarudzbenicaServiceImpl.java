@@ -39,4 +39,11 @@ public class NarudzbenicaServiceImpl implements NarudzbenicaService{
 		return narudzbenicaRepository.proveraDatumaDavanjaPonuda();
 	}
 
+	@Override
+	public void delete(Narudzbenica n) {
+		
+		narudzbenicaRepository.delete(n);
+		
+	}
+
 }

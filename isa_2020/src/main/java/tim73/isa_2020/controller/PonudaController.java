@@ -23,9 +23,11 @@ import tim73.isa_2020.controller.ZahteviZaGodisnjiController.ZahtevBody;
 import tim73.isa_2020.dto.PonudaDTO;
 import tim73.isa_2020.dto.PregledDTO;
 import tim73.isa_2020.dto.ZahtevZaGodisnjiDTO;
+import tim73.isa_2020.model.Lek;
 import tim73.isa_2020.model.Narudzbenica;
 import tim73.isa_2020.model.Ponuda;
 import tim73.isa_2020.model.Pregled;
+import tim73.isa_2020.model.StavkaNarudzbenice;
 import tim73.isa_2020.model.ZahtevZaGodisnji;
 import tim73.isa_2020.service.EmailService;
 import tim73.isa_2020.service.NarudzbenicaService;
@@ -75,9 +77,19 @@ public class PonudaController {
 		
 		ponudaService.save(ponuda);
 		
+		
 		PonudaDTO ponudaDTO = new PonudaDTO(ponuda);
 		
 		Narudzbenica narudzbenica = ponuda.getNarudzbenica();
+		
+		Set<StavkaNarudzbenice> stavke = narudzbenica.getStavkeNarudzbenice();
+		
+		List<Lek> lekovi = new ArrayList<Lek>();
+		
+		for(StavkaNarudzbenice s: stavke) {
+			s.getLek().setKolicina(s.getKolicina()+s.getLek().getKolicina());
+			
+		}
 		
 		narudzbenica.setStatus("obradjena");
 		

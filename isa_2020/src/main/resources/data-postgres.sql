@@ -34,8 +34,9 @@ insert into "public"."korisnik" ("id", "drzava", "email", "grad", "ime", "lozink
 --insert into "public"."pacijent" ("id", "penal") values(3,0)
 insert into "public"."korisnik" ("id", "drzava", "email", "grad", "ime", "lozinka", "prezime", "telefon", "ulica", "enabled", "status") values(8, 'Srbija', 'v@gmail.com', 'Nis', 'Miroslav', '$2a$04$Vbug2lwwJGrvUXTj6z7ff.97IzVBkrJ1XfApfGNl.Z695zqcnPYra', 'Bulic', '772559', 'Niska', true, 'registrovan')
 insert into "public"."korisnik" ("id", "drzava", "email", "grad", "ime", "lozinka", "prezime", "telefon", "ulica", "enabled", "status") values(9, 'Srbija', 'violetamarceta1995@gmail.com', 'Kragujevac', 'Dragana', '$2a$04$Vbug2lwwJGrvUXTj6z7ff.97IzVBkrJ1XfApfGNl.Z695zqcnPYra', 'Simic', '772559', 'Glavna', true, 'registrovan')
+insert into "public"."korisnik" ("id", "drzava", "email", "grad", "ime", "lozinka", "prezime", "telefon", "ulica", "enabled", "status") values(10, 'Srbija', 'olga@gmail.com', 'Novi Becej', 'Olga', '$2a$04$Vbug2lwwJGrvUXTj6z7ff.97IzVBkrJ1XfApfGNl.Z695zqcnPYra', 'Momirov', '882559', 'Glavna', true, 'registrovan')
 
-
+insert into "public"."administrator_apoteke" ("id", "apoteka_id") values(10, 2)
 
 insert into "public"."sifrarnik_lekova" ( "dodatne_napomene", "naziv", "oblik_leka", "proizvodjac", "recept", "sastav", "vrsta_leka") values( null, 'bromazepam', '', null, 'true', null, null)
 insert into "public"."sifrarnik_lekova" ( "dodatne_napomene", "naziv", "oblik_leka", "proizvodjac", "recept", "sastav", "vrsta_leka") values( null, 'fervex', null, null, 'false', null, null)
@@ -70,6 +71,8 @@ insert into "public"."korisnik_authority"  ("korisnik_id", "authority_id") value
 insert into "public"."korisnik_authority"  ("korisnik_id", "authority_id") values (7, 2)
 insert into "public"."korisnik_authority"  ("korisnik_id", "authority_id") values (8, 5)
 insert into "public"."korisnik_authority"  ("korisnik_id", "authority_id") values (9, 5)
+insert into "public"."korisnik_authority"  ("korisnik_id", "authority_id") values (10, 4)
+
 
 insert into "public"."tip_pregleda" ( "cena", "tip") values( 1000.0, 'pregled mladeza')
 insert into "public"."tip_pregleda" ( "cena", "tip") values( 500.0, 'kontrola')
@@ -110,10 +113,13 @@ insert into "public"."radno_vreme" ("interval", "apoteka_id", "dermatolog_id", "
 
 insert into "public"."radno_vreme" ("interval", "apoteka_id", "dermatolog_id", "farmaceut_id") values('2021-01-25T08:00:00.000+01:00/2021-09-25T15:00:00.000+01:00',2,null,4)
 
-insert into "public"."narudzbenica" ("rok_ponude", "status", "apoteka_id") values ('2021-02-02T14:00:00.000+01:00', 'ceka ponude', 2)
+insert into "public"."narudzbenica" ("rok_ponude", "status", "administrator_apoteke_id", "apoteka_id") values ('2021-02-02T14:00:00.000+01:00', 'ceka ponude', 6, 2)
 insert into "public"."stavka_narudzbenice" ("kolicina", "lek_id", "narudzbenica_id") values (25, 5, 1)
 insert into "public"."ponuda" ("rok_isporuke", "rok_istekao", "status", "ukupna_cena", "narudzbenica_id", "dobavljac_id") values ('2021-02-21T14:00:00.000+01:00', false, 'ceka na odgovor', 20500.00, 1, 8)
 insert into "public"."ponuda" ("rok_isporuke", "rok_istekao", "status", "ukupna_cena", "narudzbenica_id", "dobavljac_id") values ('2021-02-11T14:00:00.000+01:00', false, 'ceka na odgovor', 22000.00, 1, 9)
+
+insert into "public"."narudzbenica" ("rok_ponude", "status", "administrator_apoteke_id", "apoteka_id") values ('2021-02-02T14:00:00.000+01:00', 'ceka ponude', 6, 2)
+insert into "public"."stavka_narudzbenice" ("kolicina", "lek_id", "narudzbenica_id") values (10, 8, 2)
 
 insert into "public"."cenovnik" ("interval", "apoteka_id") values ('2021-01-01T20:18:00.000+01:00/2021-01-31T20:18:00.000+01:00', 2)
 insert into "public"."cenovnik_stavka" ("cena", "cenovnik_id", "lek_id") values (250.00, 1, 2)
