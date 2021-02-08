@@ -582,7 +582,7 @@ public class LekController {
 		
 		for(Lek l:apoteka.getLekovi()) {
 			if(l.getSifrarnikLekova().getNaziv().equals(lek.getNaziv())) {
-				l.setKolicina(l.getKolicina()+lek.getKolicina());
+				l.setKolicina(lek.getKolicina());
 				lekService.save(l);
 				return new ResponseEntity<String> ("Uspesno ste izmenili lek", HttpStatus.OK);
 

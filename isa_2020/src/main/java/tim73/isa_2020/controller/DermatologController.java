@@ -319,25 +319,40 @@ public class DermatologController {
 			String apotekeUKojimaRadi="";
 			double ocena=0;
 			double ocenaBroj = 0;
-			for (Apoteka a : dermatolog.getApoteke()) {
-				if (!a.equals(admin.getApoteka())) {
-					brojApoteka++;
-					apotekeUKojimaRadi += a.getNaziv() + ",";
-
-					if (!dermatolog.getOceneDermatologa().isEmpty()) {
-						for (OcenaDermatolog o : dermatolog.getOceneDermatologa()) {
-							ocena = +o.getVrednost();
-							ocenaBroj++;
-						}
-						ocena = ocena / ocenaBroj;
-					}
-				}
-
-			}
-			if (brojApoteka == dermatolog.getApoteke().size()) {
-				apotekeUKojimaRadi=apotekeUKojimaRadi.substring(0, apotekeUKojimaRadi.length()-1);
-				dermatolozi.add(new LekarDTO(dermatolog.getId(), dermatolog.getIme()+" "+dermatolog.getPrezime(), "dermatolog", ocena,apotekeUKojimaRadi));
 			
+			if(dermatolog.getApoteke().isEmpty()) {
+				if (!dermatolog.getOceneDermatologa().isEmpty()) {
+					for (OcenaDermatolog o : dermatolog.getOceneDermatologa()) {
+						ocena = +o.getVrednost();
+						ocenaBroj++;
+					}
+					ocena = ocena / ocenaBroj;
+				}
+				dermatolozi.add(new LekarDTO(dermatolog.getId(), dermatolog.getIme()+" "+dermatolog.getPrezime(), "dermatolog", ocena,apotekeUKojimaRadi));
+
+			} else {
+				for (Apoteka a : dermatolog.getApoteke()) {
+					if (!a.equals(admin.getApoteka())) {
+						brojApoteka++;
+						apotekeUKojimaRadi += a.getNaziv() + ",";
+
+						if (!dermatolog.getOceneDermatologa().isEmpty()) {
+							for (OcenaDermatolog o : dermatolog.getOceneDermatologa()) {
+								ocena = +o.getVrednost();
+								ocenaBroj++;
+							}
+							ocena = ocena / ocenaBroj;
+						}
+					}
+
+				}
+				if (brojApoteka == dermatolog.getApoteke().size()) {
+					apotekeUKojimaRadi = apotekeUKojimaRadi.substring(0, apotekeUKojimaRadi.length() - 1);
+					dermatolozi
+							.add(new LekarDTO(dermatolog.getId(), dermatolog.getIme() + " " + dermatolog.getPrezime(),
+									"dermatolog", ocena, apotekeUKojimaRadi));
+
+				}
 			}
 		}
 		return new ResponseEntity<List<LekarDTO>>(dermatolozi, HttpStatus.OK);
