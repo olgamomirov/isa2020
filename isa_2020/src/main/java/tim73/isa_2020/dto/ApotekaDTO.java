@@ -8,10 +8,19 @@ public class ApotekaDTO {
 	private String naziv;
 	private String grad;
 	private double ocena;
+	
+	private String drzava;
+	private String ulica;
 	//za mape
 	private double lat;
 	private double lng;
 	
+	
+	public ApotekaDTO() {
+		super();
+		
+	}
+
 	public ApotekaDTO (Apoteka apoteka) {
 		this(apoteka.getId(), apoteka.getNaziv(), apoteka.getGrad(), apoteka.getOcena());
 	}
@@ -21,6 +30,14 @@ public class ApotekaDTO {
 	}
 	
 	
+	public ApotekaDTO(String naziv, String grad, String drzava, String ulica) {
+		super();
+		this.naziv = naziv;
+		this.grad = grad;
+		this.drzava = drzava;
+		this.ulica = ulica;
+	}
+
 	public ApotekaDTO(Long id, String naziv, String grad, double ocena) {
 		super();
 		this.id = id;
@@ -107,9 +124,13 @@ public class ApotekaDTO {
 		return lng;
 	}
 
-	
+	public String getDrzava() {
+		return drzava;
+	}
 
-	
+	public String getUlica() {
+		return ulica;
+	}	
 	
 
 }

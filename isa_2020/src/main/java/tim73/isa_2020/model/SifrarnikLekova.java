@@ -58,7 +58,7 @@ public class SifrarnikLekova {
 
 	
 	public SifrarnikLekova(String naziv, String vrstaLeka, String oblikLeka, String sastav, String proizvodjac,
-			boolean recept, String dodatneNapomene, List<Long> sifreZamenskih) {
+			boolean recept, String dodatneNapomene) {
 		super();
 		this.naziv = naziv;
 		this.vrstaLeka = vrstaLeka;

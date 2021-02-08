@@ -28,8 +28,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import tim73.isa_2020.dto.ApotekaDTO;
+import tim73.isa_2020.dto.FarmaceutDTO;
 import tim73.isa_2020.dto.LekarDTO;
+import tim73.isa_2020.model.AdministratorSistema;
 import tim73.isa_2020.model.Apoteka;
+import tim73.isa_2020.model.Authority;
 import tim73.isa_2020.model.Dermatolog;
 import tim73.isa_2020.model.Farmaceut;
 import tim73.isa_2020.model.Korisnik;
@@ -373,6 +376,21 @@ System.out.println(apoteka.getLat());
 		System.out.println("usao");
 
 		return new ResponseEntity<List<String>>(nazivi, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/registruj", method = RequestMethod.POST, consumes = "application/json")
+	@PreAuthorize("hasRole('SISTEM')") //administrator sistema dodaje novog administratora sistema 
+	public void registruj(@RequestBody ApotekaDTO apoteka, HttpServletRequest request) {
+		
+		
+	
+		Apoteka a = new Apoteka();
+		a.setNaziv(apoteka.getNaziv());
+		a.setGrad(apoteka.getGrad());
+        a.setDrzava(apoteka.getDrzava());
+        a.setUlica(apoteka.getUlica());
+		
+		apotekaService.save(a);
 	}
 
 }

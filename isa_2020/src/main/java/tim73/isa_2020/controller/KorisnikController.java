@@ -35,6 +35,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import tim73.isa_2020.controller.DermatologController.PasswordChanger;
 import tim73.isa_2020.controller.DermatologController.StatusBody;
 import tim73.isa_2020.dto.ApotekaDTO;
 import tim73.isa_2020.dto.DermatologDTO;
@@ -44,6 +45,7 @@ import tim73.isa_2020.dto.LozinkaDTO;
 import tim73.isa_2020.dto.PacijentPodaciDTO;
 import tim73.isa_2020.dto.PregledDTO;
 import tim73.isa_2020.model.AdministratorApoteke;
+import tim73.isa_2020.model.AdministratorSistema;
 import tim73.isa_2020.model.Apoteka;
 import tim73.isa_2020.model.Authority;
 import tim73.isa_2020.model.Dermatolog;
@@ -458,7 +460,57 @@ public class KorisnikController {
 	}
 
 	
-	
+	static class StatusBody {
+		public String statusNovi;
+		
+	}
+	@RequestMapping(value = "/change-status", method = RequestMethod.POST)
+	@PreAuthorize("hasRole('SISTEM')")
+	public ResponseEntity<AdministratorSistema> changeStatus(@RequestBody StatusBody status, HttpServletRequest request) {
+		
+		String token = tokenUtils.getToken(request);
+		String username = this.tokenUtils.getUsernameFromToken(token);
+		AdministratorSistema user = (AdministratorSistema) this.userDetailsService.loadUserByUsername(username);
+		List<Authority> authority = (List<Authority>) user.getAuthorities();
+		
+		System.out.println(status.statusNovi  + " sta cita?");
+		String status1 = status.statusNovi;
+		user.setStatus(status1);
 
+		korisnikService.save(user);
 	
+		System.out.println(user.getStatus() + " kakooo" + user.getIme() + " " + user.getTelefon());
+		
+		
+     return new ResponseEntity<AdministratorSistema>(user, HttpStatus.OK); 
+	}
+	static class PasswordChanger {
+		public String oldPassword;
+		public String newPassword;
+	}
+
+	@RequestMapping(value = "/change-password", method = RequestMethod.POST)
+	@PreAuthorize("hasRole('SISTEM')")
+	public ResponseEntity<AdministratorSistema> changePassword(@RequestBody PasswordChanger passwordChanger,
+			HttpServletRequest request) {
+		
+		String token = tokenUtils.getToken(request);
+		String username = this.tokenUtils.getUsernameFromToken(token);
+		AdministratorSistema user = (AdministratorSistema) this.userDetailsService.loadUserByUsername(username);
+		;
+        user.setStatus("ulogovan");
+		
+
+		if (BCrypt.checkpw(passwordChanger.oldPassword, user.getLozinka())) {
+
+			user.setLozinka(passwordEncoder.encode(passwordChanger.newPassword));
+			korisnikService.save(user);
+			return new ResponseEntity<AdministratorSistema>(user, HttpStatus.OK);
+		} else {
+
+			return new ResponseEntity<AdministratorSistema>(user, HttpStatus.NOT_MODIFIED);
+		}
+
+	}
+
 }
