@@ -154,7 +154,7 @@ public class KorisnikController {
 
 				Pacijent korisnik = (Pacijent) this.userDetailsService.loadUserByUsername(username);
 				System.out.println(korisnik.getPenal());
-				korisnikDTO = new PacijentPodaciDTO(korisnik, korisnik.getPenal());
+				korisnikDTO = new PacijentPodaciDTO(korisnik, korisnik.getPenal(),korisnik.getLoyaltyProgram().getKategorijaKorisnika());
 				return ResponseEntity.ok(korisnikDTO);
 
 			} else if (a.getAuthority().equals("ROLE_ADMINISTRATOR")) {

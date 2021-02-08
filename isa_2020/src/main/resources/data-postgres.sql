@@ -37,22 +37,27 @@ insert into "public"."korisnik" ("id", "drzava", "email", "grad", "ime", "lozink
 
 
 
-insert into "public"."sifrarnik_lekova" ( "dodatne_napomene", "naziv", "oblik_leka", "proizvodjac", "recept", "sastav", "vrsta_leka") values( null, 'bromazepam', '', null, 'true', null, null)
-insert into "public"."sifrarnik_lekova" ( "dodatne_napomene", "naziv", "oblik_leka", "proizvodjac", "recept", "sastav", "vrsta_leka") values( null, 'fervex', null, null, 'false', null, null)
-insert into "public"."sifrarnik_lekova" ( "dodatne_napomene", "naziv", "oblik_leka", "proizvodjac", "recept", "sastav", "vrsta_leka") values( null, 'panadol', null, null, 'false', null, null)
-insert into "public"."sifrarnik_lekova" ( "dodatne_napomene", "naziv", "oblik_leka", "proizvodjac", "recept", "sastav", "vrsta_leka") values( null, 'febricet', null, null, 'false', null, null)
-insert into "public"."sifrarnik_lekova" ( "dodatne_napomene", "naziv", "oblik_leka", "proizvodjac", "recept", "sastav", "vrsta_leka") values( null, 'brufen', null, null, 'false', null, null)
+insert into "public"."sifrarnik_lekova" ( "dodatne_napomene", "naziv", "oblik_leka", "proizvodjac", "recept", "sastav", "vrsta_leka", "poeni") values( null, 'bromazepam', '', null, 'true', null, null, 1)
+insert into "public"."sifrarnik_lekova" ( "dodatne_napomene", "naziv", "oblik_leka", "proizvodjac", "recept", "sastav", "vrsta_leka", "poeni") values( null, 'fervex', null, null, 'false', null, null, 1)
+insert into "public"."sifrarnik_lekova" ( "dodatne_napomene", "naziv", "oblik_leka", "proizvodjac", "recept", "sastav", "vrsta_leka", "poeni") values( null, 'panadol', null, null, 'false', null, null, 1)
+insert into "public"."sifrarnik_lekova" ( "dodatne_napomene", "naziv", "oblik_leka", "proizvodjac", "recept", "sastav", "vrsta_leka", "poeni") values( null, 'febricet', null, null, 'false', null, null, 1)
+insert into "public"."sifrarnik_lekova" ( "dodatne_napomene", "naziv", "oblik_leka", "proizvodjac", "recept", "sastav", "vrsta_leka", "poeni") values( null, 'brufen', null, null, 'false', null, null, 1)
 
 
 
 insert into "public"."dobavljac" ("id") values(8)
 insert into "public"."dobavljac" ("id") values(9)
 
-insert into "public"."pacijent" ("id", "penal") values(5,0)
+
+insert into "public"."loyalty_program" ( "kategorija_korisnika", "popust", "prag_poena") values( 'regular', 0.0, 0)
+insert into "public"."loyalty_program" ( "kategorija_korisnika", "popust", "prag_poena") values( 'silver', 5.0, 7)
+
+
+insert into "public"."pacijent" ("id", "penal", "alergija_id", "poeni", "loyalty_program_id") values(5,0, null, 3,1)
 
 insert into "public"."alergije" ("id") values(1)
 insert into "public"."alergije_na_lek" ( "alergija_id","sifrarnik_leka_id") values(1,1)
-insert into "public"."pacijent" ("id","penal", "alergija_id") values(3,0,1)
+insert into "public"."pacijent" ("id","penal", "alergija_id", "poeni", "loyalty_program_id") values(3,0,1,5,1)
 
 
 
@@ -71,8 +76,8 @@ insert into "public"."korisnik_authority"  ("korisnik_id", "authority_id") value
 insert into "public"."korisnik_authority"  ("korisnik_id", "authority_id") values (8, 5)
 insert into "public"."korisnik_authority"  ("korisnik_id", "authority_id") values (9, 5)
 
-insert into "public"."tip_pregleda" ( "cena", "tip") values( 1000.0, 'pregled mladeza')
-insert into "public"."tip_pregleda" ( "cena", "tip") values( 500.0, 'kontrola')
+insert into "public"."tip_pregleda" ( "cena", "tip", "poeni") values( 1000.0, 'pregled mladeza', 2)
+insert into "public"."tip_pregleda" ( "cena", "tip", "poeni") values( 500.0, 'kontrola', 2)
 insert into "public"."pregled" ( "dijagnoza", "interval", "status", "terapija", "apoteka_id", "dermatolog_id", "farmaceut_id", "pacijent_id", "tip_id") values( 'zdravo', '2021-11-07T08:00:00.000+01:00/2021-11-07T15:00:00.000+01:00', 'rezervisan', 'nema', 2, 2, null, 3, 1)
 insert into "public"."pregled" ( "dijagnoza", "interval", "status", "terapija", "apoteka_id", "dermatolog_id", "farmaceut_id", "pacijent_id", "tip_id") values( 'kontrola', '2021-01-30T23:28:00.000+01:00/2021-01-30T23:55:00.000+01:00', 'rezervisan', 'nema', 2, 2, null, 3, 1)
 insert into "public"."pregled" ( "dijagnoza", "interval", "status", "terapija", "apoteka_id", "dermatolog_id", "farmaceut_id", "pacijent_id", "tip_id") values( null, '2021-01-30T23:28:00.000+01:00/2021-01-30T23:55:00.000+01:00', 'rezervisan', 'nema', 2, 2, null, 3, 1)
@@ -124,5 +129,6 @@ insert into "public"."cenovnik" ("interval", "apoteka_id") values ('2021-02-01T2
 insert into "public"."cenovnik_stavka" ("cena", "cenovnik_id", "lek_id") values (250.00, 2, 2)
 insert into "public"."cenovnik_stavka" ("cena", "cenovnik_id", "lek_id") values (400.00, 2, 5)
 insert into "public"."cenovnik_stavka" ("cena", "cenovnik_id", "lek_id") values (300.00, 2, 8)
+
 
 

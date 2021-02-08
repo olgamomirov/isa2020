@@ -8,6 +8,7 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
@@ -18,6 +19,8 @@ public class Pacijent extends Korisnik{
 	private static final long serialVersionUID = 1L;
 	
 	private int penal = 0;
+	
+	private int poeni=0;
 
 	@OneToMany(mappedBy = "pacijent", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	private Set<Rezervacija> rezervacije = new HashSet<Rezervacija>();
@@ -47,6 +50,9 @@ public class Pacijent extends Korisnik{
 	
 	@ManyToMany(mappedBy = "pacijenti")
 	private Set<Apoteka> apoteke= new HashSet<Apoteka>();
+	
+	@ManyToOne
+	private LoyaltyProgram loyaltyProgram;
 	
 
 	public Pacijent() {
@@ -139,6 +145,22 @@ public class Pacijent extends Korisnik{
 
 	public void setApoteke(Set<Apoteka> apoteke) {
 		this.apoteke = apoteke;
+	}
+
+	public int getPoeni() {
+		return poeni;
+	}
+
+	public void setPoeni(int poeni) {
+		this.poeni = poeni;
+	}
+
+	public LoyaltyProgram getLoyaltyProgram() {
+		return loyaltyProgram;
+	}
+
+	public void setLoyaltyProgram(LoyaltyProgram loyaltyProgram) {
+		this.loyaltyProgram = loyaltyProgram;
 	}
 
 	

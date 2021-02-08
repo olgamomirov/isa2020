@@ -42,6 +42,7 @@ import tim73.isa_2020.model.CenovnikStavka;
 import tim73.isa_2020.model.Farmaceut;
 import tim73.isa_2020.model.Korisnik;
 import tim73.isa_2020.model.Lek;
+import tim73.isa_2020.model.LoyaltyProgram;
 import tim73.isa_2020.model.Pacijent;
 import tim73.isa_2020.model.Rezervacija;
 import tim73.isa_2020.model.SifrarnikLekova;
@@ -52,6 +53,7 @@ import tim73.isa_2020.service.EmailService;
 import tim73.isa_2020.service.KorisnikService;
 import tim73.isa_2020.service.KorisnikServiceImpl;
 import tim73.isa_2020.service.LekService;
+import tim73.isa_2020.service.LoyaltyProgramService;
 import tim73.isa_2020.service.PregledService;
 import tim73.isa_2020.service.RezervacijaService;
 import tim73.isa_2020.service.SifrarnikLekovaService;
@@ -84,11 +86,12 @@ public class RezervacijaController {
 	
 	@Autowired
 	private SifrarnikLekovaService sifrarnikSevice;
-  
-  @Autowired
+
+	@Autowired
 	private PregledService pregledService;
 
-	
+	@Autowired
+	private LoyaltyProgramService loyaltyProgramService;
 	
 	@GetMapping(value = "/setTime/{id}")
 	ResponseEntity <RezervacijaDTO>  setTime(@PathVariable Long id) {
@@ -165,6 +168,16 @@ public class RezervacijaController {
 		rezervacija.getLek().setKolicina(rezervacija.getLek().getKolicina()-1);
 		}
 		rezervacija.setStatus("preuzeto");
+		// dodavanje poena za loyalty program kada se preuzme lek
+		Pacijent p=rezervacija.getPacijent();
+		p.setPoeni(p.getPoeni()+rezervacija.getLek().getSifrarnikLekova().getPoeni());
+		for(LoyaltyProgram lp:loyaltyProgramService.findByOrderByPragPoenaDesc()) {
+			if(lp.getPragPoena()<=p.getPoeni()) {
+				p.setLoyaltyProgram(lp);
+				break;
+			}
+		}
+		korisnikService.save(p);
 		
 		rezervacijaService.save(rezervacija);
 		
@@ -266,12 +279,9 @@ public class RezervacijaController {
 				}
 			}
 			
-
-
-
-			
-			
-			
+			//dodatan popust za loyalty program
+			cena=cena*((100-p.getLoyaltyProgram().getPopust())/100);
+				
 			
 			rezervacije.add(new RezervacijaDTO(r,cena));
 		}
