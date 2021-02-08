@@ -76,17 +76,17 @@ public class SifrarnikLekovaController {
 	@PreAuthorize("hasRole('SISTEM')")
 	void dodavanjeNovogLeka(@RequestBody sifrarnik lek, HttpServletRequest request) throws ParseException, MailException, InterruptedException {
 
-		List<SifrarnikLekova> sviZamenski = sifrarnikLekovaService.findAll();
-		
+		SifrarnikLekova noviLek = new SifrarnikLekova(lek.naziv, lek.vrsta, lek.oblik, lek.sastav, lek.proizvodjac, lek.recept, lek.dodatneNapomene);
+
 		Set<SifrarnikLekova> zamenskiLekovi = new HashSet<SifrarnikLekova>();
 		
+		if(lek.zamenskiLekovi.size()>0) {
 		for(Long id: lek.zamenskiLekovi) {
 			zamenskiLekovi.add(sifrarnikLekovaService.getById(id));
 		}
 		
-		SifrarnikLekova noviLek = new SifrarnikLekova(lek.naziv, lek.vrsta, lek.oblik, lek.sastav, lek.proizvodjac, lek.recept, lek.dodatneNapomene);
 		noviLek.setZamenskiLekovi(zamenskiLekovi);
-		
+		}
 			sifrarnikLekovaService.save(noviLek);	
 		
 	}
