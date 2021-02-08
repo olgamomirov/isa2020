@@ -21,14 +21,15 @@ private Long id; //sifra
 	private String dodatneNapomene;
 
 	public SifrarnikLekovaDTO(SifrarnikLekova sifrarnik) {
-		this(sifrarnik.getNaziv(), sifrarnik.getVrstaLeka(), sifrarnik.getOblikLeka(), sifrarnik.getSastav(), sifrarnik.getProizvodjac(), sifrarnik.isRecept(), sifrarnik.getDodatneNapomene());
+		this(sifrarnik.getId(), sifrarnik.getNaziv(), sifrarnik.getVrstaLeka(), sifrarnik.getOblikLeka(), sifrarnik.getSastav(), sifrarnik.getProizvodjac(), sifrarnik.isRecept(), sifrarnik.getDodatneNapomene());
 		
 	}
 	
 	
-	public SifrarnikLekovaDTO(String naziv, String vrstaLeka, String oblikLeka, String sastav, String proizvodjac,
+	public SifrarnikLekovaDTO(Long id, String naziv, String vrstaLeka, String oblikLeka, String sastav, String proizvodjac,
 			boolean recept, String dodatneNapomene) {
 		super();
+		this.id = id;
 		this.naziv = naziv;
 		this.vrstaLeka = vrstaLeka;
 		this.oblikLeka = oblikLeka;

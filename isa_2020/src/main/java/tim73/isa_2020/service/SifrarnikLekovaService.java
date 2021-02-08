@@ -12,4 +12,6 @@ public interface SifrarnikLekovaService {
 	List<SifrarnikLekova> findAll();
 	
 	SifrarnikLekova findByNaziv(String naziv);
+	
+	void save(SifrarnikLekova sifrarnik);
 }

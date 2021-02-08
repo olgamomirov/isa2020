@@ -1,20 +1,30 @@
 package tim73.isa_2020.controller;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.MailException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import tim73.isa_2020.controller.LekController.Lek1;
 import tim73.isa_2020.dto.SifrarnikLekovaDTO;
+import tim73.isa_2020.model.Apoteka;
+import tim73.isa_2020.model.Lek;
+import tim73.isa_2020.model.Pregled;
 import tim73.isa_2020.model.SifrarnikLekova;
 import tim73.isa_2020.securityService.TokenUtils;
 import tim73.isa_2020.service.KorisnikServiceImpl;
@@ -40,7 +50,7 @@ public class SifrarnikLekovaController {
 	}
 	
 	@GetMapping(value="/sviLekovi")
-	@PreAuthorize("hasRole('ADMINISTRATOR')")
+	@PreAuthorize("hasRole('ADMINISTRATOR') or hasRole('SISTEM')")
 	public ResponseEntity<Set<SifrarnikLekovaDTO>> getSvi() {
 		
 		
@@ -50,6 +60,35 @@ public class SifrarnikLekovaController {
 		     sifreLista.add(new SifrarnikLekovaDTO(sifra));
 		}
 		return new ResponseEntity<Set<SifrarnikLekovaDTO>>(sifreLista,HttpStatus.OK);
+	}
+	
+	static class sifrarnik{
+		public String naziv;
+		public String vrsta;
+		public String oblik;
+		public String sastav;
+		public String proizvodjac;
+		public boolean recept;
+		public String dodatneNapomene;
+		public List<Long> zamenskiLekovi;
+	}
+	@RequestMapping(value = "/noviLek", method = RequestMethod.POST, produces = "application/json" ,  consumes = "application/json")
+	@PreAuthorize("hasRole('SISTEM')")
+	void dodavanjeNovogLeka(@RequestBody sifrarnik lek, HttpServletRequest request) throws ParseException, MailException, InterruptedException {
+
+		List<SifrarnikLekova> sviZamenski = sifrarnikLekovaService.findAll();
+		
+		Set<SifrarnikLekova> zamenskiLekovi = new HashSet<SifrarnikLekova>();
+		
+		for(Long id: lek.zamenskiLekovi) {
+			zamenskiLekovi.add(sifrarnikLekovaService.getById(id));
+		}
+		
+		SifrarnikLekova noviLek = new SifrarnikLekova(lek.naziv, lek.vrsta, lek.oblik, lek.sastav, lek.proizvodjac, lek.recept, lek.dodatneNapomene);
+		noviLek.setZamenskiLekovi(zamenskiLekovi);
+		
+			sifrarnikLekovaService.save(noviLek);	
+		
 	}
 	
 }

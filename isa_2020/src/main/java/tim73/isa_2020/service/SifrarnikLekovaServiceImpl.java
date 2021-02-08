@@ -30,4 +30,11 @@ public class SifrarnikLekovaServiceImpl implements SifrarnikLekovaService {
 		return sifrarnikLekovaRepository.searchByNazivLikeIgnoreCase(naziv);
 	}
 
+	@Override
+	public void save(SifrarnikLekova sifrarnik) {
+		
+		sifrarnikLekovaRepository.save(sifrarnik);
+		
+	}
+
 }
