@@ -121,7 +121,7 @@ public class RezervacijaController {
 		RezervacijaDTO rezervacijaDTO = null;
 		
 		if(rezervacija!=null) {
-			if(f.getApoteka().equals(rezervacija.getLek().getApoteka())) {
+			if(f.getApoteka().equals(rezervacija.getApoteka())) {
 				if(rezervacija.getStatus().equals("izdavanje")) {
 					DateTime datumPreuzimanja= new DateTime (rezervacija.getDatumPreuzimanja());
 				System.out.println(datumPreuzimanja.getMillis());
@@ -170,7 +170,7 @@ public class RezervacijaController {
 		
 		
 		mailService.sendSimpleMessage(pacijent.getEmail(), "Potvrda", "Uspesno ste pruzeli lek: "
-				+ rezervacija.getLek().getSifrarnikLekova().getNaziv() + " u apoteci: " + rezervacija.getLek().getApoteka().getNaziv());
+				+ rezervacija.getLek().getSifrarnikLekova().getNaziv() + " u apoteci: " + rezervacija.getApoteka().getNaziv());
 				
 		return new ResponseEntity<RezervacijaDTO>(rezervacijaDTO, HttpStatus.OK);
 	}
@@ -216,7 +216,7 @@ public class RezervacijaController {
 
 		Lek lek = lekService.findBySifrarnikLekovaIdAndApotekaId(sl.getId(), novaRezervacija.apoteka);
 
-		Rezervacija rezervacija = new Rezervacija(novaRezervacija.vreme + ":00.000+01:00", "izdavanje", lek, p);
+		Rezervacija rezervacija = new Rezervacija(novaRezervacija.vreme + ":00.000+01:00", "izdavanje", lek, p, lek.getApoteka());
 		rezervacijaService.save(rezervacija);
 		mailService.sendSimpleMessage(p.getEmail(), "REZERVACIJA LEKA", "Uspesno ste rezervisali lek: "
 				+ novaRezervacija.nazivLeka + ". Vas jedinstveni broj rezervacije je: " + rezervacija.getId() + ".");
@@ -266,7 +266,7 @@ public class RezervacijaController {
 		}
 		
 		
-		Rezervacija rezervisi = new Rezervacija(rezervacija.datumPreuzimanja + ":00.000+01:00", "izdavanje" , lek, p);
+		Rezervacija rezervisi = new Rezervacija(rezervacija.datumPreuzimanja + ":00.000+01:00", "izdavanje" , lek, p, lek.getApoteka());
 		rezervacijaService.save(rezervisi);
 		
 		RezervacijaDTO rezervacijaDTO = new RezervacijaDTO(rezervisi);

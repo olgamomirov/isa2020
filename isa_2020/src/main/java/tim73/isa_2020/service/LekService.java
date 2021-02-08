@@ -18,4 +18,5 @@ public interface LekService {
 
 	Lek findBySifrarnikLekovaIdAndApotekaId(Long sifrarnikId, Long apotekaId);
 	
+	Lek findById(Long id);
 }

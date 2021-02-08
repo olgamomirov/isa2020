@@ -2,6 +2,7 @@ package tim73.isa_2020.service;
 
 import java.util.List;
 
+import tim73.isa_2020.model.Lek;
 import tim73.isa_2020.model.Rezervacija;
 
 public interface RezervacijaService {
@@ -15,4 +16,6 @@ public interface RezervacijaService {
 	void save(Rezervacija rezervacija);
 	
 	List<Rezervacija> izdavanjeRezervacije();
+	
+	List<Rezervacija> findByStatusAndLekId(String status,Long lekId);
 }
