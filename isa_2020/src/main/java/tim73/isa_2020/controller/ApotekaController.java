@@ -307,7 +307,7 @@ System.out.println(apoteka.getLat());
 		SifrarnikLekova sl = sifrarnikService.findByNaziv(nazivLeka);
 
 		for (Lek lek : lekService.findBySifrarnikLekova(sl.getId())) {
-			if (lek.getKolicina() > 0) {
+			if (lek.getKolicina() > 0 && lek.getApoteka()!=null) {
 				double ocena = 0;
 				double brojOcena = 0;
 				for (OcenaApoteka oa : lek.getApoteka().getOceneApoteke()) {

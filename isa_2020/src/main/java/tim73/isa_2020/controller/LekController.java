@@ -10,6 +10,8 @@ import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.joda.time.DateTime;
+import org.joda.time.Interval;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -37,6 +39,8 @@ import tim73.isa_2020.dto.SifrarnikLekovaDTO;
 import tim73.isa_2020.model.AdministratorApoteke;
 import tim73.isa_2020.model.Alergije;
 import tim73.isa_2020.model.Apoteka;
+import tim73.isa_2020.model.Cenovnik;
+import tim73.isa_2020.model.CenovnikStavka;
 import tim73.isa_2020.model.Dermatolog;
 import tim73.isa_2020.model.Korisnik;
 import tim73.isa_2020.model.Lek;
@@ -484,7 +488,12 @@ public class LekController {
 		List<LekDTO> lekovi = new ArrayList<LekDTO>();
 		Apoteka apoteka= admin.getApoteka();
 		
+		java.util.Date juDate = new Date();
+	    DateTime dt = new DateTime(juDate);
+		
+		
 		for(Lek l:apoteka.getLekovi()) {
+			double cena=0;
 			double ocena=0;
 			double brOcena=0;
 			if(!l.getSifrarnikLekova().getOceneLekova().isEmpty()) {
@@ -494,7 +503,19 @@ public class LekController {
 				}
 			}
 			ocena=ocena/brOcena;
-			lekovi.add(new LekDTO(l,ocena, l.getKolicina()));
+			
+			for(Cenovnik cenovnik:apoteka.getCenovnici()) {
+				Interval interval=new Interval(cenovnik.getInterval());
+				if (dt.isAfter(interval.getStart())&& dt.isBefore(interval.getEnd())) {
+					for(CenovnikStavka cs:cenovnik.getStavkeCenovnika()) {
+						if(cs.getLek().equals(l)) {
+							cena=cs.getCena();
+						}
+					}
+				}
+			}
+			
+			lekovi.add(new LekDTO(l,ocena, l.getKolicina(),cena));
 		}
 		
 		return new ResponseEntity<List<LekDTO>>(lekovi,HttpStatus.OK);

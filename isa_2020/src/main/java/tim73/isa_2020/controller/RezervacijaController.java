@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.websocket.server.PathParam;
 
 import org.joda.time.DateTime;
+import org.joda.time.Interval;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -34,13 +35,17 @@ import org.springframework.web.bind.annotation.RestController;
 import tim73.isa_2020.dto.ApotekaDTO;
 import tim73.isa_2020.dto.LekDTO;
 import tim73.isa_2020.dto.RezervacijaDTO;
+import tim73.isa_2020.model.AkcijaPromocija;
 import tim73.isa_2020.model.Apoteka;
+import tim73.isa_2020.model.Cenovnik;
+import tim73.isa_2020.model.CenovnikStavka;
 import tim73.isa_2020.model.Farmaceut;
 import tim73.isa_2020.model.Korisnik;
 import tim73.isa_2020.model.Lek;
 import tim73.isa_2020.model.Pacijent;
 import tim73.isa_2020.model.Rezervacija;
 import tim73.isa_2020.model.SifrarnikLekova;
+import tim73.isa_2020.model.StavkeAkcijePromocije;
 import tim73.isa_2020.securityService.TokenUtils;
 import tim73.isa_2020.service.ApotekaService;
 import tim73.isa_2020.service.EmailService;
@@ -232,9 +237,46 @@ public class RezervacijaController {
 		Pacijent p = (Pacijent) this.korisnikDetails.loadUserByUsername(username);
 		List<RezervacijaDTO> rezervacije=new ArrayList<RezervacijaDTO>();
 		
+		
 		for(Rezervacija r:rezervacijaService.findByPacijentId(p.getId())) {
-			rezervacije.add(new RezervacijaDTO(r));
+		    DateTime dt = new DateTime(r.getDatumPreuzimanja());
+
+			double cena=0;
+			Lek lek=r.getLek();
+			for(Cenovnik cenovnik:r.getApoteka().getCenovnici()) {
+				Interval interval=new Interval(cenovnik.getInterval());
+				if (dt.isAfter(interval.getStart())&& dt.isBefore(interval.getEnd())) {
+					for(CenovnikStavka cs:cenovnik.getStavkeCenovnika()) {
+						if(cs.getLek().equals(lek)) {
+							cena=cs.getCena();
+						}
+					}
+				}
+			}
+
+			for(AkcijaPromocija ap:r.getApoteka().getAkcijePromocije()) {
+				Interval interval=new Interval(ap.getVremeVazenja());
+
+				if (dt.isAfter(interval.getStart())&& dt.isBefore(interval.getEnd())) {
+					for(StavkeAkcijePromocije aps:ap.getStavke()) {
+						if(aps.getLek().equals(lek)) {
+							cena=cena*((100-ap.getProcenatAkcije())/100);
+						}
+					}
+				}
+			}
+			
+
+
+
+			
+			
+			
+			
+			rezervacije.add(new RezervacijaDTO(r,cena));
 		}
+		
+		
 		
 		
 		return new ResponseEntity<List<RezervacijaDTO>>(rezervacije, HttpStatus.OK);
