@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.joda.time.Interval;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +22,8 @@ import tim73.isa_2020.controller.KorisnikController.PenalBody;
 import tim73.isa_2020.dto.PacijentPodaciDTO;
 import tim73.isa_2020.dto.ZahtevZaGodisnjiDTO;
 import tim73.isa_2020.model.AdministratorApoteke;
+import tim73.isa_2020.model.Dermatolog;
+import tim73.isa_2020.model.Farmaceut;
 import tim73.isa_2020.model.Korisnik;
 import tim73.isa_2020.model.Pacijent;
 import tim73.isa_2020.model.Pregled;
@@ -29,6 +32,7 @@ import tim73.isa_2020.securityService.TokenUtils;
 import tim73.isa_2020.service.EmailService;
 import tim73.isa_2020.service.KorisnikService;
 import tim73.isa_2020.service.KorisnikServiceImpl;
+import tim73.isa_2020.service.PregledService;
 import tim73.isa_2020.service.ZahtevZaGodisnjiService;
 
 @RestController
@@ -52,6 +56,9 @@ public class ZahteviZaGodisnjiController {
 	
 	@Autowired
 	private EmailService mailService;
+	
+	@Autowired
+	private PregledService pregledService;
 	
 	@GetMapping("/getNeodobreniZahtevi")
 	@PreAuthorize("hasRole('ADMINISTRATOR')")
@@ -93,6 +100,45 @@ public class ZahteviZaGodisnjiController {
 	       
            zahtev1.setStatus("odobren");
 		   zahtevService.save(zahtev1);
+		   
+		   
+		   if(zahtev1.getDermatolog()==null) {
+			   Farmaceut f = (Farmaceut) korisnikService.findById(zahtev1.getFarmaceut().getId()); 
+			   for(Pregled p: f.getPregledi()) {
+				   if(p.getStatus().equals("rezervisan")) {
+					   Interval i = new Interval(p.getInterval());
+					   Interval godisnji = new Interval(zahtev1.getInterval());
+					   if(i.overlaps(godisnji)) {
+					   p.setStatus("default");
+					  
+					   p.setFarmaceut(null);
+					  
+					   mailService.sendSimpleMessage(p.getPacijent().getEmail(), "OTKAZIVANJE PREGLEDA ", "Vas pregled za termin "
+								+ p.getInterval() + " je otkazan jer je lekar tada na godisnjem odmoru.");
+					   p.setPacijent(null);
+					   pregledService.save(p);
+				   }
+			   }
+			   }
+		   }else {
+			  Dermatolog d = (Dermatolog) korisnikService.findById(zahtev1.getDermatolog().getId()); 
+			  for(Pregled p: d.getPregledi()) {
+				   if(p.getStatus().equals("rezervisan")) {
+					   Interval i = new Interval(p.getInterval());
+					   Interval godisnji = new Interval(zahtev1.getInterval());
+					   if(i.overlaps(godisnji)) {
+					   p.setStatus("default");
+					  
+					   p.setDermatolog(null);
+					  
+					   mailService.sendSimpleMessage(p.getPacijent().getEmail(), "OTKAZIVANJE PREGLEDA ", "Vas pregled za termin "
+								+ p.getInterval() + " je otkazan jer je lekar tada na godisnjem odmoru.");
+					   p.setPacijent(null);
+					   pregledService.save(p);
+				   }
+			   }
+			  }
+		   }
 		   
 		   mailService.sendSimpleMessage(zahtev.email, "Vas zahtev za godisnji odmor je odobren. ", "Od: "
 					+ zahtev1.getInterval() + "do: ");
