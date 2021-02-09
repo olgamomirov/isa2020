@@ -45,12 +45,12 @@ public class ZalbaController {
 		
 		for(Zalba z: zalbe) {
 			if(z.getFarmaceut()==null&&z.getDermatolog()==null) {
-			zalbeDTO.add(new ZalbaDTO(z.getId(), z.getTekstZalbe(), z.getPacijent().getIme(), z.getPacijent().getPrezime(), null, null, z.getApoteka().getNaziv()));
+			zalbeDTO.add(new ZalbaDTO(z.getId(), z.getTekstZalbe(), z.getStatus(), z.getPacijent().getIme(), z.getPacijent().getPrezime(), null, null, z.getApoteka().getNaziv()));
 			}else if(z.getFarmaceut()==null&&z.getApoteka()==null){
-				zalbeDTO.add(new ZalbaDTO(z.getId(), z.getTekstZalbe(), z.getPacijent().getIme(), z.getPacijent().getPrezime(), z.getDermatolog().getIme(), null, null));
+				zalbeDTO.add(new ZalbaDTO(z.getId(), z.getTekstZalbe(), z.getStatus(), z.getPacijent().getIme(), z.getPacijent().getPrezime(), z.getDermatolog().getIme(), null, null));
 
 			}else if(z.getDermatolog()==null&&z.getApoteka()==null){
-				zalbeDTO.add(new ZalbaDTO(z.getId(), z.getTekstZalbe(), z.getPacijent().getIme(), z.getPacijent().getPrezime(), null, z.getFarmaceut().getIme(), null));
+				zalbeDTO.add(new ZalbaDTO(z.getId(), z.getTekstZalbe(), z.getStatus(), z.getPacijent().getIme(), z.getPacijent().getPrezime(), null, z.getFarmaceut().getIme(), null));
 
 			}
 		}
@@ -67,6 +67,8 @@ public class ZalbaController {
 		public void oodbijZahtev(@RequestBody  OdgovorBody odgovor, HttpServletRequest request) throws MailException, InterruptedException {
 			
 	       Zalba zalba = zalbaService.findOne(odgovor.id);
+	       
+	       zalba.setStatus("odgovoreno");
 	       
 	       zalba.setOdgovor(odgovor.odgovorZaSlanje);
 	       
