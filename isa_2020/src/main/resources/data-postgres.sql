@@ -138,4 +138,4 @@ insert into "public"."cenovnik_stavka" ("cena", "cenovnik_id", "lek_id") values 
 insert into "public"."cenovnik_stavka" ("cena", "cenovnik_id", "lek_id") values (400.00, 2, 5)
 insert into "public"."cenovnik_stavka" ("cena", "cenovnik_id", "lek_id") values (300.00, 2, 8)
 
-insert into "public"."zalba" ("tekst_zalbe", "pacijent_id", "dermatolog_id") values ('kasnio je na pregled',5, 2)
+insert into "public"."zalba" ("tekst_zalbe", "status", "pacijent_id", "dermatolog_id") values ('kasnio je na pregled','ceka na odgovor', 5, 2)

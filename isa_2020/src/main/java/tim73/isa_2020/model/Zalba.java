@@ -19,6 +19,8 @@ public class Zalba {
 	
 	private String odgovor;
 	
+	private String status;
+	
 	@ManyToOne
 	private Korisnik pacijent;
 	
@@ -37,28 +39,31 @@ public class Zalba {
 		
 	}
 
-	public Zalba(String tekstZalbe, String odgovor, Korisnik pacijent, Apoteka apoteka) {
+	public Zalba(String tekstZalbe, String odgovor, String status, Korisnik pacijent, Apoteka apoteka) {
 		super();
 		this.tekstZalbe = tekstZalbe;
 		this.odgovor = odgovor;
+		this.status = status;
 		this.pacijent = pacijent;
 		this.apoteka = apoteka;
 	}
 
 
-	public Zalba(String tekstZalbe, String odgovor, Korisnik pacijent, Farmaceut farmaceut) {
+	public Zalba(String tekstZalbe, String odgovor , String status, Korisnik pacijent, Farmaceut farmaceut) {
 		super();
 		this.tekstZalbe = tekstZalbe;
 		this.odgovor = odgovor;
+		this.status = status;
 		this.pacijent = pacijent;
 		this.farmaceut = farmaceut;
 	}
 
 
-	public Zalba(String tekstZalbe, String odgovor, Korisnik pacijent, Dermatolog dermatolog) {
+	public Zalba(String tekstZalbe, String odgovor , String status, Korisnik pacijent, Dermatolog dermatolog) {
 		super();
 		this.tekstZalbe = tekstZalbe;
 		this.odgovor = odgovor;
+		this.status = status;
 		this.pacijent = pacijent;
 		this.dermatolog = dermatolog;
 	}
@@ -114,6 +119,14 @@ public class Zalba {
 
 	public void setOdgovor(String odgovor) {
 		this.odgovor = odgovor;
+	}
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
 	}
 
 }
