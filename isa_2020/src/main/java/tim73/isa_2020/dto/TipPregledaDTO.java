@@ -10,6 +10,12 @@ public class TipPregledaDTO {
 	
 	private double cena;
 	
+	
+	
+	public TipPregledaDTO() {
+		super();
+	}
+
 	public TipPregledaDTO(TipPregleda tip) {
 		this(tip.getId(), tip.getTip(), tip.getCena());
 	}

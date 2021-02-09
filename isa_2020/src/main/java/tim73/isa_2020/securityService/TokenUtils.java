@@ -18,7 +18,7 @@ import tim73.isa_2020.model.Korisnik;
 public class TokenUtils {
 
 	// Izdavac tokena
-	@Value("spring-security-example")
+	@Value("isa_2020")
 	private String APP_NAME;
 
 	// Tajna koju samo backend aplikacija treba da zna kako bi mogla da generise i proveri JWT https://jwt.io/
@@ -26,7 +26,7 @@ public class TokenUtils {
 	public String SECRET;
 
 	// Period vazenja
-	@Value("300000")
+	@Value("1800000")
 	private int EXPIRES_IN;
 
 	// Naziv headera kroz koji ce se prosledjivati JWT u komunikaciji server-klijent

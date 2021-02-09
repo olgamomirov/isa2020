@@ -19,4 +19,19 @@ public class LoyaltyProgramServiceImpl implements LoyaltyProgramService {
 		return loyaltyProgramRepository.findByOrderByPragPoenaDesc();
 	}
 
+	@Override
+	public void save(LoyaltyProgram lp) {
+		loyaltyProgramRepository.save(lp);
+	}
+
+	@Override
+	public LoyaltyProgram findById(Long id) {
+		return loyaltyProgramRepository.getOne(id);
+	}
+
+	@Override
+	public List<LoyaltyProgram> findAll() {
+		return loyaltyProgramRepository.findAll();
+	}
+
 }
