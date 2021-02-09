@@ -322,7 +322,9 @@ public class LekController {
 				}
 				
 			}
-			UpitZaLek upitZaSlanje = new UpitZaLek(lek, "nepregledan" , new Date());
+			DateTime danas = new DateTime();
+			String danasString  = danas.toString();
+			UpitZaLek upitZaSlanje = new UpitZaLek(lek, "nepregledan" , danasString);
 			upitService.save(upitZaSlanje);
 		}
 			

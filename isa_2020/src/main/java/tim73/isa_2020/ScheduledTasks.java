@@ -88,7 +88,7 @@ public class ScheduledTasks {
 		
 		for(Pregled p: pregledService.proveraPregleda()) {
 			DateTime vremePregleda= new DateTime(p.getInterval().split("/")[0]);
-			
+			System.out.println("jel radi ovo? :( " + vremePregleda);
 				if((((vremePregleda.getMillis()+600000)-System.currentTimeMillis())<0)) { //moze najkasnije 10 miinuta da zakasni sa zapocinjanjem pregleda
 
 

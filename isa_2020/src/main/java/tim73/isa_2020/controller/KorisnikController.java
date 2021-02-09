@@ -44,6 +44,8 @@ import tim73.isa_2020.dto.LekarDTO;
 import tim73.isa_2020.dto.LozinkaDTO;
 import tim73.isa_2020.dto.PacijentPodaciDTO;
 import tim73.isa_2020.dto.PregledDTO;
+import tim73.isa_2020.dto.UpitZaLekDTO;
+import tim73.isa_2020.dto.ZalbaDTO;
 import tim73.isa_2020.model.AdministratorApoteke;
 import tim73.isa_2020.model.AdministratorSistema;
 import tim73.isa_2020.model.Apoteka;
@@ -53,8 +55,10 @@ import tim73.isa_2020.model.Farmaceut;
 import tim73.isa_2020.model.Korisnik;
 import tim73.isa_2020.model.Pacijent;
 import tim73.isa_2020.model.Pregled;
+import tim73.isa_2020.model.UpitZaLek;
 import tim73.isa_2020.model.UserTokenState;
 import tim73.isa_2020.model.ZahtevZaGodisnji;
+import tim73.isa_2020.model.Zalba;
 import tim73.isa_2020.repository.PacijentRepository;
 import tim73.isa_2020.securityService.TokenUtils;
 import tim73.isa_2020.service.ApotekaService;
@@ -64,6 +68,7 @@ import tim73.isa_2020.service.KorisnikServiceImpl;
 import tim73.isa_2020.service.PacijentService;
 import tim73.isa_2020.service.PregledService;
 import tim73.isa_2020.service.ZahtevZaGodisnjiService;
+import tim73.isa_2020.service.ZalbaService;
 import tim73.isa_2020.token.JwtAuthenticationRequest;
 
 @RestController
@@ -100,6 +105,9 @@ public class KorisnikController {
 
 	@Autowired
 	private PasswordEncoder passwordEncoder;
+	
+	@Autowired
+	private ZalbaService zalbaService;
 
 	/*
 	 * @PostMapping(value = "/login", consumes=MediaType.APPLICATION_JSON_VALUE)
@@ -511,6 +519,35 @@ public class KorisnikController {
 			return new ResponseEntity<AdministratorSistema>(user, HttpStatus.NOT_MODIFIED);
 		}
 
+	}
+	@GetMapping(value = "/sveZalbe") //pacijent moze da vidi zalbe i odgovore na zalbe
+	@PreAuthorize("hasRole('PACIJENT')")
+	public ResponseEntity<List<ZalbaDTO>> dobaviOdgovoreNaZalbe(HttpServletRequest request) {
+		
+		 String token = tokenUtils.getToken(request);
+		 String username = this.tokenUtils.getUsernameFromToken(token);
+		 Pacijent pacijent = (Pacijent) this.userDetailsService.loadUserByUsername(username);
+		
+		 List<Zalba> zalbe = zalbaService.findAll();
+		
+		 List<ZalbaDTO> zalbeDTO = new ArrayList<ZalbaDTO>();
+		 
+		 for(Zalba z: zalbe) {
+			 if(z.getPacijent().getId().equals(pacijent.getId())) {
+				 if(z.getFarmaceut()==null&&z.getDermatolog()==null) {
+						zalbeDTO.add(new ZalbaDTO(z.getId(), z.getTekstZalbe(), z.getStatus(), z.getOdgovor(), z.getPacijent().getIme(), z.getPacijent().getPrezime(), null, null, z.getApoteka().getNaziv()));
+						}else if(z.getFarmaceut()==null&&z.getApoteka()==null){
+							zalbeDTO.add(new ZalbaDTO(z.getId(), z.getTekstZalbe(), z.getStatus(), z.getOdgovor(), z.getPacijent().getIme(), z.getPacijent().getPrezime(), z.getDermatolog().getIme(), null, null));
+
+						}else if(z.getDermatolog()==null&&z.getApoteka()==null){
+							zalbeDTO.add(new ZalbaDTO(z.getId(), z.getTekstZalbe(), z.getStatus(), z.getOdgovor(),  z.getPacijent().getIme(), z.getPacijent().getPrezime(), null, z.getFarmaceut().getIme(), null));
+
+						}
+			 }
+		 }
+		  
+		 
+		return new ResponseEntity<List<ZalbaDTO>>(zalbeDTO, HttpStatus.OK);
 	}
 
 }

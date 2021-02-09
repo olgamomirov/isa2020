@@ -10,6 +10,8 @@ public class ZalbaDTO {
 	
 	private String status;
 	
+	private String odgovor;
+	
 	private String dermatologIme;
 	
 	private String farmaceutIme;
@@ -26,14 +28,15 @@ public class ZalbaDTO {
 	}
 	
 	public ZalbaDTO(Zalba z) {
-		this(z.getId(), z.getTekstZalbe(), z.getStatus(), z.getPacijent().getIme(), z.getPacijent().getPrezime(), z.getDermatolog().getIme(), z.getFarmaceut().getIme(), z.getApoteka().getNaziv());
+		this(z.getId(), z.getTekstZalbe(), z.getStatus(), z.getOdgovor(), z.getPacijent().getIme(), z.getPacijent().getPrezime(), z.getDermatolog().getIme(), z.getFarmaceut().getIme(), z.getApoteka().getNaziv());
 	}
 
-	public ZalbaDTO(Long id, String tekstZalbe, String status, String ime, String prezime, String dermatologId, String farmaceutId, String apotekaId) {
+	public ZalbaDTO(Long id, String tekstZalbe, String status, String odgovor, String ime, String prezime, String dermatologId, String farmaceutId, String apotekaId) {
 		super();
 		this.id = id;
 		this.tekstZalbe = tekstZalbe;
 		this.status = status;
+		this.odgovor = odgovor;
 		this.imePacijenta = ime;
 		this.prezimePacijenta = prezime;
 		this.dermatologIme = dermatologId;
@@ -72,6 +75,14 @@ public class ZalbaDTO {
 
 	public String getStatus() {
 		return status;
+	}
+
+	public String getOdgovor() {
+		return odgovor;
+	}
+
+	public void setOdgovor(String odgovor) {
+		this.odgovor = odgovor;
 	}
 	
 }
