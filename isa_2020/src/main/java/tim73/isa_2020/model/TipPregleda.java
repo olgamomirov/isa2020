@@ -11,6 +11,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
 @Entity
@@ -30,6 +31,9 @@ public class TipPregleda {
 	@OneToMany(mappedBy = "tip", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	private Set<Pregled> pregledi= new HashSet<Pregled>();
 
+	@ManyToOne
+	private Apoteka apoteka;
+	
 	public TipPregleda() {
 		super();
 		// TODO Auto-generated constructor stub
@@ -75,6 +79,14 @@ public class TipPregleda {
 
 	public void setPoeni(int poeni) {
 		this.poeni = poeni;
+	}
+
+	public Apoteka getApoteka() {
+		return apoteka;
+	}
+
+	public void setApoteka(Apoteka apoteka) {
+		this.apoteka = apoteka;
 	}
 	
 

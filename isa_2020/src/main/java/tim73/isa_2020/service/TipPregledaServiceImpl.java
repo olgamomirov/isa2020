@@ -23,8 +23,17 @@ public class TipPregledaServiceImpl implements TipPregledaService{
 
 	@Override
 	public List<TipPregleda> findAll() {
-		// TODO Auto-generated method stub
 		return tipRepository.findAll();
+	}
+
+	@Override
+	public List<TipPregleda> findByTip(String tip) {
+		return tipRepository.findByTip(tip);
+	}
+
+	@Override
+	public TipPregleda findByTipAndApotekaId(String tip, Long idApoteke) {
+		return tipRepository.findByTipAndApotekaId(tip, idApoteke);
 	}
 
 }

@@ -9,4 +9,9 @@ public interface TipPregledaService {
 	void save(TipPregleda tip);
 	
 	List<TipPregleda> findAll();
+	
+	List<TipPregleda> findByTip(String tip);
+	
+	TipPregleda findByTipAndApotekaId (String tip, Long idApoteke);
+	
 }

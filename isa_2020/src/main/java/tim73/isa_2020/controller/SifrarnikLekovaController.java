@@ -70,6 +70,7 @@ public class SifrarnikLekovaController {
 		public String proizvodjac;
 		public boolean recept;
 		public String dodatneNapomene;
+		public int poeni;
 		public List<Long> zamenskiLekovi;
 	}
 	@RequestMapping(value = "/noviLek", method = RequestMethod.POST, produces = "application/json" ,  consumes = "application/json")
@@ -77,7 +78,7 @@ public class SifrarnikLekovaController {
 	void dodavanjeNovogLeka(@RequestBody sifrarnik lek, HttpServletRequest request) throws ParseException, MailException, InterruptedException {
 
 		SifrarnikLekova noviLek = new SifrarnikLekova(lek.naziv, lek.vrsta, lek.oblik, lek.sastav, lek.proizvodjac, lek.recept, lek.dodatneNapomene);
-
+		noviLek.setPoeni(lek.poeni);
 		Set<SifrarnikLekova> zamenskiLekovi = new HashSet<SifrarnikLekova>();
 		
 		if(lek.zamenskiLekovi.size()>0) {
