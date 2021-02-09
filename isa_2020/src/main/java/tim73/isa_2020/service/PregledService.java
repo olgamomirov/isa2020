@@ -26,4 +26,7 @@ public interface PregledService {
 	List<Pregled> findByFarmaceutIdAndApotekaId(Long farmaceutId, Long apotekaId);
 	
 	List<Pregled> findByDermatologIdAndApotekaId(Long dermatologId, Long apotekaId);
+	
+	void delete(List<Pregled> pregled);
+	
 }

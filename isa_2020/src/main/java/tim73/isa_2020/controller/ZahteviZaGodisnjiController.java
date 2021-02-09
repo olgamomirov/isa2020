@@ -46,9 +46,6 @@ public class ZahteviZaGodisnjiController {
 	private TokenUtils tokenUtils;
 
 	@Autowired
-	private AuthenticationManager authenticationManager;
-
-	@Autowired
 	private KorisnikServiceImpl userDetailsService;
 	
 	@Autowired
@@ -101,6 +98,7 @@ public class ZahteviZaGodisnjiController {
            zahtev1.setStatus("odobren");
 		   zahtevService.save(zahtev1);
 		   
+		   List<Pregled> preglediZaBrisanje = new ArrayList<Pregled>();
 		   
 		   if(zahtev1.getDermatolog()==null) {
 			   Farmaceut f = (Farmaceut) korisnikService.findById(zahtev1.getFarmaceut().getId()); 
@@ -109,13 +107,13 @@ public class ZahteviZaGodisnjiController {
 					   Interval i = new Interval(p.getInterval());
 					   Interval godisnji = new Interval(zahtev1.getInterval());
 					   if(i.overlaps(godisnji)) {
-					   p.setStatus("default");
-					  
-					   p.setFarmaceut(null);
-					  
+						   preglediZaBrisanje.add(p);
 					   mailService.sendSimpleMessage(p.getPacijent().getEmail(), "OTKAZIVANJE PREGLEDA ", "Vas pregled za termin "
 								+ p.getInterval() + " je otkazan jer je lekar tada na godisnjem odmoru.");
 					   p.setPacijent(null);
+					   p.setFarmaceut(null);
+					   p.setApoteka(null);
+					   p.setTip(null);
 					   pregledService.save(p);
 				   }
 			   }
@@ -127,19 +125,24 @@ public class ZahteviZaGodisnjiController {
 					   Interval i = new Interval(p.getInterval());
 					   Interval godisnji = new Interval(zahtev1.getInterval());
 					   if(i.overlaps(godisnji)) {
-					   p.setStatus("default");
-					  
-					   p.setDermatolog(null);
-					  
+					
+					  preglediZaBrisanje.add(p);
 					   mailService.sendSimpleMessage(p.getPacijent().getEmail(), "OTKAZIVANJE PREGLEDA ", "Vas pregled za termin "
 								+ p.getInterval() + " je otkazan jer je lekar tada na godisnjem odmoru.");
 					   p.setPacijent(null);
+					   p.setDermatolog(null);
+					   p.setApoteka(null);
+					   p.setTip(null);
 					   pregledService.save(p);
+					   
+					 
+					 
 				   }
 			   }
 			  }
+			  
 		   }
-		   
+		   pregledService.delete(preglediZaBrisanje);
 		   mailService.sendSimpleMessage(zahtev.email, "Vas zahtev za godisnji odmor je odobren. ", "Od: "
 					+ zahtev1.getInterval() + "do: ");
 		   
