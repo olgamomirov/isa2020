@@ -11,8 +11,7 @@ public class ApotekaDTO {
 	private String drzava;
 	private double ocena;
 	
-	private String drzava;
-	private String ulica;
+	
 	//za mape
 	private double lat;
 	private double lng;
@@ -192,22 +191,6 @@ public class ApotekaDTO {
 	}
 
 
-	public double getLat() {
-		return lat;
-	}
-
-	public double getLng() {
-		return lng;
-	}
-
-	public String getDrzava() {
-		return drzava;
-	}
-
-
-	public String getUlica() {
-		return ulica;
-	}	
 	
 
 }
