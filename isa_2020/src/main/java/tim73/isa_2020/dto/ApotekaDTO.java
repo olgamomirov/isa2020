@@ -17,6 +17,9 @@ public class ApotekaDTO {
 	private double lng;
 	
 	
+	private double cena;
+	private double cenaSaPopustom;
+	
 
 
 
@@ -35,6 +38,8 @@ public class ApotekaDTO {
 	public ApotekaDTO (Apoteka apoteka, double ocena) {
 		this(apoteka.getId(), apoteka.getNaziv(), apoteka.getGrad(), ocena);
 	}
+	
+	
 	
 
 	
@@ -155,6 +160,26 @@ public class ApotekaDTO {
 
 	public void setLng(double lng) {
 		this.lng = lng;
+	}
+
+
+	public double getCena() {
+		return cena;
+	}
+
+
+	public void setCena(double cena) {
+		this.cena = cena;
+	}
+
+
+	public double getCenaSaPopustom() {
+		return cenaSaPopustom;
+	}
+
+
+	public void setCenaSaPopustom(double cenaSaPopustom) {
+		this.cenaSaPopustom = cenaSaPopustom;
 	}
 
 
