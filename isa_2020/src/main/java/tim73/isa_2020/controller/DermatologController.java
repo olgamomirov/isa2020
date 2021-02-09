@@ -2,8 +2,10 @@ package tim73.isa_2020.controller;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -37,6 +39,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import tim73.isa_2020.dto.DermatologDTO;
+import tim73.isa_2020.dto.FarmaceutDTO;
 import tim73.isa_2020.dto.LekarDTO;
 import tim73.isa_2020.model.AdministratorApoteke;
 import tim73.isa_2020.model.Apoteka;
@@ -50,6 +53,7 @@ import tim73.isa_2020.model.Pregled;
 import tim73.isa_2020.model.RadnoVreme;
 import tim73.isa_2020.model.UserTokenState;
 import tim73.isa_2020.repository.KorisnikRepository;
+import tim73.isa_2020.securityService.AuthorityService;
 import tim73.isa_2020.securityService.TokenUtils;
 import tim73.isa_2020.service.ApotekaService;
 import tim73.isa_2020.service.DermatologService;
@@ -91,6 +95,9 @@ public class DermatologController {
 	
 	@Autowired
 	private RadnoVremeService radnoVremeService;
+	
+	@Autowired
+	private AuthorityService authorityService;
 
 	@Bean
 	public PasswordEncoder encoder() {
@@ -357,7 +364,6 @@ public class DermatologController {
 		}
 		return new ResponseEntity<List<LekarDTO>>(dermatolozi, HttpStatus.OK);
 	}
-	
 	@PostMapping(value="/noviDermatolog/radnoVreme")
 	@PreAuthorize("hasRole('ADMINISTRATOR')")
 	public ResponseEntity<String> zaposli(@RequestParam("lekar") Long id,@RequestBody List<String> radnoVreme, HttpServletRequest request){
@@ -423,6 +429,31 @@ public class DermatologController {
 	 return new ResponseEntity<String>("Farmaceut je otpusten!", HttpStatus.OK);
 		
 	}
+	
+	@RequestMapping(value = "/registruj", method = RequestMethod.POST, consumes = "application/json")
+	@PreAuthorize("hasRole('SISTEM')")
+	public void registruj(@RequestBody DermatologDTO korisnik, HttpServletRequest request) {
+		
+		List<Authority> a=authorityService.findByname("ROLE_DERMATOLOG");
+		
+		
+		Dermatolog dermatolog = new Dermatolog();
+		dermatolog.setEmail(korisnik.getEmail());
+		dermatolog.setIme(korisnik.getIme());
+		dermatolog.setPrezime(korisnik.getPrezime());
+		dermatolog.setDrzava(korisnik.getDrzava());
+		dermatolog.setGrad(korisnik.getGrad());
+		dermatolog.setUlica(korisnik.getUlica());
+		dermatolog.setTelefon(korisnik.getTelefon());
+		dermatolog.setStatus("registrovan");
+		dermatolog.setEnabled(true);
+		dermatolog.setLozinka(passwordEncoder.encode("123"));
+		dermatolog.setAuthorities(a);
+		
+		
+		korisnikService.save(dermatolog);
+	}
+	
 	
 }
 	

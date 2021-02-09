@@ -476,6 +476,7 @@ public class LekController {
 		
 		return new ResponseEntity<List<String>>(lekovi,HttpStatus.OK);
 	}
+
 	
 
 	@GetMapping(value = "/lekovi_Apoteke")
@@ -606,7 +607,6 @@ public class LekController {
 				l.setKolicina(lek.getKolicina());
 				lekService.save(l);
 				return new ResponseEntity<String> ("Uspesno ste izmenili lek", HttpStatus.OK);
-
 			}
 		}
 		return null;

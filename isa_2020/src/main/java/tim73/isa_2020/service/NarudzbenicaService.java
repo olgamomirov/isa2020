@@ -15,4 +15,6 @@ public interface NarudzbenicaService {
 	
 	List<Narudzbenica> proveraNarudzbenice();
 	
+	void delete(Narudzbenica n);
+	
 }

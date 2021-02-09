@@ -32,6 +32,9 @@ public class Narudzbenica {
 	@ManyToOne
 	private Apoteka apoteka;
 	
+	@ManyToOne
+	private AdministratorApoteke administratorApoteke;
+	
 	@OneToMany(mappedBy = "narudzbenica", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	private Set<StavkaNarudzbenice> stavkeNarudzbenice = new HashSet<StavkaNarudzbenice>();
 	
@@ -43,11 +46,12 @@ public class Narudzbenica {
 		
 	}
 
-	public Narudzbenica(String rokPonude, String status, Apoteka apoteka) {
+	public Narudzbenica(String rokPonude, String status, Apoteka apoteka, AdministratorApoteke admin) {
 		super();
 		this.rokPonude = rokPonude;
 		this.status = status;
 		this.apoteka = apoteka;
+		this.administratorApoteke = admin;
 	}
 
 	public Narudzbenica(String rokPonude, String status, Apoteka apoteka, Set<StavkaNarudzbenice> stavkeNarudzbenice) {
@@ -99,6 +103,14 @@ public class Narudzbenica {
 
 	public void setStatus(String status) {
 		this.status = status;
+	}
+
+	public AdministratorApoteke getAdministratorApoteke() {
+		return administratorApoteke;
+	}
+
+	public void setAdministratorApoteke(AdministratorApoteke administratorApoteke) {
+		this.administratorApoteke = administratorApoteke;
 	}
 	
 }
