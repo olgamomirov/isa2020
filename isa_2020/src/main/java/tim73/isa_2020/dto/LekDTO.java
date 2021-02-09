@@ -30,6 +30,10 @@ public class LekDTO {
 	
 	private double ocena;
 	
+	private int kolicina;
+	
+	private double cena;
+	
 	public LekDTO (Lek lek) {
 		this(lek.getId(), lek.getSifrarnikLekova().getNaziv(), lek.getSifrarnikLekova().getId(), lek.getApoteka().getId(), 
 				lek.getSifrarnikLekova().getVrstaLeka(), lek.getSifrarnikLekova().getOblikLeka(), lek.getSifrarnikLekova().getSastav(), 
@@ -43,6 +47,25 @@ public class LekDTO {
 		this(lek.getId(), lek.getSifrarnikLekova().getNaziv(), lek.getSifrarnikLekova().getId(), lek.getApoteka().getId(), 
 				lek.getSifrarnikLekova().getVrstaLeka(), lek.getSifrarnikLekova().getOblikLeka(), lek.getSifrarnikLekova().getSastav(), 
 				lek.getSifrarnikLekova().getProizvodjac(), lek.getSifrarnikLekova().getDodatneNapomene(), lek.getSifrarnikLekova().isRecept(),ocena
+				);
+					
+				
+	}
+	
+	public LekDTO (Lek lek,double ocena, int kolicina, double cena) {
+		this(lek.getId(), lek.getSifrarnikLekova().getNaziv(), lek.getSifrarnikLekova().getId(), lek.getApoteka().getId(), 
+				lek.getSifrarnikLekova().getVrstaLeka(), lek.getSifrarnikLekova().getOblikLeka(),
+				lek.getSifrarnikLekova().getSastav(), lek.getSifrarnikLekova().getProizvodjac(),
+				lek.getSifrarnikLekova().getDodatneNapomene(), lek.getSifrarnikLekova().isRecept(), ocena, kolicina,
+				cena);
+				
+	}
+	
+	public LekDTO (Lek lek,double ocena,double cena) {
+		this(lek.getId(), lek.getSifrarnikLekova().getNaziv(), lek.getSifrarnikLekova().getId(), lek.getApoteka().getId(), 
+				lek.getSifrarnikLekova().getVrstaLeka(), lek.getSifrarnikLekova().getOblikLeka(), lek.getSifrarnikLekova().getSastav(), 
+				lek.getSifrarnikLekova().getProizvodjac(), lek.getSifrarnikLekova().getDodatneNapomene(), lek.getSifrarnikLekova().isRecept(),ocena,
+				cena
 				);
 					
 				
@@ -102,6 +125,68 @@ public class LekDTO {
 
                   
 	}
+	
+	public LekDTO(Long id, String naziv, Long sifra, Long idApoteka, String vrstaLeka, String oblikLeka, String sastav, String proizvodjac,
+			String dodatneNapomene, boolean recept, double ocena, double cena) {
+
+          this.id = id;
+          
+          this.naziv = naziv;
+          
+          this.sifra = sifra;
+          
+          this.idApoteka = idApoteka;
+          
+          this.vrstaLeka = vrstaLeka;
+          
+          this.oblikLeka = oblikLeka;
+          
+          this.sastav = sastav;
+          
+          this.proizvodjac = proizvodjac;
+          
+          this.dodatneNapomene = dodatneNapomene;
+          
+          this.recept = recept;
+          
+          this.ocena=ocena;
+          
+          this.cena=cena;
+
+                  
+	}
+	
+	public LekDTO(Long id, String naziv, Long sifra, Long idApoteka, String vrstaLeka, String oblikLeka, String sastav, String proizvodjac,
+			String dodatneNapomene, boolean recept, double ocena, int kolicina, double cena) {
+
+          this.id = id;
+          
+          this.naziv = naziv;
+          
+          this.sifra = sifra;
+          
+          this.idApoteka = idApoteka;
+          
+          this.vrstaLeka = vrstaLeka;
+          
+          this.oblikLeka = oblikLeka;
+          
+          this.sastav = sastav;
+          
+          this.proizvodjac = proizvodjac;
+          
+          this.dodatneNapomene = dodatneNapomene;
+          
+          this.recept = recept;
+          
+          this.ocena=ocena;
+          
+          this.kolicina=kolicina;
+          
+          this.cena=cena;
+                  
+	}
+
 
 	public Long getId() {
 		return id;
@@ -145,6 +230,16 @@ public class LekDTO {
 
 	public double getOcena() {
 		return ocena;
+	}
+
+	
+	
+	public int getKolicina() {
+		return kolicina;
+	}
+
+	public double getCena() {
+		return cena;
 	}
 
 	@Override

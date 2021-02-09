@@ -13,13 +13,14 @@ public class PacijentPodaciDTO {
 	private String drzava;
 	private String telefon;
 	private int penali;
+	private String tipKorisnika;
 	
 	public PacijentPodaciDTO (Korisnik korisnik) {
 		this(korisnik.getEmail(), korisnik.getIme(), korisnik.getPrezime(), korisnik.getUlica(), korisnik.getGrad(), korisnik.getDrzava(), korisnik.getTelefon());
 	}
 	
-	public PacijentPodaciDTO (Korisnik korisnik, int penali) {
-		this(korisnik.getEmail(), korisnik.getIme(), korisnik.getPrezime(), korisnik.getUlica(), korisnik.getGrad(), korisnik.getDrzava(), korisnik.getTelefon(), penali);
+	public PacijentPodaciDTO (Korisnik korisnik, int penali, String tipKorisnika) {
+		this(korisnik.getEmail(), korisnik.getIme(), korisnik.getPrezime(), korisnik.getUlica(), korisnik.getGrad(), korisnik.getDrzava(), korisnik.getTelefon(), penali, tipKorisnika);
 	}
 	
 
@@ -29,7 +30,7 @@ public class PacijentPodaciDTO {
 
 
 	public PacijentPodaciDTO(String email, String ime, String prezime, String ulica, String grad, String drzava,
-			String telefon, int penali) {
+			String telefon, int penali, String tipKorisnika) {
 		super();
 		this.email = email;
 		this.ime = ime;
@@ -39,6 +40,7 @@ public class PacijentPodaciDTO {
 		this.drzava = drzava;
 		this.telefon = telefon;
 		this.penali=penali;
+		this.tipKorisnika=tipKorisnika;
 	}
 	
 	
@@ -114,6 +116,10 @@ public class PacijentPodaciDTO {
 
 	public int getPenali() {
 		return penali;
+	}
+
+	public String getTipKorisnika() {
+		return tipKorisnika;
 	}
 
 	

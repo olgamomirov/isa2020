@@ -7,6 +7,8 @@ public class ApotekaDTO {
 	private Long id;
 	private String naziv;
 	private String grad;
+	private String ulica;
+	private String drzava;
 	private double ocena;
 	
 	private String drzava;
@@ -16,19 +18,26 @@ public class ApotekaDTO {
 	private double lng;
 	
 	
+
+
+
+
 	public ApotekaDTO() {
 		super();
 		
 	}
 
+
 	public ApotekaDTO (Apoteka apoteka) {
 		this(apoteka.getId(), apoteka.getNaziv(), apoteka.getGrad(), apoteka.getOcena());
 	}
 
+	
 	public ApotekaDTO (Apoteka apoteka, double ocena) {
 		this(apoteka.getId(), apoteka.getNaziv(), apoteka.getGrad(), ocena);
 	}
 	
+
 	
 	public ApotekaDTO(String naziv, String grad, String drzava, String ulica) {
 		super();
@@ -37,6 +46,7 @@ public class ApotekaDTO {
 		this.drzava = drzava;
 		this.ulica = ulica;
 	}
+
 
 	public ApotekaDTO(Long id, String naziv, String grad, double ocena) {
 		super();
@@ -56,6 +66,21 @@ public class ApotekaDTO {
 		this.lng=lng;
 	}
 
+	
+	public ApotekaDTO(Long id, String naziv, String grad, String ulica, String drzava, double ocena, double lat,
+			double lng) {
+		super();
+		this.id = id;
+		this.naziv = naziv;
+		this.grad = grad;
+		this.ulica = ulica;
+		this.drzava = drzava;
+		this.ocena = ocena;
+		this.lat = lat;
+		this.lng = lng;
+	}
+
+
 	public Long getId() {
 		return id;
 	}
@@ -74,18 +99,75 @@ public class ApotekaDTO {
 		return ocena;
 	}
 
+
+	public double getLat() {
+		return lat;
+	}
+
+	public double getLng() {
+		return lng;
+	}
+
+
+	public String getUlica() {
+		return ulica;
+	}
+
+
+	public void setUlica(String ulica) {
+		this.ulica = ulica;
+	}
+
+
+	public String getDrzava() {
+		return drzava;
+	}
+
+
+	public void setDrzava(String drzava) {
+		this.drzava = drzava;
+	}
+
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+
+	public void setNaziv(String naziv) {
+		this.naziv = naziv;
+	}
+
+
+	public void setGrad(String grad) {
+		this.grad = grad;
+	}
+
+
+	public void setOcena(double ocena) {
+		this.ocena = ocena;
+	}
+
+
+	public void setLat(double lat) {
+		this.lat = lat;
+	}
+
+
+	public void setLng(double lng) {
+		this.lng = lng;
+	}
+
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((grad == null) ? 0 : grad.hashCode());
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		result = prime * result + ((naziv == null) ? 0 : naziv.hashCode());
-		long temp;
-		temp = Double.doubleToLongBits(ocena);
-		result = prime * result + (int) (temp ^ (temp >>> 32));
 		return result;
 	}
+
 
 	@Override
 	public boolean equals(Object obj) {
@@ -96,11 +178,6 @@ public class ApotekaDTO {
 		if (getClass() != obj.getClass())
 			return false;
 		ApotekaDTO other = (ApotekaDTO) obj;
-		if (grad == null) {
-			if (other.grad != null)
-				return false;
-		} else if (!grad.equals(other.grad))
-			return false;
 		if (id == null) {
 			if (other.id != null)
 				return false;
@@ -111,10 +188,9 @@ public class ApotekaDTO {
 				return false;
 		} else if (!naziv.equals(other.naziv))
 			return false;
-		if (Double.doubleToLongBits(ocena) != Double.doubleToLongBits(other.ocena))
-			return false;
 		return true;
 	}
+
 
 	public double getLat() {
 		return lat;
@@ -127,6 +203,7 @@ public class ApotekaDTO {
 	public String getDrzava() {
 		return drzava;
 	}
+
 
 	public String getUlica() {
 		return ulica;

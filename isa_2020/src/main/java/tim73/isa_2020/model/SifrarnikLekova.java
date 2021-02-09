@@ -39,6 +39,8 @@ public class SifrarnikLekova {
 	
 	private String dodatneNapomene;
 	
+	private int poeni=0;
+	
 	@ManyToMany
 	@JoinTable(name ="zamene_lekova", joinColumns = @JoinColumn(name="lek_id", referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name="zamena_id", referencedColumnName = "id"))
 	private Set<SifrarnikLekova> zamenskiLekovi;
@@ -174,6 +176,14 @@ public class SifrarnikLekova {
 
 	public void setOceneLekova(Set<OcenaSifrarnikLekova> oceneLekova) {
 		this.oceneLekova = oceneLekova;
+	}
+
+	public int getPoeni() {
+		return poeni;
+	}
+
+	public void setPoeni(int poeni) {
+		this.poeni = poeni;
 	}
 	
 	

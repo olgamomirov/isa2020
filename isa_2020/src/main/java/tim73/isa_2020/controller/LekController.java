@@ -10,6 +10,8 @@ import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.joda.time.DateTime;
+import org.joda.time.Interval;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,11 +33,14 @@ import tim73.isa_2020.controller.RezervacijaController.Body;
 import tim73.isa_2020.dto.ApotekaDTO;
 import tim73.isa_2020.dto.LekDTO;
 import tim73.isa_2020.dto.LekZaAlergijeDTO;
+import tim73.isa_2020.dto.NoviLekDTO;
 import tim73.isa_2020.dto.RezervacijaDTO;
 import tim73.isa_2020.dto.SifrarnikLekovaDTO;
 import tim73.isa_2020.model.AdministratorApoteke;
 import tim73.isa_2020.model.Alergije;
 import tim73.isa_2020.model.Apoteka;
+import tim73.isa_2020.model.Cenovnik;
+import tim73.isa_2020.model.CenovnikStavka;
 import tim73.isa_2020.model.Dermatolog;
 import tim73.isa_2020.model.Korisnik;
 import tim73.isa_2020.model.Lek;
@@ -87,6 +92,9 @@ public class LekController {
 	
 	@Autowired
 	private OcenaSifrarnikLekovaService ocenaSifrarnikLekovaService;
+	
+	@Autowired
+	private RezervacijaService rezervacijaService;
 	
 	@GetMapping(value = "/sviLekovi")
 	public ResponseEntity<List<LekDTO>> findAll() {
@@ -469,5 +477,138 @@ public class LekController {
 		return new ResponseEntity<List<String>>(lekovi,HttpStatus.OK);
 	}
 
+	
 
+	@GetMapping(value = "/lekovi_Apoteke")
+	@PreAuthorize("hasRole('ADMINISTRATOR')")
+	public ResponseEntity<List<LekDTO>> lekovi_Apoteke (HttpServletRequest request){
+		String token = tokenUtils.getToken(request);
+		String username = this.tokenUtils.getUsernameFromToken(token);
+		AdministratorApoteke admin = (AdministratorApoteke) this.userDetailsService.loadUserByUsername(username);
+		
+		List<LekDTO> lekovi = new ArrayList<LekDTO>();
+		Apoteka apoteka= admin.getApoteka();
+		
+		java.util.Date juDate = new Date();
+	    DateTime dt = new DateTime(juDate);
+		
+		
+		for(Lek l:apoteka.getLekovi()) {
+			double cena=0;
+			double ocena=0;
+			double brOcena=0;
+			if(!l.getSifrarnikLekova().getOceneLekova().isEmpty()) {
+				for(OcenaSifrarnikLekova ocenaLeka:l.getSifrarnikLekova().getOceneLekova()) {
+					ocena+=ocenaLeka.getVrednost();
+					brOcena++;
+				}
+			}
+			ocena=ocena/brOcena;
+			
+			for(Cenovnik cenovnik:apoteka.getCenovnici()) {
+				Interval interval=new Interval(cenovnik.getInterval());
+				if (dt.isAfter(interval.getStart())&& dt.isBefore(interval.getEnd())) {
+					for(CenovnikStavka cs:cenovnik.getStavkeCenovnika()) {
+						if(cs.getLek().equals(l)) {
+							cena=cs.getCena();
+						}
+					}
+				}
+			}
+			
+			lekovi.add(new LekDTO(l,ocena, l.getKolicina(),cena));
+		}
+		
+		return new ResponseEntity<List<LekDTO>>(lekovi,HttpStatus.OK);
+	}
+	
+	@PostMapping(value = "/brisanje/{id}")
+	@PreAuthorize("hasRole('ADMINISTRATOR')")
+	public ResponseEntity<String> brisanje (@PathVariable Long id,HttpServletRequest request){
+		String token = tokenUtils.getToken(request);
+		String username = this.tokenUtils.getUsernameFromToken(token);
+		AdministratorApoteke admin = (AdministratorApoteke) this.userDetailsService.loadUserByUsername(username);
+		Apoteka apoteka= admin.getApoteka();
+
+		Lek lek = lekService.findById(id);
+		
+		System.out.println(rezervacijaService.findByStatusAndLekId("izdavanje",lek.getId()).isEmpty());
+
+		
+		for(Rezervacija r:rezervacijaService.findByStatusAndLekId("izdavanje",lek.getId())) {
+			System.out.println(r.getStatus());
+		}
+		if ((rezervacijaService.findByStatusAndLekId("izdavanje",lek.getId()).isEmpty())) { //ako nema rezervacija koje su u statusu izdavanje
+			System.out.println("zasto si usao");
+			apoteka.getLekovi().remove(lek);
+			lek.setApoteka(null);
+			lekService.save(lek);
+			return new ResponseEntity<String>("Uspesno ste uklonili lek", HttpStatus.OK);
+		}
+		return new ResponseEntity<String>("Lek jos nije preuzet", HttpStatus.BAD_REQUEST);
+	}
+	
+	@GetMapping(value = "/lekoviZaDodavanje")
+	@PreAuthorize("hasRole('ADMINISTRATOR')")
+	public ResponseEntity<List<String>> lekoviZaDodavanje (HttpServletRequest request){
+	
+		List<String> lekovi= new ArrayList<String>();
+		
+		String token = tokenUtils.getToken(request);
+		String username = this.tokenUtils.getUsernameFromToken(token);
+		AdministratorApoteke admin = (AdministratorApoteke) this.userDetailsService.loadUserByUsername(username);
+		Apoteka apoteka= admin.getApoteka();
+
+		
+		for (SifrarnikLekova sl:sifrarnikLekovaService.findAll()) {
+			int br=0;
+			for(Lek lek:apoteka.getLekovi()) {
+				
+				if(!lek.getSifrarnikLekova().getNaziv().equals(sl.getNaziv())) {
+					br++;
+				}
+				
+			}
+			if(br==apoteka.getLekovi().size()) {
+				System.out.println(sl.getNaziv());
+				lekovi.add(sl.getNaziv());
+			}
+		}
+		return new ResponseEntity<List<String>>(lekovi, HttpStatus.OK);
+		
+	}
+	
+	@PostMapping(value = "/noviLek")
+	@PreAuthorize("hasRole('ADMINISTRATOR')")
+	public ResponseEntity<String> noviLek (@RequestBody NoviLekDTO noviLek,HttpServletRequest request){
+	
+		String token = tokenUtils.getToken(request);
+		String username = this.tokenUtils.getUsernameFromToken(token);
+		AdministratorApoteke admin = (AdministratorApoteke) this.userDetailsService.loadUserByUsername(username);
+		Apoteka apoteka= admin.getApoteka();
+		
+		Lek lek= new Lek(noviLek.getKolicina(), apoteka, sifrarnikLekovaService.findByNaziv(noviLek.getNaziv()));
+		apoteka.getLekovi().add(lek);
+		lekService.save(lek);
+		return new ResponseEntity<String> ("Uspesno ste dodali novi lek u apoteku", HttpStatus.OK);
+	}
+	
+	@PostMapping(value = "/promeniLek")
+	@PreAuthorize("hasRole('ADMINISTRATOR')")
+	public ResponseEntity<String> promeniLek (@RequestBody NoviLekDTO lek,HttpServletRequest request){
+	
+		String token = tokenUtils.getToken(request);
+		String username = this.tokenUtils.getUsernameFromToken(token);
+		AdministratorApoteke admin = (AdministratorApoteke) this.userDetailsService.loadUserByUsername(username);
+		Apoteka apoteka= admin.getApoteka();
+		
+		for(Lek l:apoteka.getLekovi()) {
+			if(l.getSifrarnikLekova().getNaziv().equals(lek.getNaziv())) {
+				l.setKolicina(lek.getKolicina());
+				lekService.save(l);
+				return new ResponseEntity<String> ("Uspesno ste izmenili lek", HttpStatus.OK);
+			}
+		}
+		return null;
+	}
 }

@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import tim73.isa_2020.model.Lek;
 import tim73.isa_2020.model.Rezervacija;
 import tim73.isa_2020.repository.RezervacijaRepository;
 
@@ -40,6 +41,11 @@ public class RezervacijaServiceImpl implements RezervacijaService{
 	@Override
 	public List<Rezervacija> izdavanjeRezervacije() {
 		return rezervacijaRepository.izdavanjeRezervacije();
+	}
+
+	@Override
+	public List<Rezervacija> findByStatusAndLekId(String status,Long lekId) {
+		return rezervacijaRepository.findByStatusAndLekId(status,lekId);
 	}
 
 }

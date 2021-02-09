@@ -29,18 +29,22 @@ public class Rezervacija {
 	
 	@ManyToOne
 	private Pacijent pacijent;
+	
+	@ManyToOne
+	private Apoteka apoteka;
 
 	public Rezervacija() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
 
-	public Rezervacija(String datumPreuzimanja, String status, Lek lek, Pacijent pacijent) {
+	public Rezervacija(String datumPreuzimanja, String status, Lek lek, Pacijent pacijent,Apoteka apoteka) {
 		super();
 		this.datumPreuzimanja = datumPreuzimanja;
 		this.status = status;
 		this.lek = lek;
 		this.pacijent = pacijent;
+		this.apoteka=apoteka;
 	}
 
 	public String getDatumPreuzimanja() {
@@ -78,5 +82,14 @@ public class Rezervacija {
 	public void setStatus(String status) {
 		this.status = status;
 	}
+
+	public Apoteka getApoteka() {
+		return apoteka;
+	}
+
+	public void setApoteka(Apoteka apoteka) {
+		this.apoteka = apoteka;
+	}
+	
 	
 }

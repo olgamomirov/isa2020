@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -30,7 +31,11 @@ import org.springframework.web.bind.annotation.RestController;
 import tim73.isa_2020.dto.ApotekaDTO;
 import tim73.isa_2020.dto.FarmaceutDTO;
 import tim73.isa_2020.dto.LekarDTO;
+
+import tim73.isa_2020.model.AdministratorApoteke;
+
 import tim73.isa_2020.model.AdministratorSistema;
+
 import tim73.isa_2020.model.Apoteka;
 import tim73.isa_2020.model.Authority;
 import tim73.isa_2020.model.Dermatolog;
@@ -56,7 +61,7 @@ import tim73.isa_2020.service.PregledService;
 import tim73.isa_2020.service.RezervacijaService;
 import tim73.isa_2020.service.SifrarnikLekovaService;
 
-//@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping(value = "/a")
 public class ApotekaController {
@@ -308,7 +313,7 @@ System.out.println(apoteka.getLat());
 		SifrarnikLekova sl = sifrarnikService.findByNaziv(nazivLeka);
 
 		for (Lek lek : lekService.findBySifrarnikLekova(sl.getId())) {
-			if (lek.getKolicina() > 0) {
+			if (lek.getKolicina() > 0 && lek.getApoteka()!=null) {
 				double ocena = 0;
 				double brojOcena = 0;
 				for (OcenaApoteka oa : lek.getApoteka().getOceneApoteke()) {
@@ -378,6 +383,55 @@ System.out.println(apoteka.getLat());
 		return new ResponseEntity<List<String>>(nazivi, HttpStatus.OK);
 	}
 	
+
+	@GetMapping(value = "/podaciApoteke")
+	@PreAuthorize("hasRole('ADMINISTRATOR')")
+	public ResponseEntity<ApotekaDTO> podaciApoteke(HttpServletRequest request) {
+		String token = tokenUtils.getToken(request);
+		String username = this.tokenUtils.getUsernameFromToken(token);
+		AdministratorApoteke admin = (AdministratorApoteke) this.userDetailsService.loadUserByUsername(username);
+
+		Apoteka apoteka = admin.getApoteka();
+
+		double ocena = 0;
+		double brOcena = 0;
+		if (!apoteka.getOceneApoteke().isEmpty()) {
+			for (OcenaApoteka oa : apoteka.getOceneApoteke()) {
+				ocena += oa.getVrednost();
+				brOcena++;
+			}
+			ocena = ocena / brOcena;
+		}
+
+		ApotekaDTO apotekaDTO = new ApotekaDTO(apoteka.getId(), apoteka.getNaziv(), apoteka.getGrad(),
+				apoteka.getUlica(), apoteka.getDrzava(), ocena, apoteka.getLat(), apoteka.getLng());
+		
+		return new ResponseEntity<ApotekaDTO>(apotekaDTO, HttpStatus.OK);
+	}
+	
+	@PutMapping(value="/promeniPodatke")
+	@PreAuthorize("hasRole('ADMINISTRATOR')")
+	public ResponseEntity<ApotekaDTO> promeniPodatke(@RequestBody ApotekaDTO apotekaDTO, HttpServletRequest request) {
+		String token = tokenUtils.getToken(request);
+		String username = this.tokenUtils.getUsernameFromToken(token);
+		AdministratorApoteke admin = (AdministratorApoteke) this.userDetailsService.loadUserByUsername(username);
+
+		Apoteka apoteka = admin.getApoteka();
+		apoteka.setNaziv(apotekaDTO.getNaziv());
+		apoteka.setDrzava(apotekaDTO.getDrzava());
+		apoteka.setGrad(apotekaDTO.getGrad());
+		apoteka.setUlica(apotekaDTO.getUlica());
+		apoteka.setLat(apotekaDTO.getLat());
+		apoteka.setLng(apotekaDTO.getLng());
+
+		apotekaService.save(apoteka);
+
+		return new ResponseEntity<ApotekaDTO>(apotekaDTO, HttpStatus.OK);
+
+
+	}
+
+
 	@RequestMapping(value = "/registruj", method = RequestMethod.POST, consumes = "application/json")
 	@PreAuthorize("hasRole('SISTEM')") //administrator sistema dodaje novog administratora sistema 
 	public void registruj(@RequestBody ApotekaDTO apoteka, HttpServletRequest request) {
@@ -392,5 +446,6 @@ System.out.println(apoteka.getLat());
 		
 		apotekaService.save(a);
 	}
+
 
 }
