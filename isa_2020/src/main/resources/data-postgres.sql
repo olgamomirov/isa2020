@@ -54,7 +54,12 @@ insert into "public"."sifrarnik_lekova" ( "dodatne_napomene", "naziv", "oblik_le
 insert into "public"."dobavljac" ("id") values(8)
 insert into "public"."dobavljac" ("id") values(9)
 
-insert into "public"."pacijent" ("id", "penal") values(5,0)
+insert into "public"."loyalty_program" ( "kategorija_korisnika", "popust", "prag_poena") values( 'regular', 0.0, 0)
+insert into "public"."loyalty_program" ( "kategorija_korisnika", "popust", "prag_poena") values( 'silver', 5.0, 7)
+
+
+insert into "public"."pacijent" ("id", "penal", "alergija_id", "poeni", "loyalty_program_id") values(5,0, null, 3,1)
+
 
 insert into "public"."alergije" ("id") values(1)
 insert into "public"."alergije_na_lek" ( "alergija_id","sifrarnik_leka_id") values(1,1)

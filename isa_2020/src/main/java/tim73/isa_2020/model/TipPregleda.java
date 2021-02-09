@@ -25,6 +25,8 @@ public class TipPregleda {
 	
 	private double cena = 0;
 	
+	private int poeni=0;
+	
 	@OneToMany(mappedBy = "tip", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
 	private Set<Pregled> pregledi= new HashSet<Pregled>();
 
@@ -65,6 +67,14 @@ public class TipPregleda {
 
 	public void setPregledi(Set<Pregled> pregledi) {
 		this.pregledi = pregledi;
+	}
+
+	public int getPoeni() {
+		return poeni;
+	}
+
+	public void setPoeni(int poeni) {
+		this.poeni = poeni;
 	}
 	
 

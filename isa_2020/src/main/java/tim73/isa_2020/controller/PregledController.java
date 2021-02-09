@@ -49,6 +49,7 @@ import tim73.isa_2020.model.Dermatolog;
 import tim73.isa_2020.model.Farmaceut;
 import tim73.isa_2020.model.Korisnik;
 import tim73.isa_2020.model.Lek;
+import tim73.isa_2020.model.LoyaltyProgram;
 import tim73.isa_2020.model.Pacijent;
 import tim73.isa_2020.model.Pregled;
 import tim73.isa_2020.model.RadnoVreme;
@@ -61,6 +62,7 @@ import tim73.isa_2020.service.EmailService;
 import tim73.isa_2020.service.FarmaceutService;
 import tim73.isa_2020.service.KorisnikService;
 import tim73.isa_2020.service.KorisnikServiceImpl;
+import tim73.isa_2020.service.LoyaltyProgramService;
 import tim73.isa_2020.service.PacijentService;
 import tim73.isa_2020.service.PregledService;
 import tim73.isa_2020.service.TipPregledaService;
@@ -103,6 +105,9 @@ public class PregledController {
 	
 	@Autowired
 	private ZahtevZaGodisnjiService godisnjiService;
+	
+	@Autowired
+	private LoyaltyProgramService loyaltyProgramService;
 	
 	/*
 	@GetMapping(value = "/addPregled")
@@ -342,8 +347,9 @@ public class PregledController {
 				Interval interval=new Interval(pregled.getInterval());
 				System.out.println(interval.getStart().toString("dd/MM/yyyy HH:mm"));
 				double trajanje= (interval.getEndMillis()-interval.getStartMillis())/60000; //pretvaranje u minute
+				
 				preglediDTO.add(new PregledZaPacijentaDTO(pregled,
-						(pregled.getDermatolog().getIme() + " " + pregled.getDermatolog().getPrezime()), interval.getStart().toString("dd/MM/yyyy HH:mm"), pregled.getTip().getCena(), trajanje));
+						(pregled.getDermatolog().getIme() + " " + pregled.getDermatolog().getPrezime()), interval.getStart().toString("dd/MM/yyyy HH:mm"), pregled.getTip().getCena()*((100-p.getLoyaltyProgram().getPopust())/100), trajanje));
 			}
 		}
 		
@@ -375,7 +381,7 @@ public class PregledController {
 				Interval interval=new Interval(pregled.getInterval());
 				double trajanje= (interval.getEndMillis()-interval.getStartMillis())/60000; //pretvaranje u minute
 				preglediDTO.add(new PregledZaPacijentaDTO(pregled,
-						(pregled.getFarmaceut().getIme() + " " + pregled.getFarmaceut().getPrezime()), interval.getStart().toString("dd/MM/yyyy HH:mm"), pregled.getTip().getCena(), trajanje));
+						(pregled.getFarmaceut().getIme() + " " + pregled.getFarmaceut().getPrezime()), interval.getStart().toString("dd/MM/yyyy HH:mm"), pregled.getTip().getCena()*((100-p.getLoyaltyProgram().getPopust())/100), trajanje));
 			}
 		}
 		
@@ -402,11 +408,11 @@ public class PregledController {
 
 			pregledDTO = new PregledZaPacijentaDTO(pregled,
 					(pregled.getDermatolog().getIme() + " " + pregled.getDermatolog().getPrezime()),
-					interval.getStart().toString("dd/MM/yyyy HH:mm"), pregled.getTip().getCena(), trajanje);
+					interval.getStart().toString("dd/MM/yyyy HH:mm"), pregled.getTip().getCena()*((100-pregled.getPacijent().getLoyaltyProgram().getPopust())/100), trajanje);
 		} else {
 			pregledDTO = new PregledZaPacijentaDTO(pregled,
 					(pregled.getFarmaceut().getIme() + " " + pregled.getFarmaceut().getPrezime()),
-					interval.getStart().toString("dd/MM/yyyy HH:mm"), pregled.getTip().getCena(), trajanje);
+					interval.getStart().toString("dd/MM/yyyy HH:mm"), pregled.getTip().getCena()*((100-pregled.getPacijent().getLoyaltyProgram().getPopust())/100), trajanje);
 
 		}
 		return new ResponseEntity<PregledZaPacijentaDTO>(pregledDTO, HttpStatus.OK);
@@ -434,12 +440,12 @@ public class PregledController {
 				if (pregled.getFarmaceut() != null) {
 					preglediDTO.add(new PregledZaPacijentaDTO(pregled,
 							(pregled.getFarmaceut().getIme() + " " + pregled.getFarmaceut().getPrezime()),
-							interval.getStart().toString("dd/MM/yyyy HH:mm"), pregled.getTip().getCena(), trajanje));
+							interval.getStart().toString("dd/MM/yyyy HH:mm"), pregled.getTip().getCena()*((100-p.getLoyaltyProgram().getPopust())/100), trajanje));
 				}
 				else {
 					preglediDTO.add(new PregledZaPacijentaDTO(pregled,
 							(pregled.getDermatolog().getIme() + " " + pregled.getDermatolog().getPrezime()),
-							interval.getStart().toString("dd/MM/yyyy HH:mm"), pregled.getTip().getCena(), trajanje));
+							interval.getStart().toString("dd/MM/yyyy HH:mm"), pregled.getTip().getCena()*((100-p.getLoyaltyProgram().getPopust())/100), trajanje));
 				}
 			}
 		}
@@ -470,7 +476,13 @@ public class PregledController {
 	//prikaz unapreg kreiranih pregleda kod dermatologa
 	@GetMapping(value = "/pregledi/{id}")
 	@PreAuthorize("hasRole('PACIJENT')")
-	public ResponseEntity<List<PregledZaPacijentaDTO>> preglediKodDermatologa(@PathVariable long id){
+	public ResponseEntity<List<PregledZaPacijentaDTO>> preglediKodDermatologa(@PathVariable long id,HttpServletRequest request){
+		
+		String token = tokenUtils.getToken(request);
+		String username = this.tokenUtils.getUsernameFromToken(token);
+		Pacijent pacijent = (Pacijent) this.korisnikDetails.loadUserByUsername(username);
+		
+		
 		List<PregledZaPacijentaDTO> preglediDTO= new ArrayList<PregledZaPacijentaDTO>();
 		for(Pregled p:pregledService.findByApotekaIdAndStatus(id, "default")) {
 			Interval interval = new Interval(p.getInterval());
@@ -478,7 +490,7 @@ public class PregledController {
 			if(p.getDermatolog()!=null) {
 				double trajanje= (interval.getEndMillis()-interval.getStartMillis())/60000; //pretvaranje u minute
 
-				preglediDTO.add(new PregledZaPacijentaDTO(p, p.getDermatolog().getIme()+" "+p.getDermatolog().getPrezime(), interval.getStart().toString("dd/MM/yyyy HH:mm"), p.getTip().getCena(), trajanje));
+				preglediDTO.add(new PregledZaPacijentaDTO(p, p.getDermatolog().getIme()+" "+p.getDermatolog().getPrezime(), interval.getStart().toString("dd/MM/yyyy HH:mm"), p.getTip().getCena()*((100-pacijent.getLoyaltyProgram().getPopust())/100), trajanje));
 			}
 		}
 		return new ResponseEntity<List<PregledZaPacijentaDTO>>(preglediDTO,HttpStatus.OK);
@@ -644,6 +656,18 @@ public class PregledController {
 		pregled.setTerapija(p.terapija);
 		
 		pregled.setStatus("odradjen");
+		
+		// dodavanje poena za loyalty program kada se odradi pregled
+		Pacijent pacijent=pregled.getPacijent();
+		pacijent.setPoeni(pacijent.getPoeni()+pregled.getTip().getPoeni());
+		for(LoyaltyProgram lp:loyaltyProgramService.findByOrderByPragPoenaDesc()) {
+			if(lp.getPragPoena()<=pacijent.getPoeni()) {
+				pacijent.setLoyaltyProgram(lp);
+				break;
+			}
+		}
+		korisnikService.save(pacijent);
+		
 		
 		pregledService.save(pregled);		
 			
