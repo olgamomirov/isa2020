@@ -94,7 +94,8 @@ public class ScheduledTasks {
 					p.setStatus("neodradjen");
 					pregledService.save(p);	
 				
-			}else {
+			}
+			}else if(p.getStatus().equals("rezervisan")){
 				if((((vremePregleda.getMillis()+600000)-System.currentTimeMillis())<0)) { //moze najkasnije 10 miinuta da zakasni sa zapocinjanjem pregleda
 System.out.println(p.getStatus());
 
@@ -114,7 +115,7 @@ System.out.println(p.getStatus());
 					//vremePregleda=null;
 					}
 					
-				}
+				//}
 					
 					
 			

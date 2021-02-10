@@ -770,8 +770,9 @@ public class PregledController {
 		
 		noviPregled.setPacijent(pacijent);
 		
+		TipPregleda tipDermatolog = tipService.findByTipAndApotekaId("dermatolog", a.getId()); 
 		
-		noviPregled.setTip(trenutni.getTip());
+		noviPregled.setTip(tipDermatolog);
 		
 		noviPregled.setApoteka(a);
 
@@ -858,7 +859,7 @@ public class PregledController {
 		noviPregled.setPacijent(pacijent);
 		
 		
-		noviPregled.setTip(trenutni.getTip());
+		noviPregled.setTip(tipService.findByTipAndApotekaId("farmaceut", a.getId()));
 		
 		noviPregled.setApoteka(a);
 
