@@ -35,9 +35,11 @@ import tim73.isa_2020.dto.LekarDTO;
 import tim73.isa_2020.model.AdministratorApoteke;
 
 import tim73.isa_2020.model.AdministratorSistema;
-
+import tim73.isa_2020.model.AkcijaPromocija;
 import tim73.isa_2020.model.Apoteka;
 import tim73.isa_2020.model.Authority;
+import tim73.isa_2020.model.Cenovnik;
+import tim73.isa_2020.model.CenovnikStavka;
 import tim73.isa_2020.model.Dermatolog;
 import tim73.isa_2020.model.Farmaceut;
 import tim73.isa_2020.model.Korisnik;
@@ -45,11 +47,13 @@ import tim73.isa_2020.model.Lek;
 import tim73.isa_2020.model.OcenaApoteka;
 import tim73.isa_2020.model.OcenaDermatolog;
 import tim73.isa_2020.model.OcenaFarmaceut;
+import tim73.isa_2020.model.OcenaSifrarnikLekova;
 import tim73.isa_2020.model.Pacijent;
 import tim73.isa_2020.model.Pregled;
 import tim73.isa_2020.model.RadnoVreme;
 import tim73.isa_2020.model.Rezervacija;
 import tim73.isa_2020.model.SifrarnikLekova;
+import tim73.isa_2020.model.StavkeAkcijePromocije;
 import tim73.isa_2020.securityService.TokenUtils;
 import tim73.isa_2020.service.ApotekaService;
 import tim73.isa_2020.service.DermatologService;
@@ -307,12 +311,51 @@ System.out.println(apoteka.getLat());
 	// za apoteke koje imaju na stanju lek koji zeli da se rezervise
 	@GetMapping(value = "/rezervacijaLeka/{nazivLeka}")
 	@PreAuthorize("hasRole('PACIJENT')")
-	public ResponseEntity<List<ApotekaDTO>> apotekeSaLekovimaNaStanju(@PathVariable String nazivLeka) {
+	public ResponseEntity<List<ApotekaDTO>> apotekeSaLekovimaNaStanju(@PathVariable String nazivLeka,HttpServletRequest request) {
 
+		String token = tokenUtils.getToken(request);
+		String username = this.tokenUtils.getUsernameFromToken(token);
+		Pacijent p = (Pacijent) this.userDetailsService.loadUserByUsername(username);
+		
 		List<ApotekaDTO> apotekeSaLekovimaNaStanju = new ArrayList<ApotekaDTO>();
 		SifrarnikLekova sl = sifrarnikService.findByNaziv(nazivLeka);
 
+		java.util.Date juDate = new Date();
+	    DateTime dt = new DateTime(juDate);
+		
+		
 		for (Lek lek : lekService.findBySifrarnikLekova(sl.getId())) {
+			double cena=0;
+			double cenaSaPopustom=0;
+			
+			Apoteka apoteka=lek.getApoteka();
+			
+			for(Cenovnik cenovnik:apoteka.getCenovnici()) {
+				Interval interval=new Interval(cenovnik.getInterval());
+				if (dt.isAfter(interval.getStart())&& dt.isBefore(interval.getEnd())) {
+					for(CenovnikStavka cs:cenovnik.getStavkeCenovnika()) {
+						if(cs.getLek().equals(lek)) {
+							cena=cs.getCena();
+						}
+					}
+				}
+			}
+			
+			for(AkcijaPromocija ap:apoteka.getAkcijePromocije()) {
+				Interval interval=new Interval(ap.getVremeVazenja());
+
+				if (dt.isAfter(interval.getStart())&& dt.isBefore(interval.getEnd())) {
+					for(StavkeAkcijePromocije aps:ap.getStavke()) {
+						if(aps.getLek().equals(lek)) {
+							cena=cena*((100-ap.getProcenatAkcije())/100);
+						}
+					}
+				}
+			}
+			
+			cenaSaPopustom=cena*((100-p.getLoyaltyProgram().getPopust())/100);
+			
+			
 			if (lek.getKolicina() > 0 && lek.getApoteka()!=null) {
 				double ocena = 0;
 				double brojOcena = 0;
@@ -321,7 +364,10 @@ System.out.println(apoteka.getLat());
 					brojOcena++;
 				}
 				ocena = ocena / brojOcena;
-				apotekeSaLekovimaNaStanju.add(new ApotekaDTO(lek.getApoteka(), ocena));
+				 ApotekaDTO apotekadto=new ApotekaDTO(lek.getApoteka(), ocena);
+				 apotekadto.setCena(cena);
+				 apotekadto.setCenaSaPopustom(cenaSaPopustom);
+				apotekeSaLekovimaNaStanju.add(apotekadto);
 			}
 		}
 

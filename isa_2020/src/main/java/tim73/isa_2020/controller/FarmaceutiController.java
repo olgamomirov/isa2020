@@ -202,12 +202,16 @@ public class FarmaceutiController {
 
 	@GetMapping(value = "/slobodni/{vreme}/{idApoteke}")
 	@PreAuthorize("hasRole('PACIJENT')")
-	public ResponseEntity<List<LekarDTO>> slobodniFarmaceuti(@PathVariable String vreme, @PathVariable Long idApoteke) {
+	public ResponseEntity<List<LekarDTO>> slobodniFarmaceuti(@PathVariable String vreme, @PathVariable Long idApoteke, HttpServletRequest request) {
 		String datum = vreme.split("T")[0];
 		String vremeString = vreme.split("T")[1];
 		System.out.println(datum);
 		System.out.println(vremeString);
 
+		String token = tokenUtils.getToken(request);
+		String username = this.tokenUtils.getUsernameFromToken(token);
+		Pacijent pacijent = (Pacijent) this.userDetailsService.loadUserByUsername(username);
+		
 		DateTime vremePregleda = new DateTime(Integer.parseInt(datum.split("-")[0]),
 				Integer.parseInt(datum.split("-")[1]), Integer.parseInt(datum.split("-")[2]),
 				Integer.parseInt(vremeString.split(":")[0]), Integer.parseInt(vremeString.split(":")[1]));
@@ -219,12 +223,15 @@ public class FarmaceutiController {
 		for (Farmaceut farmaceut : sviFarmaceutiIzApoteke) {
 			int slobodanPregled = 0;
 			int slobodanUTokuRadnogVremena = 0;
+			double cena=0;
+			double cenaSaPopustom=0;
 			for (Pregled pregled : farmaceut.getPregledi()) {
 				Interval interval = new Interval(pregled.getInterval());
 				if (pregled != null && pregled.getApoteka().getId().equals(idApoteke)
 						&& (interval.contains(noviPregled)) || interval.overlaps(noviPregled)) {
 					slobodanPregled++;
 				}
+				cena=pregled.getTip().getCena();
 			}
 			for (RadnoVreme rv : farmaceut.getRadnoVreme()) {
 				Interval interval = new Interval(rv.getInterval());
@@ -235,9 +242,22 @@ public class FarmaceutiController {
 			}
 
 			if (slobodanPregled == 0 && slobodanUTokuRadnogVremena != 0) {
-
+				
+				
+				double ocena=0;
+				double brOcena=0;
+				if(!farmaceut.getOceneFarmaceuta().isEmpty()) {
+					for(OcenaFarmaceut of:farmaceut.getOceneFarmaceuta()) {
+						ocena+=of.getVrednost();
+						brOcena++;
+					}
+					ocena=ocena/brOcena;
+				}
+				
+				cenaSaPopustom=cena*((100-pacijent.getLoyaltyProgram().getPopust())/100);
+				
 				slobodniFarmaceuti.add(new LekarDTO(farmaceut.getId(),
-						farmaceut.getIme() + " " + farmaceut.getPrezime(), "farmaceut", 0));
+						farmaceut.getIme() + " " + farmaceut.getPrezime(), "farmaceut", ocena,cena,cenaSaPopustom));
 			}
 		}
 		return new ResponseEntity<List<LekarDTO>>(slobodniFarmaceuti, HttpStatus.OK);

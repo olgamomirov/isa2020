@@ -5,6 +5,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.joda.time.DateTime;
 import org.joda.time.Interval;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,8 +27,11 @@ import tim73.isa_2020.model.CenovnikStavka;
 import tim73.isa_2020.model.Lek;
 import tim73.isa_2020.model.OcenaApoteka;
 import tim73.isa_2020.model.OcenaSifrarnikLekova;
+import tim73.isa_2020.model.Pacijent;
 import tim73.isa_2020.model.StavkeAkcijePromocije;
+import tim73.isa_2020.securityService.TokenUtils;
 import tim73.isa_2020.service.ApotekaService;
+import tim73.isa_2020.service.KorisnikServiceImpl;
 import tim73.isa_2020.service.LekService;
 import tim73.isa_2020.service.OcenaApotekaService;
 import tim73.isa_2020.service.OcenaSifrarnikLekovaService;
@@ -45,9 +50,22 @@ public class NeautentifikovaniController {
 	@Autowired
 	private OcenaSifrarnikLekovaService ocenaSifrarnikLekovaService;
 	
+	@Autowired
+	private TokenUtils tokenUtils;
+	@Autowired
+	private KorisnikServiceImpl userDetailsService;
+	
 	@GetMapping(value = "/lekovi/{id}")
-	public ResponseEntity<List<LekDTO>> lekoviApoteke(@PathVariable Long id) {
+	public ResponseEntity<List<LekDTO>> lekoviApoteke(@PathVariable Long id, HttpServletRequest request) {
 		
+		String token = tokenUtils.getToken(request);
+		Pacijent p=null;
+		if (token!=null) {
+		String username = this.tokenUtils.getUsernameFromToken(token);
+		p = (Pacijent) this.userDetailsService.loadUserByUsername(username);
+		}
+		
+		System.out.println(p);
 		List<Lek> lekovi= lekService.findByApotekaId(id);
 		
 		java.util.Date juDate = new Date();
@@ -97,7 +115,9 @@ public class NeautentifikovaniController {
 					}
 				}
 			}
-			
+			if(p!=null) {
+				cena=cena*((100-p.getLoyaltyProgram().getPopust())/100);
+			}
 			
 			lekoviDTO.add(new LekDTO(l, ocena,cena));
 		}

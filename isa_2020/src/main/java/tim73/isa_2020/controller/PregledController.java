@@ -109,6 +109,9 @@ public class PregledController {
 	@Autowired
 	private LoyaltyProgramService loyaltyProgramService;
 	
+	@Autowired
+	private TipPregledaService tipPregledaService;
+	
 	/*
 	@GetMapping(value = "/addPregled")
 	ResponseEntity<String> add(){
@@ -485,12 +488,18 @@ public class PregledController {
 		
 		List<PregledZaPacijentaDTO> preglediDTO= new ArrayList<PregledZaPacijentaDTO>();
 		for(Pregled p:pregledService.findByApotekaIdAndStatus(id, "default")) {
+			double cena=0;
+			double cenaSaPopustom=0;
+			
+			cena=p.getTip().getCena();
+			cenaSaPopustom=cena*((100-pacijent.getLoyaltyProgram().getPopust())/100);
+			
 			Interval interval = new Interval(p.getInterval());
 
 			if(p.getDermatolog()!=null) {
 				double trajanje= (interval.getEndMillis()-interval.getStartMillis())/60000; //pretvaranje u minute
 
-				preglediDTO.add(new PregledZaPacijentaDTO(p, p.getDermatolog().getIme()+" "+p.getDermatolog().getPrezime(), interval.getStart().toString("dd/MM/yyyy HH:mm"), p.getTip().getCena()*((100-pacijent.getLoyaltyProgram().getPopust())/100), trajanje));
+				preglediDTO.add(new PregledZaPacijentaDTO(p, p.getDermatolog().getIme()+" "+p.getDermatolog().getPrezime(), interval.getStart().toString("dd/MM/yyyy HH:mm"), cena,cenaSaPopustom, trajanje));
 			}
 		}
 		return new ResponseEntity<List<PregledZaPacijentaDTO>>(preglediDTO,HttpStatus.OK);
@@ -579,6 +588,7 @@ public class PregledController {
 		pregled.setApoteka(apotekaService.findById(rezervacija.getIdApoteke()));
 		pregled.setFarmaceut(farmaceutService.findOne(rezervacija.getIdFarmaceuta()));
 		pregled.setPacijent(p);
+		pregled.setTip(tipPregledaService.findByTipAndApotekaId("farmaceut", rezervacija.getIdApoteke()));
 		
 		pregledService.save(pregled);
 		
