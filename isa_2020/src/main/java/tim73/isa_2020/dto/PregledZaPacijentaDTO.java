@@ -23,10 +23,16 @@ private Long id;
 	
 	private double cena;
 	
+	private double cenaSaPopustom;
+	
 	private double trajanje; //u minutima
 	
 	public PregledZaPacijentaDTO (Pregled pregled, String lekar,String start, double cena, double trajanje) {
 		this(pregled.getId(),  pregled.getStatus(), pregled.getDijagnoza(), pregled.getTerapija(),   pregled.getApoteka().getNaziv(),lekar, start, cena, trajanje);
+	}
+	
+	public PregledZaPacijentaDTO (Pregled pregled, String lekar,String start, double cena, double cenaSaPopustom,double trajanje) {
+		this(pregled.getId(),  pregled.getStatus(), pregled.getDijagnoza(), pregled.getTerapija(),   pregled.getApoteka().getNaziv(),lekar, start, cena, cenaSaPopustom, trajanje);
 	}
 	
 	public PregledZaPacijentaDTO(Long id,  String status, String dijagnoza, String terapija,  String apoteka,String lekar,String start, double cena, double trajanje) {
@@ -40,6 +46,21 @@ private Long id;
 		this.start=start;
 		this.cena=cena;
 		this.trajanje=trajanje;
+		
+	}
+	
+public PregledZaPacijentaDTO(Long id,  String status, String dijagnoza, String terapija,  String apoteka,String lekar,String start, double cena,double cenaSaPopustom, double trajanje) {
+		
+		this.id = id;
+		this.status = status;
+		this.dijagnoza = dijagnoza;
+		this.terapija = terapija;
+		this.apoteka=apoteka;
+		this.lekar=lekar;
+		this.start=start;
+		this.cena=cena;
+		this.trajanje=trajanje;
+		this.cenaSaPopustom=cenaSaPopustom;
 		
 	}
 
@@ -77,6 +98,10 @@ private Long id;
 
 	public double getTrajanje() {
 		return trajanje;
+	}
+
+	public double getCenaSaPopustom() {
+		return cenaSaPopustom;
 	}
 	
 	

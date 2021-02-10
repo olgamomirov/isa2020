@@ -9,6 +9,9 @@ public class LekarDTO {
 	private String specijalizacija;
 	private double ocena=0;
 	private String apoteka;
+	private double cena;
+	private double cenaSaPopustom;
+
 	
 	
 	public LekarDTO(String imeIPrezime, String specijalizacija) {
@@ -24,6 +27,18 @@ public class LekarDTO {
 		this.imeIPrezime = imeIPrezime;
 		this.specijalizacija = specijalizacija;
 		this.ocena=ocena2;
+		
+		
+	}
+	
+	public LekarDTO(Long id, String imeIPrezime, String specijalizacija, double ocena2, double cena,double cenaSaPopustom) {
+		super();
+		this.id=id;
+		this.imeIPrezime = imeIPrezime;
+		this.specijalizacija = specijalizacija;
+		this.ocena=ocena2;
+		this.cena=cena;
+		this.cenaSaPopustom=cenaSaPopustom;
 		
 	}
 	
@@ -103,6 +118,14 @@ public class LekarDTO {
 
 	public String getApoteka() {
 		return apoteka;
+	}
+
+	public double getCena() {
+		return cena;
+	}
+
+	public double getCenaSaPopustom() {
+		return cenaSaPopustom;
 	}
 	
 	
