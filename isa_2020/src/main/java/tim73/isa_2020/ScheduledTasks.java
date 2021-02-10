@@ -93,8 +93,28 @@ public class ScheduledTasks {
 				if((((vremePregleda.getMillis())-System.currentTimeMillis())<0)) { //ako je unapred definisan pregled ne ceka se 10 minuta, odmah odlazi u neodradjene
 					p.setStatus("neodradjen");
 					pregledService.save(p);	
+				}
+			}else if(p.getStatus().equals("u toku")) {
+				System.out.println("kako nema u toku");
+				DateTime krajPregleda= new DateTime(p.getInterval().split("/")[1]);
+				if((((krajPregleda.getMillis()+60000)-System.currentTimeMillis())<0)) { 
+					p.setStatus("neodradjen");
+					
+					if(p.getPacijent().getPenal()!=0) {
+					p.getPacijent().setPenal(p.getPacijent().getPenal()+1);
+					pacijentService.save(p.getPacijent());
+					pregledService.save(p);	
+					
+					}else {
+						p.getPacijent().setPenal(1);	
+						pacijentService.save(p.getPacijent());
+						pregledService.save(p);	
+						
+					}
+					
 				
-			}
+					
+				}
 			}else if(p.getStatus().equals("rezervisan")){
 				if((((vremePregleda.getMillis()+600000)-System.currentTimeMillis())<0)) { //moze najkasnije 10 miinuta da zakasni sa zapocinjanjem pregleda
 System.out.println(p.getStatus());

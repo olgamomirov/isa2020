@@ -649,6 +649,24 @@ public class PregledController {
 		return new ResponseEntity<List<PregledDTO>>(preglediDTO,HttpStatus.OK);
 		
 	}
+	static class pregledId{
+		public Long id;
+	}
+	@PostMapping(value = "/pregledUToku")
+	@PreAuthorize("hasRole('DERMATOLOG') or hasRole('FARMACEUT')")
+	public ResponseEntity<PregledDTO> pregledZapocet(@RequestBody pregledId pregledId){
+     
+		Pregled pregled = pregledService.findOne(pregledId.id);
+		
+		pregled.setStatus("u toku");
+	
+		pregledService.save(pregled);		
+			
+		PregledDTO dto = new PregledDTO(pregled);
+		return new ResponseEntity<PregledDTO>(dto,HttpStatus.OK);
+		
+
+	}
 	static class PregledKraj{
 		public String informacije;
 		public Long pregledID;
