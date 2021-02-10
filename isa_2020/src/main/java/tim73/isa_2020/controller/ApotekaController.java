@@ -489,6 +489,8 @@ System.out.println(apoteka.getLat());
 		a.setGrad(apoteka.getGrad());
         a.setDrzava(apoteka.getDrzava());
         a.setUlica(apoteka.getUlica());
+        a.setLat(apoteka.getLat());
+		a.setLng(apoteka.getLng());
 		
 		apotekaService.save(a);
 	}
