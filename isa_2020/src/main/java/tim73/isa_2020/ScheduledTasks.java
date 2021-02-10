@@ -82,15 +82,22 @@ public class ScheduledTasks {
 			}
 		}
 	}
-	@Scheduled(fixedRate = 60000)
+	@Scheduled(fixedRate = 30000)
 	public void cronJob() {
 		
 		
 		for(Pregled p: pregledService.proveraPregleda()) {
 			DateTime vremePregleda= new DateTime(p.getInterval().split("/")[0]);
-			
+			System.out.println("jel radi ovo? :( " + vremePregleda);
+			if(p.getStatus().equals("default")) {
+				if((((vremePregleda.getMillis())-System.currentTimeMillis())<0)) { //ako je unapred definisan pregled ne ceka se 10 minuta, odmah odlazi u neodradjene
+					p.setStatus("neodradjen");
+					pregledService.save(p);	
+				
+			}
+			}else if(p.getStatus().equals("rezervisan")){
 				if((((vremePregleda.getMillis()+600000)-System.currentTimeMillis())<0)) { //moze najkasnije 10 miinuta da zakasni sa zapocinjanjem pregleda
-
+System.out.println(p.getStatus());
 
 					p.setStatus("neodradjen");
 					if(p.getPacijent()!=null) {
@@ -105,19 +112,18 @@ public class ScheduledTasks {
 						pregledService.save(p);	
 						
 					}
-					vremePregleda=null;
-					}else {
-						p.setStatus("neodradjen");
-						pregledService.save(p);	
+					//vremePregleda=null;
 					}
 					
+				//}
+					
+					
+			
+			
+			
+			}
 				}
-					
-					
-			
-			
-			
-		}
+			}
 		
 		
 	}

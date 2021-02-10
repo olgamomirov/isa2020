@@ -90,9 +90,9 @@ insert into "public"."tip_pregleda" ( "cena", "tip", "poeni", "apoteka_id") valu
 insert into "public"."tip_pregleda" ( "cena", "tip", "poeni", "apoteka_id") values( 500.0, 'farmaceut', 2, 2)
 insert into "public"."pregled" ( "dijagnoza", "interval", "status", "terapija", "apoteka_id", "dermatolog_id", "farmaceut_id", "pacijent_id", "tip_id") values( 'zdravo', '2021-11-07T08:00:00.000+01:00/2021-11-07T15:00:00.000+01:00', 'rezervisan', 'nema', 2, 2, null, 3, 1)
 insert into "public"."pregled" ( "dijagnoza", "interval", "status", "terapija", "apoteka_id", "dermatolog_id", "farmaceut_id", "pacijent_id", "tip_id") values( 'kontrola', '2021-01-30T23:28:00.000+01:00/2021-01-30T23:55:00.000+01:00', 'rezervisan', 'nema', 2, 2, null, 3, 1)
-insert into "public"."pregled" ( "dijagnoza", "interval", "status", "terapija", "apoteka_id", "dermatolog_id", "farmaceut_id", "pacijent_id", "tip_id") values( null, '2021-01-30T23:28:00.000+01:00/2021-01-30T23:55:00.000+01:00', 'rezervisan', 'nema', 2, 2, null, 3, 1)
+insert into "public"."pregled" ( "dijagnoza", "interval", "status", "terapija", "apoteka_id", "dermatolog_id", "farmaceut_id", "pacijent_id", "tip_id") values( null, '2021-02-10T15:49:00.000+01:00/2021-02-10T16:55:00.000+01:00', 'rezervisan', 'nema', 2, 2, null, 3, 1)
 insert into "public"."pregled" ( "dijagnoza", "interval", "status", "terapija", "apoteka_id", "dermatolog_id", "farmaceut_id", "pacijent_id", "tip_id") values( 'strasno', '2021-01-17T08:00:00.000+01:00/2021-01-17T15:00:00.000+01:00', 'rezervisan', 'cccc', 2, null, 4, 3, 2)
-insert into "public"."pregled" ( "dijagnoza", "interval", "status", "terapija", "apoteka_id", "dermatolog_id", "farmaceut_id", "pacijent_id", "tip_id") values( null, '2021-02-23T08:00:00.000+01:00/2021-02-23T15:00:00.000+01:00', 'default', 'null', 2, 2, null, null, 2)
+insert into "public"."pregled" ( "dijagnoza", "interval", "status", "terapija", "apoteka_id", "dermatolog_id", "farmaceut_id", "pacijent_id", "tip_id") values( null, '2021-02-09T16:45:00.000+01:00/2021-02-09T16:55:00.000+01:00', 'default', 'null', 2, 2, null, null, 2)
 insert into "public"."pregled" ( "dijagnoza", "interval", "status", "terapija", "apoteka_id", "dermatolog_id", "farmaceut_id", "pacijent_id", "tip_id") values( null, '2021-03-28T08:00:00.000+01:00/2021-03-28T15:00:00.000+01:00', 'rezervisan', 'null', 2, null, 4, 5, 2)
 insert into "public"."pregled" ( "dijagnoza", "interval", "status", "terapija", "apoteka_id", "dermatolog_id", "farmaceut_id", "pacijent_id", "tip_id") values( null, '2021-12-09T08:00:00.000+01:00/2021-12-09T15:00:00.000+01:00', 'rezervisan', 'null', 2, 2, null, 5, 1)
 insert into "public"."pregled" ( "dijagnoza", "interval", "status", "terapija", "apoteka_id", "dermatolog_id", "farmaceut_id", "pacijent_id", "tip_id") values( null, '2021-03-14T08:00:00.000+01:00/2021-03-14T15:00:00.000+01:00', 'rezervisan', 'null', 2, 2, null, 3, 1)
@@ -117,7 +117,7 @@ insert into "public"."lek" ( "kolicina", "apoteka_id", "sifra_leka_id") values( 
 insert into "public"."lek" ( "kolicina", "apoteka_id", "sifra_leka_id") values( 7, 3, 3)
 --insert into "public"."lek" ( "kolicina", "apoteka_id", "sifra_leka_id") values( 5, 2, 4)
 
-insert into "public"."rezervacija" ("datum_preuzimanja","status", "lek_id", "pacijent_id", "apoteka_id") values('2021-01-31T14:00:00.000+01:00','izdavanje', 2, 3, 2)
+insert into "public"."rezervacija" ("datum_preuzimanja","status", "lek_id", "pacijent_id", "apoteka_id") values('2021-02-21T14:00:00.000+01:00','izdavanje', 2, 3, 2)
 
 insert into "public"."rezervacija" ("datum_preuzimanja", "status", "lek_id", "pacijent_id", "apoteka_id") values('2021-01-13T14:00:00.000+01:00','preuzeto', 3, 3, 3)
 
@@ -145,3 +145,4 @@ insert into "public"."cenovnik_stavka" ("cena", "cenovnik_id", "lek_id") values 
 
 
 insert into "public"."zalba" ("tekst_zalbe", "status", "pacijent_id", "dermatolog_id") values ('kasnio je na pregled','ceka na odgovor', 5, 2)
+insert into "public"."zalba" ("tekst_zalbe", "status", "pacijent_id", "farmaceut_id") values ('ruzno ponasanje','ceka na odgovor', 5, 4)

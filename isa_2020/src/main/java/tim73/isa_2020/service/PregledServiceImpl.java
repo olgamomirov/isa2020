@@ -74,4 +74,11 @@ public class PregledServiceImpl implements PregledService{
 		return pregledRepository.findByDermatologIdAndApotekaId(dermatologId, apotekaId);
 	}
 
+
+	@Override
+	public void delete(List<Pregled> pregled) {
+		
+		pregledRepository.deleteInBatch(pregled);
+	}
+
 }

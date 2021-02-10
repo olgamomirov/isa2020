@@ -24,13 +24,13 @@ public class UpitZaLek {
 	
 	private String status; //pregledan i nepregledan (od strane administratora)
 	
-	private Date datumSlanjaUpita;
+	private String datumSlanjaUpita;
 
 	public UpitZaLek() {
 		super();
 	}
 
-	public UpitZaLek(Lek lek, String status, Date datumSlanjaUpita) {
+	public UpitZaLek(Lek lek, String status, String datumSlanjaUpita) {
 		super();
 		this.lek = lek;
 		this.status = status;
@@ -53,11 +53,11 @@ public class UpitZaLek {
 		this.status = status;
 	}
 
-	public Date getDatumSlanjaUpita() {
+	public String getDatumSlanjaUpita() {
 		return datumSlanjaUpita;
 	}
 
-	public void setDatumSlanjaUpita(Date datumSlanjaUpita) {
+	public void setDatumSlanjaUpita(String datumSlanjaUpita) {
 		this.datumSlanjaUpita = datumSlanjaUpita;
 	}
 
