@@ -37,6 +37,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import tim73.isa_2020.controller.DermatologController.PasswordChanger;
 import tim73.isa_2020.controller.DermatologController.StatusBody;
+import tim73.isa_2020.dto.AdminApotekaDTO;
 import tim73.isa_2020.dto.ApotekaDTO;
 import tim73.isa_2020.dto.DermatologDTO;
 import tim73.isa_2020.dto.FarmaceutDTO;
@@ -60,11 +61,13 @@ import tim73.isa_2020.model.UserTokenState;
 import tim73.isa_2020.model.ZahtevZaGodisnji;
 import tim73.isa_2020.model.Zalba;
 import tim73.isa_2020.repository.PacijentRepository;
+import tim73.isa_2020.securityService.AuthorityService;
 import tim73.isa_2020.securityService.TokenUtils;
 import tim73.isa_2020.service.ApotekaService;
 import tim73.isa_2020.service.EmailService;
 import tim73.isa_2020.service.KorisnikService;
 import tim73.isa_2020.service.KorisnikServiceImpl;
+import tim73.isa_2020.service.LoyaltyProgramService;
 import tim73.isa_2020.service.PacijentService;
 import tim73.isa_2020.service.PregledService;
 import tim73.isa_2020.service.ZahtevZaGodisnjiService;
@@ -108,7 +111,12 @@ public class KorisnikController {
 	
 	@Autowired
 	private ZalbaService zalbaService;
+	
+	@Autowired
+	private AuthorityService authorityService;
 
+	@Autowired
+	private LoyaltyProgramService loyaltyService;
 	/*
 	 * @PostMapping(value = "/login", consumes=MediaType.APPLICATION_JSON_VALUE)
 	 * public void login(@RequestBody Korisnik korisnik) {
@@ -548,6 +556,44 @@ public class KorisnikController {
 		  
 		 
 		return new ResponseEntity<List<ZalbaDTO>>(zalbeDTO, HttpStatus.OK);
+	}
+	
+	@RequestMapping(value = "/registracija", method = RequestMethod.POST, consumes = "application/json")
+	public void registruj(@RequestBody PacijentPodaciDTO korisnik, HttpServletRequest request) throws MailException, InterruptedException {
+		
+		List<Authority> a=authorityService.findByname("ROLE_PACIJENT");
+	
+		 Pacijent pacijent = new Pacijent();
+		 pacijent.setEmail(korisnik.getEmail());
+		 pacijent.setIme(korisnik.getIme());
+		 pacijent.setPrezime(korisnik.getPrezime());
+		 pacijent.setDrzava(korisnik.getDrzava());
+		 pacijent.setGrad(korisnik.getGrad());
+		 pacijent.setUlica(korisnik.getUlica());
+		 pacijent.setTelefon(korisnik.getTelefon());
+		 pacijent.setStatus("registrovan");
+		 pacijent.setEnabled(true);
+		 pacijent.setLozinka(passwordEncoder.encode("123"));
+		 pacijent.setLoyaltyProgram(loyaltyService.findById((long)1));
+		 pacijent.setAuthorities(a);
+		
+			mailService.sendSimpleMessage(pacijent.getEmail(),
+					"Link za aktivaciju naloga",
+					"http://localhost:3000/aktiviranjeNaloga/" + pacijent.getEmail());
+			
+		korisnikService.save(pacijent);
+	}
+	
+	@RequestMapping(value = "/promeniStatus", method = RequestMethod.POST)
+	public void changeStatusPatient(@RequestParam("email") String email) {
+	
+		
+		Korisnik pacijent = korisnikService.findByEmail(email);
+		pacijent.setStatus("ulogovan");
+
+		korisnikService.save(pacijent);
+	
+	
 	}
 
 }

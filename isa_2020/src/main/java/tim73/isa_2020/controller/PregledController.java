@@ -896,8 +896,6 @@ public class PregledController {
 	static class UnapredDefinisanPregled{
 		public Long id; //id lekara za kog se pregled definise
 		public String datumStart; //pocetak
-		public double cena;
-		public String tip;
 	}
 	
 	@PostMapping(value = "/definisiSlobodanTermin")
@@ -964,8 +962,9 @@ public class PregledController {
         				System.out.println("ne moze " + flag1 + " " + flag2 + " " + flag3);
         				
         			}if(flag3&&(flag1==false)&&(flag2==false)){
-        	TipPregleda t = new TipPregleda(p.tip, p.cena);
-        	tipService.save(t);
+        	
+        	TipPregleda t = tipService.findByTipAndApotekaId("dermatolog", a.getId());
+        	
         	noviPregled.setTip(t);
         	noviPregled.setApoteka(a);
         	pregledService.save(noviPregled);
