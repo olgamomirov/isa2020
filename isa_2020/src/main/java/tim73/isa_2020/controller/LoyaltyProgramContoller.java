@@ -18,8 +18,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import tim73.isa_2020.dto.LoyaltyProgramDTO;
 import tim73.isa_2020.model.LoyaltyProgram;
+import tim73.isa_2020.model.Pacijent;
 import tim73.isa_2020.model.TipPregleda;
+import tim73.isa_2020.service.KorisnikService;
 import tim73.isa_2020.service.LoyaltyProgramService;
+import tim73.isa_2020.service.PacijentService;
 import tim73.isa_2020.service.TipPregledaService;
 
 @RestController
@@ -32,6 +35,12 @@ public class LoyaltyProgramContoller {
 	
 	@Autowired
 	private TipPregledaService tipPregledaService;
+	
+	@Autowired
+	private PacijentService pacijentService;
+	
+	@Autowired
+	private KorisnikService korisnikService;
 	
 	
 	@PostMapping(value="/novi")
@@ -105,6 +114,30 @@ public class LoyaltyProgramContoller {
 			tipPregledaService.save(tp);
 		}
 		return new ResponseEntity<String>("Uspesno ste izmenili poene", HttpStatus.OK);
+	}
+	
+	@PutMapping(value="/brisanje/{id}")
+	@PreAuthorize("hasRole('SISTEM')")
+	public ResponseEntity<String> brisanje(@PathVariable Long id){
+		LoyaltyProgram lp=loyaltyProgramService.findById(id);
+		for(Pacijent p:pacijentService.findByLoyaltyProgramId(id)) {
+			p.setLoyaltyProgram(null);
+		}
+		
+		loyaltyProgramService.delete(lp);
+		
+		
+		for(Pacijent p:pacijentService.findAll()) {
+			for(LoyaltyProgram l:loyaltyProgramService.findByOrderByPragPoenaDesc()) {
+				if(p.getPoeni()>l.getPragPoena()) {
+					p.setLoyaltyProgram(l);
+					korisnikService.save(p);
+					break;
+				}
+			}
+		}
+		
+		return new ResponseEntity<String>("Uspesno ste obrisali program", HttpStatus.OK);
 	}
 
 }

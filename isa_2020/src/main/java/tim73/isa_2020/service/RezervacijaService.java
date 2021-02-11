@@ -18,4 +18,7 @@ public interface RezervacijaService {
 	List<Rezervacija> izdavanjeRezervacije();
 	
 	List<Rezervacija> findByStatusAndLekId(String status,Long lekId);
+	
+	List<Rezervacija> findByStatusAndApotekaId(String status,Long apotekaId);
+
 }

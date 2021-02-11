@@ -13,4 +13,6 @@ public interface LoyaltyProgramService {
 	 LoyaltyProgram findById(Long id);
 	 
 	 List<LoyaltyProgram> findAll();
+	 
+	 void delete(LoyaltyProgram lp);
 }

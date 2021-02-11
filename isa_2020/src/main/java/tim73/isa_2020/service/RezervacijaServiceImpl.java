@@ -48,4 +48,9 @@ public class RezervacijaServiceImpl implements RezervacijaService{
 		return rezervacijaRepository.findByStatusAndLekId(status,lekId);
 	}
 
+	@Override
+	public List<Rezervacija> findByStatusAndApotekaId(String status, Long apotekaId) {
+		return rezervacijaRepository.findByStatusAndApotekaId(status, apotekaId);
+	}
+
 }

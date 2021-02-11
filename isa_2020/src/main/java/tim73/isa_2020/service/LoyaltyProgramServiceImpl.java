@@ -34,4 +34,9 @@ public class LoyaltyProgramServiceImpl implements LoyaltyProgramService {
 		return loyaltyProgramRepository.findAll();
 	}
 
+	@Override
+	public void delete(LoyaltyProgram lp) {
+		loyaltyProgramRepository.delete(lp);
+	}
+
 }
