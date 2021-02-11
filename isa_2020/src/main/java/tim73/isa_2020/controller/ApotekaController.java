@@ -518,6 +518,6 @@ System.out.println(apoteka.getLat());
 			}
 			apoteke.add( new ApotekaDTO(apoteka,ocena));
 		}
-		return new ResponseEntity<>(apoteke, HttpStatus.OK);
+		return new ResponseEntity<>(apoteke, HttpStatus.OK); 
 	}
 }
