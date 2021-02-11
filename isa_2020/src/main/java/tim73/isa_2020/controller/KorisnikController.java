@@ -356,7 +356,7 @@ public class KorisnikController {
 
 		Farmaceut f = (Farmaceut) k;
 
-		FarmaceutDTO farmaceutDTO = new FarmaceutDTO(f);
+		FarmaceutDTO farmaceutDTO = new FarmaceutDTO(f.getEmail(), f.getIme(), f.getPrezime(), f.getUlica(), f.getGrad(), f.getDrzava(), f.getTelefon(), f.getStatus(), f.getApoteka().getId());
 
 		return new ResponseEntity<FarmaceutDTO>(farmaceutDTO, HttpStatus.OK);
 	}
@@ -573,7 +573,7 @@ public class KorisnikController {
 		 pacijent.setTelefon(korisnik.getTelefon());
 		 pacijent.setStatus("registrovan");
 		 pacijent.setEnabled(true);
-		 pacijent.setLozinka(passwordEncoder.encode("123"));
+		 pacijent.setLozinka(passwordEncoder.encode(korisnik.getLozinka()));
 		 pacijent.setLoyaltyProgram(loyaltyService.findById((long)1));
 		 pacijent.setAuthorities(a);
 		
