@@ -495,5 +495,29 @@ System.out.println(apoteka.getLat());
 		apotekaService.save(a);
 	}
 
+	
+	@GetMapping(value = "/pretplate")
+	@PreAuthorize("hasRole('PACIJENT')")
+	public ResponseEntity<List<ApotekaDTO>> pretplate(HttpServletRequest request) {
+		String token = tokenUtils.getToken(request);
+		String username = this.tokenUtils.getUsernameFromToken(token);
+		Pacijent pacijent = (Pacijent) this.userDetailsService.loadUserByUsername(username);
 
+		List<ApotekaDTO> apoteke= new ArrayList<>();
+		
+		for(Apoteka apoteka:pacijent.getApoteke()) {
+			double ocena=0;
+			double brOcena=0;
+			
+			if(!apoteka.getOceneApoteke().isEmpty()) {
+				for(OcenaApoteka oa:apoteka.getOceneApoteke()) {
+					ocena+=oa.getVrednost();
+					brOcena++;
+				}
+				ocena=ocena/brOcena;
+			}
+			apoteke.add( new ApotekaDTO(apoteka,ocena));
+		}
+		return new ResponseEntity<>(apoteke, HttpStatus.OK); 
+	}
 }
