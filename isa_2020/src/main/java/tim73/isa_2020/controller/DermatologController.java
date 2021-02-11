@@ -259,25 +259,33 @@ public class DermatologController {
 	@PreAuthorize("hasRole('ADMINISTRATOR')")
 	public ResponseEntity<List<LekarDTO>> pretragaDermatologa(@RequestParam("ime") String ime, @RequestParam("prezime") String prezime,HttpServletRequest request){
 		
+		String token = tokenUtils.getToken(request);
+		String username = this.tokenUtils.getUsernameFromToken(token);
+		AdministratorApoteke admin = (AdministratorApoteke) this.userDetailsService.loadUserByUsername(username);
 
 		List<Dermatolog> dermatolozi=dermatologService.findByImeIPrezime(ime, prezime);
-		List<LekarDTO> dermatoloziDTO= new ArrayList<LekarDTO>();
-		for(Dermatolog dermatolog:dermatolozi) {
-			String apoteke="";
-			for(Apoteka apoteka:dermatolog.getApoteke()) {
-				apoteke+=apoteka.getNaziv()+",";
-			}
-			apoteke=apoteke.substring(0, apoteke.length()-1); //da bih uklonila poslednji zarez
-			double ocena=0;
-			double brOcena=0;
-			if(!dermatolog.getOceneDermatologa().isEmpty()) {
-				for(OcenaDermatolog od:dermatolog.getOceneDermatologa()) {
-					ocena+=od.getVrednost();
-					brOcena++;
+		List<LekarDTO> dermatoloziDTO = new ArrayList<LekarDTO>();
+		for (Dermatolog dermatolog : dermatolozi) {
+			String apoteke = "";
+			for (Apoteka apoteka : dermatolog.getApoteke()) {
+				if (apoteka.getId().equals(admin.getApoteka().getId())) {
+
+					apoteke += apoteka.getNaziv() + ",";
+
+					apoteke = apoteke.substring(0, apoteke.length() - 1); // da bih uklonila poslednji zarez
+					double ocena = 0;
+					double brOcena = 0;
+					if (!dermatolog.getOceneDermatologa().isEmpty()) {
+						for (OcenaDermatolog od : dermatolog.getOceneDermatologa()) {
+							ocena += od.getVrednost();
+							brOcena++;
+						}
+						ocena = ocena / brOcena;
+					}
+					dermatoloziDTO.add(new LekarDTO(dermatolog.getId(),
+							dermatolog.getIme() + " " + dermatolog.getPrezime(), "dermatolog", ocena, apoteke));
 				}
-				ocena=ocena/brOcena;
 			}
-			dermatoloziDTO.add(new LekarDTO(dermatolog.getId(), dermatolog.getIme()+" "+dermatolog.getPrezime(), "dermatolog", ocena, apoteke));
 		}
 		return new ResponseEntity<List<LekarDTO>>(dermatoloziDTO, HttpStatus.OK);
 	}

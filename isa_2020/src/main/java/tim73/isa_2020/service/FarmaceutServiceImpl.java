@@ -30,4 +30,9 @@ public class FarmaceutServiceImpl implements FarmaceutService{
 		return farmaceutRepository.searchByImeLikeAndPrezimeLikeIgnoreCase(ime, prezime);
 	}
 
+	@Override
+	public List<Farmaceut> findAll() {
+		return farmaceutRepository.findAll();
+	}
+
 }

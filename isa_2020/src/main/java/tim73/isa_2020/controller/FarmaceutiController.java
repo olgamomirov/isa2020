@@ -22,6 +22,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -83,13 +84,12 @@ public class FarmaceutiController {
 
 	@Autowired
 	private OcenaFarmaceutService ocenaFarmaceutService;
-	
+
 	@Autowired
 	private AuthorityService authorityService;
-	
+
 	@Autowired
 	private RadnoVremeService radnoVremeService;
-
 
 	@RequestMapping(method = RequestMethod.POST, value = "/changeData", consumes = "application/json", produces = "application/json")
 	@PreAuthorize("hasRole('FARMACEUT')")
@@ -202,7 +202,8 @@ public class FarmaceutiController {
 
 	@GetMapping(value = "/slobodni/{vreme}/{idApoteke}")
 	@PreAuthorize("hasRole('PACIJENT')")
-	public ResponseEntity<List<LekarDTO>> slobodniFarmaceuti(@PathVariable String vreme, @PathVariable Long idApoteke, HttpServletRequest request) {
+	public ResponseEntity<List<LekarDTO>> slobodniFarmaceuti(@PathVariable String vreme, @PathVariable Long idApoteke,
+			HttpServletRequest request) {
 		String datum = vreme.split("T")[0];
 		String vremeString = vreme.split("T")[1];
 		System.out.println(datum);
@@ -211,7 +212,7 @@ public class FarmaceutiController {
 		String token = tokenUtils.getToken(request);
 		String username = this.tokenUtils.getUsernameFromToken(token);
 		Pacijent pacijent = (Pacijent) this.userDetailsService.loadUserByUsername(username);
-		
+
 		DateTime vremePregleda = new DateTime(Integer.parseInt(datum.split("-")[0]),
 				Integer.parseInt(datum.split("-")[1]), Integer.parseInt(datum.split("-")[2]),
 				Integer.parseInt(vremeString.split(":")[0]), Integer.parseInt(vremeString.split(":")[1]));
@@ -223,15 +224,15 @@ public class FarmaceutiController {
 		for (Farmaceut farmaceut : sviFarmaceutiIzApoteke) {
 			int slobodanPregled = 0;
 			int slobodanUTokuRadnogVremena = 0;
-			double cena=0;
-			double cenaSaPopustom=0;
+			double cena = 0;
+			double cenaSaPopustom = 0;
 			for (Pregled pregled : farmaceut.getPregledi()) {
 				Interval interval = new Interval(pregled.getInterval());
 				if (pregled != null && pregled.getApoteka().getId().equals(idApoteke)
 						&& (interval.contains(noviPregled)) || interval.overlaps(noviPregled)) {
 					slobodanPregled++;
 				}
-				cena=pregled.getTip().getCena();
+				cena = pregled.getTip().getCena();
 			}
 			for (RadnoVreme rv : farmaceut.getRadnoVreme()) {
 				Interval interval = new Interval(rv.getInterval());
@@ -242,22 +243,21 @@ public class FarmaceutiController {
 			}
 
 			if (slobodanPregled == 0 && slobodanUTokuRadnogVremena != 0) {
-				
-				
-				double ocena=0;
-				double brOcena=0;
-				if(!farmaceut.getOceneFarmaceuta().isEmpty()) {
-					for(OcenaFarmaceut of:farmaceut.getOceneFarmaceuta()) {
-						ocena+=of.getVrednost();
+
+				double ocena = 0;
+				double brOcena = 0;
+				if (!farmaceut.getOceneFarmaceuta().isEmpty()) {
+					for (OcenaFarmaceut of : farmaceut.getOceneFarmaceuta()) {
+						ocena += of.getVrednost();
 						brOcena++;
 					}
-					ocena=ocena/brOcena;
+					ocena = ocena / brOcena;
 				}
-				
-				cenaSaPopustom=cena*((100-pacijent.getLoyaltyProgram().getPopust())/100);
-				
+
+				cenaSaPopustom = cena * ((100 - pacijent.getLoyaltyProgram().getPopust()) / 100);
+
 				slobodniFarmaceuti.add(new LekarDTO(farmaceut.getId(),
-						farmaceut.getIme() + " " + farmaceut.getPrezime(), "farmaceut", ocena,cena,cenaSaPopustom));
+						farmaceut.getIme() + " " + farmaceut.getPrezime(), "farmaceut", ocena, cena, cenaSaPopustom));
 			}
 		}
 		return new ResponseEntity<List<LekarDTO>>(slobodniFarmaceuti, HttpStatus.OK);
@@ -280,11 +280,12 @@ public class FarmaceutiController {
 						.findByFarmaceutIdAndPacijentId(pregled.getFarmaceut().getId(), p.getId());
 				if (ocena != null) {
 					farmaceut = new LekarDTO(pregled.getFarmaceut().getId(),
-							pregled.getFarmaceut().getIme()+" " + pregled.getFarmaceut().getPrezime(), "farmaceut",
+							pregled.getFarmaceut().getIme() + " " + pregled.getFarmaceut().getPrezime(), "farmaceut",
 							ocena.getVrednost());
 				} else {
 					farmaceut = new LekarDTO(pregled.getFarmaceut().getId(),
-							pregled.getFarmaceut().getIme() +" "+ pregled.getFarmaceut().getPrezime(), "farmaceut", 0);
+							pregled.getFarmaceut().getIme() + " " + pregled.getFarmaceut().getPrezime(), "farmaceut",
+							0);
 				}
 				if (!farmaceuti.contains(farmaceut)) {
 					farmaceuti.add(farmaceut);
@@ -296,121 +297,182 @@ public class FarmaceutiController {
 
 	@RequestMapping(value = "/search", method = RequestMethod.GET)
 	@PreAuthorize("hasRole('ADMINISTRATOR')")
-	public ResponseEntity<List<LekarDTO>> pretragaFarmaceuta(@RequestParam("ime") String ime, @RequestParam("prezime") String prezime,HttpServletRequest request){
-		
+	public ResponseEntity<List<LekarDTO>> pretragaFarmaceuta(@RequestParam("ime") String ime,
+			@RequestParam("prezime") String prezime, HttpServletRequest request) {
 
-		List<Farmaceut> farmaceuti=farmaceutService.findByImeIPrezime(ime, prezime);
-		List<LekarDTO> farmaceutiDTO= new ArrayList<LekarDTO>();
-		for(Farmaceut farmaceut:farmaceuti) {
-			double ocena=0;
-			double brOcena=0;
-			if(!farmaceut.getOceneFarmaceuta().isEmpty()) {
-				for(OcenaFarmaceut of:farmaceut.getOceneFarmaceuta()) {
-					ocena+=of.getVrednost();
-					brOcena++;
-				}
-				ocena=ocena/brOcena;
-			}
-			farmaceutiDTO.add(new LekarDTO(farmaceut.getId(), farmaceut.getIme()+" "+farmaceut.getPrezime(), "farmaceut", ocena, farmaceut.getApoteka().getNaziv()));
-		}
-		return new ResponseEntity<List<LekarDTO>>(farmaceutiDTO, HttpStatus.OK);
-	}
-	@RequestMapping(value = "/farmaceuti", method = RequestMethod.GET)
-	@PreAuthorize("hasRole('ADMINISTRATOR')")
-	public ResponseEntity<List<LekarDTO>> farmaceuti(HttpServletRequest request){
 		String token = tokenUtils.getToken(request);
 		String username = this.tokenUtils.getUsernameFromToken(token);
 		AdministratorApoteke admin = (AdministratorApoteke) this.userDetailsService.loadUserByUsername(username);
-		
-		List<LekarDTO> farmaceutiDTO= new ArrayList<LekarDTO>();
-		
-		Apoteka a=admin.getApoteka();
-		
-		for(Farmaceut farmaceut:a.getFarmaceuti()) {
-			
-			double ocena=0;
-			double brOcena=0;
-			if(!farmaceut.getOceneFarmaceuta().isEmpty()) {
-				for(OcenaFarmaceut of:farmaceut.getOceneFarmaceuta()) {
-					ocena+=of.getVrednost();
-					brOcena++;
+
+		List<Farmaceut> farmaceuti = farmaceutService.findByImeIPrezime(ime, prezime);
+		List<LekarDTO> farmaceutiDTO = new ArrayList<LekarDTO>();
+		for (Farmaceut farmaceut : farmaceuti) {
+			if (farmaceut.getApoteka().getId().equals(admin.getApoteka().getId())) {
+				double ocena = 0;
+				double brOcena = 0;
+				if (!farmaceut.getOceneFarmaceuta().isEmpty()) {
+					for (OcenaFarmaceut of : farmaceut.getOceneFarmaceuta()) {
+						ocena += of.getVrednost();
+						brOcena++;
+					}
+					ocena = ocena / brOcena;
 				}
-				ocena=ocena/brOcena;
+				farmaceutiDTO.add(new LekarDTO(farmaceut.getId(), farmaceut.getIme() + " " + farmaceut.getPrezime(),
+						"farmaceut", ocena, farmaceut.getApoteka().getNaziv()));
 			}
-			farmaceutiDTO.add(new LekarDTO(farmaceut.getId(), farmaceut.getIme()+" "+farmaceut.getPrezime(), "farmaceut", ocena, farmaceut.getApoteka().getNaziv()));
 		}
 		return new ResponseEntity<List<LekarDTO>>(farmaceutiDTO, HttpStatus.OK);
 	}
-	
-	//administrator apoteke zaposljava novog farmaceuta
-		@RequestMapping(value = "/registruj", method = RequestMethod.POST, consumes = "application/json")
-		@PreAuthorize("hasRole('ADMINISTRATOR')")
-		public void registruj(@RequestBody FarmaceutDTO korisnik, HttpServletRequest request) {
-			
-			String token = tokenUtils.getToken(request);
-			String username = this.tokenUtils.getUsernameFromToken(token);
-			AdministratorApoteke admin = (AdministratorApoteke) this.userDetailsService.loadUserByUsername(username);
-			
-			List<Authority> a=authorityService.findByname("ROLE_FARMACEUT");
-			Set<RadnoVreme> radnoVreme= new HashSet<RadnoVreme>();
-			
-			Farmaceut farmaceut= new Farmaceut();
-			farmaceut.setEmail(korisnik.getEmail());
-			farmaceut.setIme(korisnik.getIme());
-			farmaceut.setPrezime(korisnik.getPrezime());
-			farmaceut.setDrzava(korisnik.getDrzava());
-			farmaceut.setGrad(korisnik.getGrad());
-			farmaceut.setUlica(korisnik.getUlica());
-			farmaceut.setTelefon(korisnik.getTelefon());
-			farmaceut.setStatus("registrovan");
-			farmaceut.setEnabled(true);
-			farmaceut.setLozinka(passwordEncoder.encode("123"));
-			farmaceut.setAuthorities(a);
-			farmaceut.setApoteka(admin.getApoteka());
-			
-			for(String s:korisnik.getRadnoVreme()) {
-				String interval = s.split(",")[0] + ":00.000+01:00" + "/" +s.split(",")[1] + ":00.000+01:00";
-				RadnoVreme rv=new RadnoVreme(interval);
-				rv.setFarmaceut(farmaceut);
-				rv.setApoteka(admin.getApoteka());
-				radnoVreme.add(rv);
+
+	@RequestMapping(value = "/farmaceuti", method = RequestMethod.GET)
+	@PreAuthorize("hasRole('ADMINISTRATOR')")
+	public ResponseEntity<List<LekarDTO>> farmaceuti(HttpServletRequest request) {
+		String token = tokenUtils.getToken(request);
+		String username = this.tokenUtils.getUsernameFromToken(token);
+		AdministratorApoteke admin = (AdministratorApoteke) this.userDetailsService.loadUserByUsername(username);
+
+		List<LekarDTO> farmaceutiDTO = new ArrayList<LekarDTO>();
+
+		Apoteka a = admin.getApoteka();
+
+		for (Farmaceut farmaceut : a.getFarmaceuti()) {
+
+			double ocena = 0;
+			double brOcena = 0;
+			if (!farmaceut.getOceneFarmaceuta().isEmpty()) {
+				for (OcenaFarmaceut of : farmaceut.getOceneFarmaceuta()) {
+					ocena += of.getVrednost();
+					brOcena++;
+				}
+				ocena = ocena / brOcena;
 			}
-			
-			farmaceut.setRadnoVreme(radnoVreme);
-			
-			korisnikService.save(farmaceut);
+			farmaceutiDTO.add(new LekarDTO(farmaceut.getId(), farmaceut.getIme() + " " + farmaceut.getPrezime(),
+					"farmaceut", ocena, farmaceut.getApoteka().getNaziv()));
 		}
-		
-		@PutMapping(value = "/otpusti/{id}")
-		@PreAuthorize("hasRole('ADMINISTRATOR')")
-		public ResponseEntity<String> otpusti(@PathVariable Long id, HttpServletRequest request) {
-			System.out.println(id);
-			String token = tokenUtils.getToken(request);
-			String username = this.tokenUtils.getUsernameFromToken(token);
-			AdministratorApoteke admin = (AdministratorApoteke) this.userDetailsService.loadUserByUsername(username);
+		return new ResponseEntity<List<LekarDTO>>(farmaceutiDTO, HttpStatus.OK);
+	}
+
+	// administrator apoteke zaposljava novog farmaceuta
+	@RequestMapping(value = "/registruj", method = RequestMethod.POST, consumes = "application/json")
+	@PreAuthorize("hasRole('ADMINISTRATOR')")
+	public void registruj(@RequestBody FarmaceutDTO korisnik, HttpServletRequest request) {
+
+		String token = tokenUtils.getToken(request);
+		String username = this.tokenUtils.getUsernameFromToken(token);
+		AdministratorApoteke admin = (AdministratorApoteke) this.userDetailsService.loadUserByUsername(username);
+
+		List<Authority> a = authorityService.findByname("ROLE_FARMACEUT");
+		Set<RadnoVreme> radnoVreme = new HashSet<RadnoVreme>();
+
+		Farmaceut farmaceut = new Farmaceut();
+		farmaceut.setEmail(korisnik.getEmail());
+		farmaceut.setIme(korisnik.getIme());
+		farmaceut.setPrezime(korisnik.getPrezime());
+		farmaceut.setDrzava(korisnik.getDrzava());
+		farmaceut.setGrad(korisnik.getGrad());
+		farmaceut.setUlica(korisnik.getUlica());
+		farmaceut.setTelefon(korisnik.getTelefon());
+		farmaceut.setStatus("registrovan");
+		farmaceut.setEnabled(true);
+		farmaceut.setLozinka(passwordEncoder.encode("123"));
+		farmaceut.setAuthorities(a);
+		farmaceut.setApoteka(admin.getApoteka());
+
+		for (String s : korisnik.getRadnoVreme()) {
+			String interval = s.split(",")[0] + ":00.000+01:00" + "/" + s.split(",")[1] + ":00.000+01:00";
+			RadnoVreme rv = new RadnoVreme(interval);
+			rv.setFarmaceut(farmaceut);
+			rv.setApoteka(admin.getApoteka());
+			radnoVreme.add(rv);
+		}
+
+		farmaceut.setRadnoVreme(radnoVreme);
+
+		korisnikService.save(farmaceut);
+	}
+
+	@PutMapping(value = "/otpusti/{id}")
+	@PreAuthorize("hasRole('ADMINISTRATOR')")
+	public ResponseEntity<String> otpusti(@PathVariable Long id, HttpServletRequest request) {
+		System.out.println(id);
+		String token = tokenUtils.getToken(request);
+		String username = this.tokenUtils.getUsernameFromToken(token);
+		AdministratorApoteke admin = (AdministratorApoteke) this.userDetailsService.loadUserByUsername(username);
+		Apoteka apoteka = admin.getApoteka();
+		Farmaceut f = farmaceutService.findOne(id);
+		if (!pregledService.findByFarmaceutIdAndApotekaId(id, apoteka.getId()).isEmpty()) {
+			for (Pregled pregled : pregledService.findByFarmaceutIdAndApotekaId(id, apoteka.getId())) {
+				if (pregled.getStatus().equals("rezervisan")) {
+					return ResponseEntity.badRequest().body("Farmaceut ima zakazane preglede");
+				}
+			}
+		}
+		f.setApoteka(null);
+
+		for (RadnoVreme rv : radnoVremeService.findByFarmaceutIdAndApotekaId(id, apoteka.getId())) {
+			f.getRadnoVreme().remove(rv);
+			radnoVremeService.remove(rv);
+
+		}
+
+		korisnikService.save(f);
+		return new ResponseEntity<String>("Farmaceut je otpusten!", HttpStatus.OK);
+
+	}
+
+	@GetMapping(value = "/zaZaposlenje")
+	@PreAuthorize("hasRole('ADMINISTRATOR')")
+	public ResponseEntity<List<LekarDTO>> zaZaposlenje(HttpServletRequest request) {
+		String token = tokenUtils.getToken(request);
+		String username = this.tokenUtils.getUsernameFromToken(token);
+		AdministratorApoteke admin = (AdministratorApoteke) this.userDetailsService.loadUserByUsername(username);
+
+		List<LekarDTO> farmaceuti = new ArrayList<LekarDTO>();
+
+		for (Farmaceut farmaceut : farmaceutService.findAll()) {
+			if (farmaceut.getApoteka() == null) {
+				double ocena = 0;
+				double brOcena = 0;
+				if (!farmaceut.getOceneFarmaceuta().isEmpty()) {
+					for (OcenaFarmaceut of : farmaceut.getOceneFarmaceuta()) {
+						ocena += of.getVrednost();
+						brOcena++;
+					}
+					ocena = ocena / brOcena;
+				}
+				farmaceuti.add(new LekarDTO(farmaceut.getId(), farmaceut.getIme() + " " + farmaceut.getPrezime(),
+						"farmaceut", ocena));
+			}
+		}
+		return new ResponseEntity<List<LekarDTO>>(farmaceuti, HttpStatus.OK);
+
+	}
+	
+	@PostMapping(value="/noviFarmaceut/radnoVreme")
+	@PreAuthorize("hasRole('ADMINISTRATOR')")
+	public ResponseEntity<String> zaposli(@RequestParam("lekar") Long id,@RequestBody List<String> radnoVreme, HttpServletRequest request){
+		String token = tokenUtils.getToken(request);
+		String username = this.tokenUtils.getUsernameFromToken(token);
+		AdministratorApoteke admin = (AdministratorApoteke) this.userDetailsService.loadUserByUsername(username);
 		Apoteka apoteka=admin.getApoteka();
-		  Farmaceut f=farmaceutService.findOne(id); 
-		  if(!pregledService.findByFarmaceutIdAndApotekaId(id, apoteka.getId()).isEmpty()) {
-			  for (Pregled pregled: pregledService.findByFarmaceutIdAndApotekaId(id, apoteka.getId())) {
-				  if(pregled.getStatus().equals("rezervisan")) {
-					  return ResponseEntity.badRequest().body("Farmaceut ima zakazane preglede");
-				  }
-			  }
-		  }
-		 f.setApoteka(null);
-		 
-		 for(RadnoVreme rv: radnoVremeService.findByFarmaceutIdAndApotekaId(id, apoteka.getId())) {
-			 f.getRadnoVreme().remove(rv);
-			 radnoVremeService.remove(rv);
-			 
-		 }
-		 
-		 korisnikService.save(f);
-		 return new ResponseEntity<String>("Farmaceut je otpusten!", HttpStatus.OK);
-			
+		
+		System.out.println(id);
+		Farmaceut farmaceut=farmaceutService.findOne(id);
+		
+		Set<RadnoVreme> rvL= new HashSet<RadnoVreme>();
+		
+		for(String rv:radnoVreme) {
+			RadnoVreme novoRV=new RadnoVreme(rv.split(",")[0]+ ":00.000+01:00" + "/" +rv.split(",")[1] + ":00.000+01:00");
+			novoRV.setApoteka(apoteka);
+			novoRV.setFarmaceut(farmaceut);
+			rvL.add(novoRV);
+			//farmaceut.setRadnoVreme(novoRV);
 		}
-		
-		
-}		
+		farmaceut.setApoteka(apoteka);
+		farmaceut.setRadnoVreme(rvL);
+		apoteka.getFarmaceuti().add(farmaceut);
+		korisnikService.save(farmaceut);
+		return new ResponseEntity<String>("Uspesno ste zaposlili dermatologa", HttpStatus.OK);
+	}
 
-
+}
