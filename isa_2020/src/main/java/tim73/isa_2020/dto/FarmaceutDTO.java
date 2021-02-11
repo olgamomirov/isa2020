@@ -15,6 +15,7 @@ public class FarmaceutDTO {
 	private String telefon;
 	private String status;
 	private List<String> radnoVreme;
+	private Long apotekaID;
 	
 	public FarmaceutDTO() {
 		super();
@@ -36,6 +37,19 @@ public class FarmaceutDTO {
 		this.drzava = drzava;
 		this.telefon = telefon;
 		this.status = status;
+	}
+	public FarmaceutDTO(String email, String ime, String prezime, String ulica, String grad, String drzava,
+			String telefon, String status, Long apotekaID) {
+		super();
+		this.email = email;
+		this.ime = ime;
+		this.prezime = prezime;
+		this.ulica = ulica;
+		this.grad = grad;
+		this.drzava = drzava;
+		this.telefon = telefon;
+		this.status = status;
+		this.apotekaID = apotekaID;
 	}
 	
 	public FarmaceutDTO(String email, String ime, String prezime, String ulica, String grad, String drzava,
@@ -116,6 +130,10 @@ public class FarmaceutDTO {
 
 	public void setRadnoVreme(List<String> radnoVreme) {
 		this.radnoVreme = radnoVreme;
+	}
+
+	public Long getApotekaID() {
+		return apotekaID;
 	}
 
 }

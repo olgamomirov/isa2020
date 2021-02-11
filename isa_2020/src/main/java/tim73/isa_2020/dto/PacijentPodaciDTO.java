@@ -14,6 +14,7 @@ public class PacijentPodaciDTO {
 	private String telefon;
 	private int penali;
 	private String tipKorisnika;
+	private String lozinka;
 	
 	public PacijentPodaciDTO (Korisnik korisnik) {
 		this(korisnik.getEmail(), korisnik.getIme(), korisnik.getPrezime(), korisnik.getUlica(), korisnik.getGrad(), korisnik.getDrzava(), korisnik.getTelefon());
@@ -57,6 +58,19 @@ public class PacijentPodaciDTO {
 		this.telefon = telefon;
 	}
 
+
+	public PacijentPodaciDTO(String email, String ime, String prezime, String ulica, String grad, String drzava,
+			String telefon, String lozinka) {
+		super();
+		this.email = email;
+		this.ime = ime;
+		this.prezime = prezime;
+		this.ulica = ulica;
+		this.grad = grad;
+		this.drzava = drzava;
+		this.telefon = telefon;
+		this.lozinka = lozinka;
+	}
 
 	public String getEmail() {
 		return email;
@@ -122,9 +136,12 @@ public class PacijentPodaciDTO {
 		return tipKorisnika;
 	}
 
-	
-	
-	
-	
+	public String getLozinka() {
+		return lozinka;
+	}
+
+	public void setLozinka(String lozinka) {
+		this.lozinka = lozinka;
+	}
 
 }

@@ -597,11 +597,12 @@ public class PregledController {
  
 	}
 	
-	@GetMapping(value = "/pregledi")
+	@GetMapping(value = "/pregledi") //pregledi pacijenta u odredjenoj apoteci kod ulogovanog dermatologa
 	@PreAuthorize("hasRole('DERMATOLOG')")
-	public ResponseEntity<List<PregledDTO>> preglediPacijent(@RequestParam("email") String email, HttpServletRequest request){
+	public ResponseEntity<List<PregledDTO>> preglediPacijent(@RequestParam("email") String email,@RequestParam("apotekaID") Long id, HttpServletRequest request){
       List<PregledDTO> preglediDTO= new ArrayList<PregledDTO>();
-		Pacijent p = (Pacijent) korisnikService.findByEmail(email);
+		
+        Pacijent p = (Pacijent) korisnikService.findByEmail(email);
 
 		String token = tokenUtils.getToken(request);
 		String username = this.tokenUtils.getUsernameFromToken(token);
@@ -609,12 +610,45 @@ public class PregledController {
 		Dermatolog d = (Dermatolog) k;
 		Set<Pregled> pregledi=p.getPregledi();
 		
+		
 		for (Pregled pregled:pregledi) {
 			if(pregled.getStatus().equals("rezervisan")) {
 				
 				if(pregled.getDermatolog()!=null&&pregled.getDermatolog().equals(d)) {
+					if(pregled.getApoteka().getId().equals(id)) {
 				
 							preglediDTO.add(new PregledDTO(pregled));
+				}
+				}
+				}
+				
+			}
+	
+		return new ResponseEntity<List<PregledDTO>>(preglediDTO,HttpStatus.OK);
+		
+	}
+	@GetMapping(value = "/preglediUSvimApotekama") //pregledi pacijenta u svim apotekama u kojima dermatolog radi
+	@PreAuthorize("hasRole('DERMATOLOG')")
+	public ResponseEntity<List<PregledDTO>> preglediPacijent(@RequestParam("email") String email, HttpServletRequest request){
+      List<PregledDTO> preglediDTO= new ArrayList<PregledDTO>();
+		
+        Pacijent p = (Pacijent) korisnikService.findByEmail(email);
+
+		String token = tokenUtils.getToken(request);
+		String username = this.tokenUtils.getUsernameFromToken(token);
+		Korisnik k = (Korisnik) this.korisnikDetails.loadUserByUsername(username);
+		Dermatolog d = (Dermatolog) k;
+		Set<Pregled> pregledi=p.getPregledi();
+		
+		
+		for (Pregled pregled:pregledi) {
+			if(pregled.getStatus().equals("rezervisan")) {
+				
+				if(pregled.getDermatolog()!=null&&pregled.getDermatolog().equals(d)) {
+					
+				
+							preglediDTO.add(new PregledDTO(pregled));
+				
 				}
 				}
 				
@@ -625,7 +659,7 @@ public class PregledController {
 	}
 	@GetMapping(value = "/preglediKodFarmaceuta") 
 	@PreAuthorize("hasRole('FARMACEUT')")
-	public ResponseEntity<List<PregledDTO>> preglediPacijentKodFarmaceuta(@RequestParam("email") String email, HttpServletRequest request){
+	public ResponseEntity<List<PregledDTO>> preglediPacijentKodFarmaceuta(@RequestParam("email") String email, @RequestParam("apotekaID") Long id, HttpServletRequest request){
       List<PregledDTO> preglediDTO= new ArrayList<PregledDTO>();
 		Pacijent p = (Pacijent) korisnikService.findByEmail(email);
 
@@ -648,6 +682,24 @@ public class PregledController {
 	
 		return new ResponseEntity<List<PregledDTO>>(preglediDTO,HttpStatus.OK);
 		
+	}
+	static class pregledId{
+		public Long id;
+	}
+	@PostMapping(value = "/pregledUToku")
+	@PreAuthorize("hasRole('DERMATOLOG') or hasRole('FARMACEUT')")
+	public ResponseEntity<PregledDTO> pregledZapocet(@RequestBody pregledId pregledId){
+     
+		Pregled pregled = pregledService.findOne(pregledId.id);
+		
+		pregled.setStatus("u toku");
+	
+		pregledService.save(pregled);		
+			
+		PregledDTO dto = new PregledDTO(pregled);
+		return new ResponseEntity<PregledDTO>(dto,HttpStatus.OK);
+		
+
 	}
 	static class PregledKraj{
 		public String informacije;

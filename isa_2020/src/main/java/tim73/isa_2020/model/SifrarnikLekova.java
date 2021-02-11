@@ -25,6 +25,7 @@ public class SifrarnikLekova {
 	@Column(unique=true, nullable=false)
 	private Long id; //sifra
 	
+	@Column(unique=true)
 	private String naziv;
 	
 	private String vrstaLeka;
