@@ -18,4 +18,9 @@ public interface PacijentService {
 	List<Pacijent> searchByImeLikeOrPrezimeLike(String ime, String prezime);
 	
 	List<Pacijent> saPenalima();
+	
+	List<Pacijent> findByLoyaltyProgramId(Long id);
+	
+	List<Pacijent> findAll();
+
 }

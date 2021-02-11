@@ -42,4 +42,14 @@ public class PacijentServiceImpl implements PacijentService{
 		return pacijentRepository.saPenalima();
 	}
 
+	@Override
+	public List<Pacijent> findByLoyaltyProgramId(Long id) {
+		return pacijentRepository.findByLoyaltyProgramId(id);
+	}
+
+	@Override
+	public List<Pacijent> findAll() {
+		return pacijentRepository.findAll();
+	}
+
 }

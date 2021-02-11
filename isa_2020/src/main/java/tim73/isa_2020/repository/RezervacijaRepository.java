@@ -19,5 +19,8 @@ public interface RezervacijaRepository extends JpaRepository<Rezervacija, Long>{
 	List<Rezervacija> izdavanjeRezervacije();
 	
 	List<Rezervacija> findByStatusAndLekId(String status,Long lekId);
+	
+	List<Rezervacija> findByStatusAndApotekaId(String status,Long apotekaId);
+
 
 }
