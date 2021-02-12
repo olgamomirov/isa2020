@@ -205,3 +205,6 @@ insert into "public"."stavke_akcije_promocije" ( "akcija_promocija_id", "lek_id"
 
 insert into "public"."zahtev_za_godisnji" ("interval", "razlog_odbijanja", "status", "apoteka_id", "dermatolog_id", "farmaceut_id") values('2021-04-05T00:00:00.000+01:00/2021-04-20T00:00:00.000+01:00', null, 'neodobren', 2, 2, null)
 insert into "public"."zahtev_za_godisnji" ("interval", "razlog_odbijanja", "status", "apoteka_id", "dermatolog_id", "farmaceut_id") values('2021-03-05T00:00:00.000+01:00/2021-03-20T00:00:00.000+01:00', null, 'neodobren', 2, null, 4)
+
+--aca je pretplacen na akcije/promocije Jankovic apotke
+insert into "public"."akcije_promocije_pretplate" ("apoteka_id", "pacijent_id") values(2, 5)

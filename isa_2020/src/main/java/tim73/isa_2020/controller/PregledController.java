@@ -1031,6 +1031,7 @@ public class PregledController {
         			
         			for(ZahtevZaGodisnji g: godisnji) {
         				Interval i = new Interval(g.getInterval());
+        				if(g.getDermatolog()!=null) {
         				if(g.getDermatolog().equals(d)) {
         					if(g.getStatus().equals("odobren")) {
         						if(i.overlaps(interval2)) {
@@ -1039,7 +1040,7 @@ public class PregledController {
         						}
         					}
         				}
-        				
+        				}
         			}
         			 boolean flag3 = false;
         		        for(RadnoVreme radnoVreme: d.getRadnoVreme()) {
