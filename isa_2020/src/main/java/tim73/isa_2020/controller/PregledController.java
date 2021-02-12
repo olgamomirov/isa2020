@@ -688,6 +688,7 @@ public class PregledController {
 				
 			}
 	
+		
 		return new ResponseEntity<List<PregledDTO>>(preglediDTO,HttpStatus.OK);
 		
 	}
