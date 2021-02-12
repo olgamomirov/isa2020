@@ -11,3 +11,7 @@ Front-end je odradjen u Visual Studio Code-u kao React aplikacija. U terminal-u 
 Otvoriti http://localhost:3000 u pretrazivacu.
 
 Napomena: Pregled se moze zapoceti 5 minuta ranije ili najkasnije 10 minuta od pocetka pregleda, u suprotnom lekaru nece biti omoguceno dugme 'zapocni pregled' i ako lekar zakasni sa zapocinjanjem pregleda, pregled odlazi u neodradjene, ali pacijent u tom slucaju ne dobija penal. 
+
+Pregledi kod dermatologa se zakazuju sa stranice apoteke, a kod farmaceuta sa linka "zakazivanje savetovanja" u gornjem meniju.
+
+Ako se ne prikaze notifikacija o uspesnoj/neuspesnoj promeni proveriti bazu.
