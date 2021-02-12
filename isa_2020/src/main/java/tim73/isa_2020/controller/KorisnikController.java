@@ -396,16 +396,16 @@ public class KorisnikController {
 		ZahtevZaGodisnji zahtev = new ZahtevZaGodisnji(interval, "neodobren", "", null, f, f.getApoteka());
 		zahtevGodisnjiService.save(zahtev);
 
-		/*
-		 * Set<AdministratorApoteke> admini = a.getAdministratorApoteke(); if(!flag) {
-		 * String email = null; for(AdministratorApoteke admin: admini) { email =
-		 * admin.getEmail(); //salje prvom adminu kog nadje break; }
-		 */
-		mailService.sendSimpleMessage("violetamarceta1995@gmail.com",
-				"Zahtev za godisnji odmor od lekara: " + k.getIme() + " " + k.getPrezime(),
-				"Od: " + godisnji.pocetak.toString() + "do: " + godisnji.kraj.toString());
-		// }
-
+		for(AdministratorApoteke admin: f.getApoteka().getAdministratorApoteke()) {
+		
+			mailService.sendSimpleMessage(admin.getEmail(),
+					"Zahtev za godisnji odmor od lekara: " + k.getIme() + " " + k.getPrezime(),
+					"Od: " + godisnji.pocetak.toString() + "do: " + godisnji.kraj.toString());
+			
+		}
+		 
+		
+		
 		return k.getIme();
 	}
 
@@ -434,15 +434,14 @@ public class KorisnikController {
 		ZahtevZaGodisnji zahtev = new ZahtevZaGodisnji(interval, "neodobren", "", d, null, a);
 		zahtevGodisnjiService.save(zahtev);
 
-		/*
-		 * Set<AdministratorApoteke> admini = a.getAdministratorApoteke(); if(!flag) {
-		 * String email = null; for(AdministratorApoteke admin: admini) { email =
-		 * admin.getEmail(); //salje prvom adminu kog nadje break; }
-		 */
-		mailService.sendSimpleMessage("violetamarceta1995@gmail.com",
-				"Zahtev za godisnji odmor od lekara: " + k.getIme() + " " + k.getPrezime(),
-				"Od: " + godisnji.pocetak.toString() + "do: " + godisnji.kraj.toString());
-		// }
+		for(AdministratorApoteke admin: a.getAdministratorApoteke()) {
+			
+			mailService.sendSimpleMessage(admin.getEmail(),
+					"Zahtev za godisnji odmor od lekara: " + k.getIme() + " " + k.getPrezime(),
+					"Od: " + godisnji.pocetak.toString() + "do: " + godisnji.kraj.toString());
+			
+		}
+		
 
 		return k.getIme();
 	}

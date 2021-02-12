@@ -283,23 +283,28 @@ static class paroviIzmena{
 		 Set<CenovnikStavka> stavkeListaStare = cenovnikStari.getStavkeCenovnika();
 		 Set<CenovnikStavka> stavkeeee = new HashSet<CenovnikStavka>();
 		 
-		 for(CenovnikStavka stavka: stavkeListaStare) {
-			 if(listaLekovaICena.size()!=0) {
+		 for(CenovnikStavka stavka : stavkeListaStare) {
+			 CenovnikStavka s = new CenovnikStavka(stavka.getCena(), stavka.getLek(),
+						cenovnikNovi);
+			 stavkeeee.add(s);
+			 
+		 }
+		 
+			 if(!listaLekovaICena.get(0).key.equals("nema izmene")) {
+									
 				 for(int i=0; i<listaLekovaICena.size(); i++) {
-			 if(stavka.getLek().getSifrarnikLekova().getNaziv().equals(listaLekovaICena.get(i).key)) {
-				 CenovnikStavka s = new CenovnikStavka(listaLekovaICena.get(i).value, stavka.getLek(), cenovnikNovi);
-				 stavkeeee.add(s);
-			 }else {
-				 CenovnikStavka s = new CenovnikStavka(stavka.getCena(), stavka.getLek(), cenovnikNovi);
-				 stavkeeee.add(s);
+				
+					 for(CenovnikStavka stavka : stavkeeee) {
+						 if(stavka.getLek().getSifrarnikLekova().getNaziv().equals(listaLekovaICena.get(i).key)) {
+							 stavka.setCena(listaLekovaICena.get(i).value);
+						 }
+					 }
+				 }
+				
+					
+			 
 			 }
-		 }
-			 }else {
-				 CenovnikStavka s = new CenovnikStavka(stavka.getCena(), stavka.getLek(), cenovnikNovi);
-				 stavkeeee.add(s);
-				 
-			 }
-		 }
+		
 		 
 		
 		 

@@ -179,20 +179,27 @@ public class LekController {
 	}
 	@GetMapping(value = "/jedinstveniNazivi/bezAlergija")
 	@PreAuthorize("hasRole('DERMATOLOG') or hasRole('FARMACEUT')")
-	public ResponseEntity<ArrayList<LekZaAlergijeDTO>> jedinstveniNaziviBezAlergija (@RequestParam("email") String email){
-		List<SifrarnikLekova> sviLekovi = sifrarnikLekovaService.findAll();
+	public ResponseEntity<ArrayList<LekZaAlergijeDTO>> jedinstveniNaziviBezAlergija (@RequestParam("email") String email, @RequestParam("id") Long id){
+		
 		ArrayList<LekZaAlergijeDTO> lekoviDTO = new ArrayList<LekZaAlergijeDTO>();
+		
 		Pacijent p = (Pacijent) userDetailsService.findByEmail(email);
+		
+		Pregled pregled = pregledService.findOne(id);
+		Apoteka a = pregled.getApoteka();
+		Set<Lek> sviLekoviApoteke = a.getLekovi();
 		Set<SifrarnikLekova> sviLekoviAlergija = new HashSet<SifrarnikLekova>();
 		if(p.getAlergija()!=null) {
 			sviLekoviAlergija = p.getAlergija().getLekovi();
+			System.out.println("ima alergije");
 		}
 		
 		boolean flag; //nije alergican na lek
-		for(SifrarnikLekova sl : sviLekovi) {
+		for(Lek sl : sviLekoviApoteke) {
 			flag = false;
 			for (SifrarnikLekova lekovi: sviLekoviAlergija) {
-			if(lekovi.getId().equals(sl.getId())){
+			if(lekovi.getNaziv().equals(sl.getSifrarnikLekova().getNaziv())){
+				System.out.println("poklapa se");
 				flag = true;
 				break;
 			}
@@ -200,7 +207,7 @@ public class LekController {
 			
 		}
 			if(flag==false) {
-			lekoviDTO.add(new LekZaAlergijeDTO(sl.getNaziv()));
+			lekoviDTO.add(new LekZaAlergijeDTO(sl));
 		}	
 		}
 		
@@ -322,10 +329,12 @@ public class LekController {
 				}
 				
 			}
+			if(lek!=null) {
 			DateTime danas = new DateTime();
 			String danasString  = danas.toString();
 			UpitZaLek upitZaSlanje = new UpitZaLek(lek, "nepregledan" , danasString);
 			upitService.save(upitZaSlanje);
+			}
 		}
 			
 			return flag;
@@ -398,9 +407,15 @@ public class LekController {
 			 
 		  }
 		}
-		Set<SifrarnikLekova> alergije = pacijent.getAlergija().getLekovi();
+		Set<SifrarnikLekova> alergije = null;
+		if(pacijent.getAlergija()!=null) {
+			alergije = pacijent.getAlergija().getLekovi();
+		}
 		List<Lek> konacnaLista = new ArrayList<Lek>();
 		boolean flag2 = true;
+		if(alergije==null) {
+			konacnaLista = lekoviZamena;
+		}else {
 		for(SifrarnikLekova sl: alergije) {
 			flag2 = true;
 			for(Lek l: lekoviZamena) {
@@ -413,6 +428,7 @@ public class LekController {
 					konacnaLista.add(l);
 				}
 			}
+		}
 		}
 		
 		for(Lek l: konacnaLista) {

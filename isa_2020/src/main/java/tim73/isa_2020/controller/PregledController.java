@@ -216,7 +216,7 @@ public class PregledController {
 		return new ResponseEntity<List<PregledDTO>>(preglediDTO, HttpStatus.OK);
 	}
 	@GetMapping(value = "/pregled/{id}")
-	@PreAuthorize("hasRole('DERMATOLOG')")
+	@PreAuthorize("hasRole('DERMATOLOG') or hasRole('FARMACEUT')")
 	public ResponseEntity <PregledDTO> findOneById(@PathVariable Long id) {
 		
 		Pregled pregled = pregledService.findOne(id);
@@ -467,6 +467,7 @@ public class PregledController {
 
 		if((interval.getStartMillis()-System.currentTimeMillis())/3600000>=24) {
 			pregled.setStatus("default");
+			pregled.setPacijent(null);
 			pregledService.save(pregled);
 			return new ResponseEntity<String>("Pregled je uspesno otkazan", HttpStatus.OK);
 
@@ -620,6 +621,13 @@ public class PregledController {
 							preglediDTO.add(new PregledDTO(pregled));
 				}
 				}
+				}else if(pregled.getStatus().equals("u toku")) {
+					if(pregled.getDermatolog()!=null&&pregled.getDermatolog().equals(d)) {
+						if(pregled.getApoteka().getId().equals(id)) {
+					
+								preglediDTO.add(new PregledDTO(pregled));
+					}
+					}	
 				}
 				
 			}
@@ -650,6 +658,13 @@ public class PregledController {
 							preglediDTO.add(new PregledDTO(pregled));
 				
 				}
+				}else if(pregled.getStatus().equals("u toku")) {
+					if(pregled.getDermatolog()!=null&&pregled.getDermatolog().equals(d)) {
+						
+						
+						preglediDTO.add(new PregledDTO(pregled));
+			
+			}
 				}
 				
 			}
@@ -676,6 +691,11 @@ public class PregledController {
 				
 							preglediDTO.add(new PregledDTO(pregled));
 				}
+				}else if(pregled.getStatus().equals("u toku")) {
+					if(pregled.getFarmaceut()!=null&&pregled.getFarmaceut().equals(f)) {
+						
+						preglediDTO.add(new PregledDTO(pregled));
+			}	
 				}
 				
 			}
@@ -826,7 +846,7 @@ public class PregledController {
         	}
         }
         PregledDTO dto = null;
-			if(!flag&&flag2) {
+			if((flag==false)&&(flag2==true)) {
 		
 		Pregled noviPregled = new Pregled(interval2.toString() , "rezervisan", "", "");
 		
@@ -850,8 +870,8 @@ public class PregledController {
 					+ interval.getStart().toString("dd/MM/yyyy HH:mm"));
 			*/
 			}
-			if(!flag2) {
-				System.out.println("nije u radnom vremenu");
+			if(flag2==false) {
+				return new ResponseEntity<PregledDTO>(dto,HttpStatus.BAD_REQUEST);
 			}
 			
 		return new ResponseEntity<PregledDTO>(dto,HttpStatus.OK);
@@ -914,7 +934,7 @@ public class PregledController {
         	}
         }
         PregledDTO dto = null;
-			if(!flag&&flag2) {
+			if((flag==false)&&(flag2==true)) {
 		
 		Pregled noviPregled = new Pregled(interval2.toString() , "rezervisan", "", "");
 		
@@ -937,8 +957,8 @@ public class PregledController {
 	     mailService.sendSimpleMessage(pacijent.getEmail(), "ZAKAZIVANJE PREGLEDA", "Zakazan Vam je pregled kod farmaceuta u "
 					+ interval.getStart().toString("dd/MM/yyyy HH:mm"));
 			}
-			if(!flag2) {
-				System.out.println("nije u radnom vremenu");
+			if(flag2==false) {
+				return new ResponseEntity<PregledDTO>(dto,HttpStatus.BAD_REQUEST);
 			}
 			
 		return new ResponseEntity<PregledDTO>(dto,HttpStatus.OK);
@@ -1011,7 +1031,7 @@ public class PregledController {
         		        }
         			if((flag1==true)||(flag2==true)||(flag3==false)) {
         				
-        				System.out.println("ne moze " + flag1 + " " + flag2 + " " + flag3);
+        				return new ResponseEntity<PregledDTO>(dto,HttpStatus.BAD_REQUEST);
         				
         			}if(flag3&&(flag1==false)&&(flag2==false)){
         	
