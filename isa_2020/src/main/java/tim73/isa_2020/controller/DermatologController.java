@@ -212,7 +212,7 @@ public class DermatologController {
 		
 		//new UserTokenState(token, tokenUtils.getExpiredIn(), authority.get(0).getName(), "ulogovan");
 	
-		System.out.println(status.statusNovi  + " sta cita?");
+		
 		String status1 = status.statusNovi;
 		user.setStatus(status1);
 
