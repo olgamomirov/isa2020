@@ -29,4 +29,6 @@ public interface PregledService {
 	
 	void delete(List<Pregled> pregled);
 	
+	void delete(Pregled pregled);
+	
 }

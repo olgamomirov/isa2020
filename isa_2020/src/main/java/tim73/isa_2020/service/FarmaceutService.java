@@ -17,5 +17,8 @@ public interface FarmaceutService {
 	List<Farmaceut> findByApotekaId(Long id);
 	
 	List<Farmaceut> findByImeIPrezime(String ime, String prezime);
+	
+	List<Farmaceut> findAll();
+
 
 }

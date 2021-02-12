@@ -18,6 +18,7 @@ import tim73.isa_2020.dto.LekarDTO;
 import tim73.isa_2020.model.Apoteka;
 import tim73.isa_2020.model.Dermatolog;
 import tim73.isa_2020.model.Farmaceut;
+import tim73.isa_2020.model.Korisnik;
 import tim73.isa_2020.model.OcenaDermatolog;
 import tim73.isa_2020.model.OcenaFarmaceut;
 import tim73.isa_2020.service.DermatologService;
@@ -35,44 +36,55 @@ public class LekariController {
 	
 	@RequestMapping(value = "/search", method = RequestMethod.GET)
 	@PreAuthorize("hasRole('PACIJENT')")
-	public ResponseEntity<List<LekarDTO>> pretragaLekara(@RequestParam("ime") String ime, @RequestParam("prezime") String prezime,HttpServletRequest request){
+	public ResponseEntity<List<LekarDTO>> pretragaLekara(@RequestParam("ime") String ime, @RequestParam("prezime") String prezime,@RequestParam("apoteka") Long apotekaId,HttpServletRequest request){
 		
 
+
+		
+		
 		List<Farmaceut> farmaceuti=farmaceutService.findByImeIPrezime(ime, prezime);
 		List<LekarDTO> lekariDTO= new ArrayList<LekarDTO>();
-		for(Farmaceut farmaceut:farmaceuti) {
-			double ocena=0;
-			double brOcena=0;
-			if(!farmaceut.getOceneFarmaceuta().isEmpty()) {
-				for(OcenaFarmaceut of:farmaceut.getOceneFarmaceuta()) {
-					ocena+=of.getVrednost();
-					brOcena++;
+		for (Farmaceut farmaceut : farmaceuti) {
+			if (farmaceut.getApoteka().getId().equals(apotekaId)) {
+				double ocena = 0;
+				double brOcena = 0;
+				if (!farmaceut.getOceneFarmaceuta().isEmpty()) {
+					for (OcenaFarmaceut of : farmaceut.getOceneFarmaceuta()) {
+						ocena += of.getVrednost();
+						brOcena++;
+					}
+					ocena = ocena / brOcena;
 				}
-				ocena=ocena/brOcena;
+				lekariDTO.add(new LekarDTO(farmaceut.getId(), farmaceut.getIme() + " " + farmaceut.getPrezime(),
+						"farmaceut", ocena, farmaceut.getApoteka().getNaziv()));
 			}
-			lekariDTO.add(new LekarDTO(farmaceut.getId(), farmaceut.getIme()+" "+farmaceut.getPrezime(), "farmaceut", ocena, farmaceut.getApoteka().getNaziv()));
 		}
 		
 		
-		List<Dermatolog> dermatolozi=dermatologService.findByImeIPrezime(ime, prezime);
-		for(Dermatolog dermatolog:dermatolozi) {
-			String apoteke="";
-			for(Apoteka apoteka:dermatolog.getApoteke()) {
-				apoteke+=apoteka.getNaziv()+",";
-			}
-			apoteke=apoteke.substring(0, apoteke.length()-1); //da bih uklonila poslednji zarez
-			double ocena=0;
-			double brOcena=0;
-			if(!dermatolog.getOceneDermatologa().isEmpty()) {
-				for(OcenaDermatolog od:dermatolog.getOceneDermatologa()) {
-					ocena+=od.getVrednost();
-					brOcena++;
+		List<Dermatolog> dermatolozi = dermatologService.findByImeIPrezime(ime, prezime);
+		for (Dermatolog dermatolog : dermatolozi) {
+			for (Apoteka a : dermatolog.getApoteke()) {
+				if (a.getId().equals(apotekaId)) {
+
+					String apoteke = "";
+					for (Apoteka apoteka : dermatolog.getApoteke()) {
+						apoteke += apoteka.getNaziv() + ",";
+					}
+					apoteke = apoteke.substring(0, apoteke.length() - 1); // da bih uklonila poslednji zarez
+					double ocena = 0;
+					double brOcena = 0;
+					if (!dermatolog.getOceneDermatologa().isEmpty()) {
+						for (OcenaDermatolog od : dermatolog.getOceneDermatologa()) {
+							ocena += od.getVrednost();
+							brOcena++;
+						}
+						ocena = ocena / brOcena;
+					}
+					lekariDTO.add(new LekarDTO(dermatolog.getId(), dermatolog.getIme() + " " + dermatolog.getPrezime(),
+							"dermatolog", ocena, apoteke));
 				}
-				ocena=ocena/brOcena;
 			}
-			lekariDTO.add(new LekarDTO(dermatolog.getId(), dermatolog.getIme()+" "+dermatolog.getPrezime(), "dermatolog", ocena, apoteke));
 		}
-		
 		return new ResponseEntity<List<LekarDTO>>(lekariDTO, HttpStatus.OK);
 	}
 	

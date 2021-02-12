@@ -286,10 +286,10 @@ public class IzvestajiController {
 				System.out.println(cena);
 				System.out.println(cenaRezervacija);
 				
-				cenaKonacno=cena+cenaRezervacija;
+				
 				
 			}
-			
+			cenaKonacno=cena+cenaRezervacija;
 			cenePregleda.add(cenaKonacno);
 			start+=86400000;
 			vreme=new DateTime(start);

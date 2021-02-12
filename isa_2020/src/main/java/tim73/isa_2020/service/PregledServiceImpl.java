@@ -81,4 +81,11 @@ public class PregledServiceImpl implements PregledService{
 		pregledRepository.deleteInBatch(pregled);
 	}
 
+
+	@Override
+	public void delete(Pregled pregled) {
+		pregledRepository.delete(pregled);
+		
+	}
+
 }

@@ -465,12 +465,31 @@ public class PregledController {
 		Pregled pregled = pregledService.findOne(id);
 		Interval interval = new Interval(pregled.getInterval());
 
+		System.out.println((interval.getStartMillis()-System.currentTimeMillis())/3600000>=24);
 		if((interval.getStartMillis()-System.currentTimeMillis())/3600000>=24) {
+			if(pregled.getTip().getTip().equals("dermatolog")) {
 			pregled.setStatus("default");
 			pregled.setPacijent(null);
 			pregledService.save(pregled);
-			return new ResponseEntity<String>("Pregled je uspesno otkazan", HttpStatus.OK);
-
+			return new ResponseEntity<String>("Pregled kod dermatologa je uspesno otkazan", HttpStatus.OK);
+			}
+			else {
+				Apoteka a=pregled.getApoteka();
+				a.getPregledi().remove(pregled);
+				Farmaceut f= pregled.getFarmaceut();
+				f.getPregledi().remove(pregled);
+				pregled.setApoteka(null);
+				pregled.setFarmaceut(null);
+				Pacijent pacijent=pregled.getPacijent();
+				pacijent.getPregledi().remove(pregled);
+				TipPregleda tip=pregled.getTip();
+				tip.getPregledi().remove(pregled);
+				pregled.setPacijent(null);
+				pregled.setTip(null);
+				pregledService.delete(pregled);
+				
+				return new ResponseEntity<String>("Pregled kod farmaceuta je uspesno otkazan", HttpStatus.OK);
+			}
 		}else {
 			return new ResponseEntity<>("Pregled mozete otkazati najmanje 24h pre zakazanog vremena", HttpStatus.BAD_REQUEST);
 
