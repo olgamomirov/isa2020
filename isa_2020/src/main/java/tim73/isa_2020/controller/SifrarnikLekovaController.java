@@ -75,7 +75,7 @@ public class SifrarnikLekovaController {
 	}
 	@RequestMapping(value = "/noviLek", method = RequestMethod.POST, produces = "application/json" ,  consumes = "application/json")
 	@PreAuthorize("hasRole('SISTEM')")
-	void dodavanjeNovogLeka(@RequestBody sifrarnik lek, HttpServletRequest request) throws ParseException, MailException, InterruptedException {
+	public ResponseEntity<String> dodavanjeNovogLeka(@RequestBody sifrarnik lek, HttpServletRequest request) throws ParseException, MailException, InterruptedException {
 
 		SifrarnikLekova noviLek = new SifrarnikLekova(lek.naziv, lek.vrsta, lek.oblik, lek.sastav, lek.proizvodjac, lek.recept, lek.dodatneNapomene);
 		noviLek.setPoeni(lek.poeni);
@@ -85,11 +85,15 @@ public class SifrarnikLekovaController {
 		for(Long id: lek.zamenskiLekovi) {
 			zamenskiLekovi.add(sifrarnikLekovaService.getById(id));
 		}
-		
+	
 		noviLek.setZamenskiLekovi(zamenskiLekovi);
 		}
-			sifrarnikLekovaService.save(noviLek);	
-		
+		if(sifrarnikLekovaService.findByNaziv(lek.naziv)==null) {
+			sifrarnikLekovaService.save(noviLek);
+			return new ResponseEntity<String>("Lek je uspesno sacuvan.", HttpStatus.OK);	
+		}else {
+		    return new ResponseEntity<String>("Lek vec postoji!", HttpStatus.BAD_REQUEST);	
+		}
 	}
 	
 }

@@ -11,7 +11,7 @@ import tim73.isa_2020.model.SifrarnikLekova;
 
 public interface SifrarnikLekovaRepository extends JpaRepository<SifrarnikLekova, Long>{
 
-	@Query("SELECT l FROM SifrarnikLekova l WHERE lower(l.naziv) LIKE %:naziv% ")
-	SifrarnikLekova searchByNazivLikeIgnoreCase(@Param("naziv") String naziv);
+	
+	SifrarnikLekova searchByNazivIgnoreCase(@Param("naziv") String naziv);
 	
 }
