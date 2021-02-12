@@ -210,8 +210,6 @@ public class DermatologController {
 		Korisnik user = (Korisnik) this.userDetailsService.loadUserByUsername(username);
 		List<Authority> authority = (List<Authority>) user.getAuthorities();
 		
-		//new UserTokenState(token, tokenUtils.getExpiredIn(), authority.get(0).getName(), "ulogovan");
-	
 		
 		String status1 = status.statusNovi;
 		user.setStatus(status1);
