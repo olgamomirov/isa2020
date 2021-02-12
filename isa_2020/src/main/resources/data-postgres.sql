@@ -66,14 +66,12 @@ insert into "public"."loyalty_program" ( "kategorija_korisnika", "popust", "prag
 insert into "public"."loyalty_program" ( "kategorija_korisnika", "popust", "prag_poena") values( 'silver', 5.0, 7)
 
 
-insert into "public"."pacijent" ("id", "penal", "alergija_id", "poeni", "loyalty_program_id") values(5,0, null, 3,1)
-
 --pacijent Ivica ima alergiju na bromazepam
 insert into "public"."alergije" ("id") values(1)
 insert into "public"."alergije_na_lek" ( "alergija_id","sifrarnik_leka_id") values(1,1)
 insert into "public"."pacijent" ("id","penal", "alergija_id", "poeni", "loyalty_program_id") values(3,0,1,5,1)
 
-
+insert into "public"."pacijent" ("id", "penal", "alergija_id", "poeni", "loyalty_program_id") values(5,0, null, 3,1)
 
 insert into "public"."authority" ("name") values ('ROLE_PACIJENT')
 insert into "public"."authority" ("name") values ('ROLE_DERMATOLOG')
@@ -106,8 +104,8 @@ insert into "public"."tip_pregleda" ( "cena", "tip", "poeni", "apoteka_id") valu
 
 insert into "public"."pregled" ( "dijagnoza", "interval", "status", "terapija", "apoteka_id", "dermatolog_id", "farmaceut_id", "pacijent_id", "tip_id") values( null, '2021-04-07T08:00:00.000+01:00/2021-04-07T08:30:00.000+01:00', 'rezervisan', null, 2, 2, null, 3, 3)
 insert into "public"."pregled" ( "dijagnoza", "interval", "status", "terapija", "apoteka_id", "dermatolog_id", "farmaceut_id", "pacijent_id", "tip_id") values( 'kontrola', '2021-01-30T14:20:00.000+01:00/2021-01-30T15:00:00.000+01:00', 'odradjen', 'bromazepam svaki drugi dan', 2, 2, null, 3, 3)
-insert into "public"."pregled" ( "dijagnoza", "interval", "status", "terapija", "apoteka_id", "dermatolog_id", "farmaceut_id", "pacijent_id", "tip_id") values( null, '2021-02-18T14:15:00.000+01:00/2021-02-18T14:45:00.000+01:00', 'rezervisan', null, 2, 2, null, 5, 3)
-insert into "public"."pregled" ( "dijagnoza", "interval", "status", "terapija", "apoteka_id", "dermatolog_id", "farmaceut_id", "pacijent_id", "tip_id") values( null, '2021-02-17T09:15:00.000+01:00/2021-02-17T09:45:00.000+01:00', 'rezervisan', null, 2, null, 4, 3, 4)
+insert into "public"."pregled" ( "dijagnoza", "interval", "status", "terapija", "apoteka_id", "dermatolog_id", "farmaceut_id", "pacijent_id", "tip_id") values( null, '2021-02-15T18:55:00.000+01:00/2021-02-15T19:25:00.000+01:00', 'rezervisan', null, 2, 2, null, 5, 3)
+insert into "public"."pregled" ( "dijagnoza", "interval", "status", "terapija", "apoteka_id", "dermatolog_id", "farmaceut_id", "pacijent_id", "tip_id") values( null, '2021-02-15T19:10:00.000+01:00/2021-02-15T19:40:00.000+01:00', 'rezervisan', null, 2, null, 4, 3, 4)
 insert into "public"."pregled" ( "dijagnoza", "interval", "status", "terapija", "apoteka_id", "dermatolog_id", "farmaceut_id", "pacijent_id", "tip_id") values( null, '2021-03-09T16:45:00.000+01:00/2021-03-09T17:15:00.000+01:00', 'default', null, 2, 2, null, null, 3)
 insert into "public"."pregled" ( "dijagnoza", "interval", "status", "terapija", "apoteka_id", "dermatolog_id", "farmaceut_id", "pacijent_id", "tip_id") values( null, '2021-02-16T13:55:00.000+01:00/2021-02-16T14:25:00.000+01:00', 'rezervisan', null, 2, null, 4, 5, 4)
 insert into "public"."pregled" ( "dijagnoza", "interval", "status", "terapija", "apoteka_id", "dermatolog_id", "farmaceut_id", "pacijent_id", "tip_id") values( null, '2021-05-09T10:25:00.000+01:00/2021-05-09T10:55:00.000+01:00', 'rezervisan', null, 3, 2, null, 5, 5)
@@ -125,6 +123,9 @@ insert into "public"."zamene_lekova" ( "lek_id", "zamena_id") values( 5, 3)
 --febricet je zamena fervex-u
 insert into "public"."zamene_lekova" ( "lek_id", "zamena_id") values( 2, 4)
 insert into "public"."zamene_lekova" ( "lek_id", "zamena_id") values( 4, 2)
+
+insert into "public"."zamene_lekova" ( "lek_id", "zamena_id") values( 2, 3)
+insert into "public"."zamene_lekova" ( "lek_id", "zamena_id") values( 3, 2)
 
 insert into "public"."lek" ( "kolicina", "apoteka_id", "sifra_leka_id") values( 5, 1, 1)
 insert into "public"."lek" ( "kolicina", "apoteka_id", "sifra_leka_id") values( 10, 2, 1)

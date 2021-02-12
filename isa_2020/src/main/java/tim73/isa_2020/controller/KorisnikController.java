@@ -258,7 +258,7 @@ public class KorisnikController {
 
 		for (Pregled p : f.getPregledi()) {
 			if (p.getInterval().equals(null)) {
-				System.out.println("nema datuma");
+				
 			} else {
 				if (p.getStatus().equals("odradjen")) {
 					pacijenti.add(p.getPacijent());
@@ -281,13 +281,17 @@ public class KorisnikController {
 		List<Korisnik> korisnici = korisnikService.findAll();
 
 		List<Korisnik> pacijenti = new ArrayList<Korisnik>();
-
+		
 		for (Korisnik k : korisnici) {
-			for (GrantedAuthority a : k.getAuthorities()) {
-				if (a.getAuthority().equals("ROLE_PACIJENT")) {
+			System.out.println(k.getEmail());
+			String authority = ((List<Authority>) k.getAuthorities()).get(0).getName();
+			
+				System.out.println(authority);
+			
+				if (authority.equals("ROLE_PACIJENT")) {
 					pacijenti.add((Pacijent) k);
 				}
-			}
+			
 		}
 		List<PacijentPodaciDTO> dto = new ArrayList<PacijentPodaciDTO>();
 		for (Korisnik k : pacijenti) {
