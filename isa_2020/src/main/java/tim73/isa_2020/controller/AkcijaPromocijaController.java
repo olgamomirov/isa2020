@@ -68,7 +68,7 @@ public class AkcijaPromocijaController {
 		Set<Lek> lek=adminA.getApoteka().getLekovi();
 		Set<StavkeAkcijePromocije> lekoviNaAkciji= new HashSet<StavkeAkcijePromocije>();
 		for(String naziv:novaAkcProm.getLekoviNaAkciji()) {
-			System.out.println(naziv);
+			
 			for(Lek l:lek) {
 				if(l.getSifrarnikLekova().getNaziv().equals(naziv)) {
 					StavkeAkcijePromocije stavka=new StavkeAkcijePromocije(l);

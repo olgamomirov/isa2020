@@ -88,14 +88,14 @@ public class ScheduledTasks {
 		
 		for(Pregled p: pregledService.proveraPregleda()) {
 			DateTime vremePregleda= new DateTime(p.getInterval().split("/")[0]);
-			System.out.println("jel radi ovo? :( " + vremePregleda);
+			
 			if(p.getStatus().equals("default")) {
 				if((((vremePregleda.getMillis())-System.currentTimeMillis())<0)) { //ako je unapred definisan pregled ne ceka se 10 minuta, odmah odlazi u neodradjene
 					p.setStatus("neodradjen");
 					pregledService.save(p);	
 				}
 			}else if(p.getStatus().equals("u toku")) {
-				System.out.println("kako nema u toku");
+				
 				DateTime krajPregleda= new DateTime(p.getInterval().split("/")[1]);
 				if((((krajPregleda.getMillis()+60000)-System.currentTimeMillis())<0)) { 
 					p.setStatus("neodradjen");
@@ -117,7 +117,7 @@ public class ScheduledTasks {
 				}
 			}else if(p.getStatus().equals("rezervisan")){
 				if((((vremePregleda.getMillis()+600000)-System.currentTimeMillis())<0)) { //moze najkasnije 10 miinuta da zakasni sa zapocinjanjem pregleda
-System.out.println(p.getStatus());
+
 
 					p.setStatus("neodradjen");
 					if(p.getPacijent()!=null) {
@@ -197,7 +197,7 @@ System.out.println(p.getStatus());
 			DateTime rok= new DateTime(n.getRokPonude());
 			
 				if((((rok.getMillis())-System.currentTimeMillis())<0)) {
-                   System.out.println(n.getPonude());
+                   
 					for(Ponuda p: n.getPonude()) {
 						p.setRokIstekao(true);
 						ponudaService.save(p);
